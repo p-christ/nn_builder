@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23a6e8dc-8ac2-458d-9d58-ea9921f6be62" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Pytorch_NN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pytorch_NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/Pytorch_NN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,14 +33,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="md" value="99" />
-          <entry key="py" value="830" />
+          <entry key="md" value="112" />
+          <entry key="py" value="1646" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Markdown" value="99" />
-          <entry key="Python" value="830" />
+          <entry key="Markdown" value="112" />
+          <entry key="Python" value="1646" />
         </counts>
       </usages-collector>
     </session>
@@ -52,8 +51,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="120">
-                <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
+              <first_editor relative-caret-position="225">
+                <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
               </first_editor>
               <second_editor />
             </state>
@@ -63,12 +62,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Pytorch_NN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+            <state relative-caret-position="-400">
               <folding>
-                <element signature="e#0#12#0" expanded="true" />
-                <marker date="1553963436471" expanded="true" signature="109:2895" ph="..." />
-                <marker date="1553963436471" expanded="true" signature="803:1077" ph="..." />
+                <marker date="1553964023090" expanded="true" signature="55:3131" ph="..." />
+                <marker date="1553964023090" expanded="true" signature="869:1020" ph="..." />
+                <marker date="1553964023090" expanded="true" signature="1118:1339" ph="..." />
+                <marker date="1553964023090" expanded="true" signature="1457:1793" ph="..." />
               </folding>
             </state>
           </provider>
@@ -178,8 +177,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="120">
-            <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
+          <first_editor relative-caret-position="225">
+            <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
           </first_editor>
           <second_editor />
         </state>
@@ -187,12 +186,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Pytorch_NN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+        <state relative-caret-position="-400">
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
-            <marker date="1553963436471" expanded="true" signature="109:2895" ph="..." />
-            <marker date="1553963436471" expanded="true" signature="803:1077" ph="..." />
+            <marker date="1553964023090" expanded="true" signature="55:3131" ph="..." />
+            <marker date="1553964023090" expanded="true" signature="869:1020" ph="..." />
+            <marker date="1553964023090" expanded="true" signature="1118:1339" ph="..." />
+            <marker date="1553964023090" expanded="true" signature="1457:1793" ph="..." />
           </folding>
         </state>
       </provider>

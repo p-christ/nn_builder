@@ -4,10 +4,10 @@ from PyTorch_Base_Network import PyTorch_Base_Network
 class Neural_Network(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network """
 
-    def __init__(self, input_dim, linear_hidden_units, hidden_activations, output_dim, output_activation,
-                 initialiser="default", batch_norm=False, cols_to_embed=None, embedding_dimensions=[]):
+    def __init__(self, input_dim: int, linear_hidden_units: list, hidden_activations, output_dim: int, output_activation: str,
+                 initialiser: str ="default", batch_norm: bool =False, cols_to_embed=None, embedding_dimensions: list =[]):
         super(Neural_Network, self).__init__()
-        super(PyTorch_Base_Network, self).__init__()
+        PyTorch_Base_Network.__init__(self)
 
         self.input_dim = input_dim
         self.linear_hidden_units = linear_hidden_units
@@ -24,12 +24,12 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
 
         self.linear_layers = nn.ModuleList([])
         if self.batch_norm: self.batch_norm_layers = nn.ModuleList([])
-        if cols_to_embed is not None: self.embedding_layers = nn.ModuleList([])
+        self.embedding_layers = nn.ModuleList([])
 
         self.create_linear_and_batch_norm_layers()
         self.create_embedding_layers()
 
-        self.initialise_all_parameters(self.linear_layers + self.embedding_layers)
+        self.initialise_all_parameters()
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
@@ -54,7 +54,12 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
             input_dim, output_dim = embedding_dimension
             self.embedding_layers.extend([nn.Embedding(input_dim, output_dim)])
 
+    def initialise_all_parameters(self):
+        self.initialise_parameters(self.linear_layers)
+        self.initialise_parameters(self.embedding_layers)
+
     def forward(self, x):
 
         pass
 
+# Neural_Network(input_dim = 2, linear_hidden_units = [2, 2], hidden_activations="relu", output_dim=3, output_activation="relu", initialiser="her")

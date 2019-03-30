@@ -28,12 +28,6 @@ class Neural_Network(nn.Module):
         self.create_linear_and_batch_norm_layers()
         self.create_embedding_layers()
 
-    def check_all_user_inputs_valid(self):
-        """Checks that all the user inputs were valid"""
-        self.check_hidden_units_valid()
-        self.check_activations_valid()
-        self.check_embedding_dimensions_valid()
-
     def create_str_to_activations_converter(self):
         """Creates a dictionary which converts strings to activations"""
         str_to_activations_converter = {"ELU": nn.ELU(), "Hardshrink": nn.Hardshrink(), "Hardtanh": nn.Hardtanh(),
@@ -47,16 +41,26 @@ class Neural_Network(nn.Module):
         return str_to_activations_converter
 
 
+    def check_all_user_inputs_valid(self):
+        """Checks that all the user inputs were valid"""
+        self.check_hidden_units_valid()
+        self.check_activations_valid()
+        self.check_embedding_dimensions_valid()
+
+
     def check_activations_valid(self):
+        """Checks that user input for hidden_activations and output_activation is valid"""
+        valid_activations_strings = self.str_to_activations_converter.keys()
+        assert self.output_activation in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
 
-
-        assert self.output_activation, str), "Output activation must "
-
-        for activations in [self.hidden_activations, self.output_activation]:
-            assert isinstance(activations, list) or isinstance(activations, str), "Activations must be a list or a string"
-
-
-
+        if isinstance(self.hidden_activations, str):
+            assert self.hidden_activations in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)
+        elif isinstance(self.hidden_activations, list):
+            assert len(self.hidden_activations) == len(self.hidden_units), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
+            for activation in self.hidden_activations:
+                assert activation in set(valid_activations_strings), "each element in hidden_activations must be from list {}".format(valid_activations_strings)
+        else:
+            raise TypeError("hidden_activations must be a string or a list of strings")
 
     def check_hidden_units_valid(self):
         """Checks that user input for hidden_units is valid"""
@@ -96,7 +100,7 @@ class Neural_Network(nn.Module):
             elif self.initialiser == "Default":
                 continue
             else:
-                raise NotImplementedError
+                raise NotImplementedError("There is only support for activations 'Xavier', 'He', 'Default'")
 
 
 

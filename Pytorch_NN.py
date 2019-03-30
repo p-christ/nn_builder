@@ -2,15 +2,19 @@ import torch.nn as nn
 
 class Neural_Network(nn.Module):
 
-    def __init__(self, input_dim, hidden_units, output_dim, initialiser, batch_norm, cols_to_embed, embedding_dimensions=[]):
-
+    def __init__(self, input_dim, hidden_units, hidden_activations, output_dim, output_activation,
+                 initialiser, batch_norm, cols_to_embed, embedding_dimensions=[]):
         super(Neural_Network, self).__init__()
 
         self.input_dim = input_dim
         self.hidden_units = hidden_units
+        self.hidden_activations = hidden_activations
         self.output_dim = output_dim
+        self.output_activation = output_activation
         self.initialiser = initialiser
         self.batch_norm = batch_norm
+
+        self.str_to_activations_converter = self.create_str_to_activations_converter()
 
         self.cols_to_embed = cols_to_embed
         self.embedding_dimensions = embedding_dimensions
@@ -26,8 +30,33 @@ class Neural_Network(nn.Module):
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        self.check_embedding_dimensions_valid()
         self.check_hidden_units_valid()
+        self.check_activations_valid()
+        self.check_embedding_dimensions_valid()
+
+    def create_str_to_activations_converter(self):
+        """Creates a dictionary which converts strings to activations"""
+        str_to_activations_converter = {"ELU": nn.ELU(), "Hardshrink": nn.Hardshrink(), "Hardtanh": nn.Hardtanh(),
+                                        "LeakyReLU": nn.LeakyReLU(), "LogSigmoid": nn.LogSigmoid(), "PReLU": nn.PReLU(),
+                                        "ReLU": nn.ReLU(), "ReLU6": nn.ReLU6(),"RReLU": nn.RReLU(), "SELU": nn.SELU(),
+                                        "CELU": nn.CELU(), "Sigmoid": nn.Sigmoid(), "Softplus": nn.Softplus(),"Softshrink": nn.Softshrink(),
+                                        "Softsign": nn.Softsign(), "Tanh": nn.Tanh(), "Tanhshrink": nn.Tanhshrink(),
+                                        "Threshold": nn.Threshold(), "Softmin": nn.Softmin(), "Softmax": nn.Softmax(),
+                                        "Softmax2d": nn.Softmax2d(), "LogSoftmax": nn.LogSoftmax(),
+                                        "AdaptiveLogSoftmaxWithLoss": nn.AdaptiveLogSoftmaxWithLoss()}
+        return str_to_activations_converter
+
+
+    def check_activations_valid(self):
+
+
+        assert self.output_activation, str), "Output activation must "
+
+        for activations in [self.hidden_activations, self.output_activation]:
+            assert isinstance(activations, list) or isinstance(activations, str), "Activations must be a list or a string"
+
+
+
 
     def check_hidden_units_valid(self):
         """Checks that user input for hidden_units is valid"""

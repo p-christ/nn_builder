@@ -2,10 +2,12 @@ import torch.nn as nn
 from PyTorch_Base_Network import PyTorch_Base_Network
 
 class Neural_Network(nn.Module, PyTorch_Base_Network):
+    """Creates a PyTorch neural network """
 
     def __init__(self, input_dim, linear_hidden_units, hidden_activations, output_dim, output_activation,
-                 initialiser, batch_norm, cols_to_embed, embedding_dimensions=[]):
+                 initialiser="default", batch_norm=False, cols_to_embed=None, embedding_dimensions=[]):
         super(Neural_Network, self).__init__()
+        super(PyTorch_Base_Network, self).__init__()
 
         self.input_dim = input_dim
         self.linear_hidden_units = linear_hidden_units
@@ -15,9 +17,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         self.initialiser = initialiser
         self.batch_norm = batch_norm
 
-        self.str_to_activations_converter = self.create_str_to_activations_converter()
-        self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
-
         self.cols_to_embed = cols_to_embed
         self.embedding_dimensions = embedding_dimensions
 
@@ -25,15 +24,16 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
 
         self.linear_layers = nn.ModuleList([])
         if self.batch_norm: self.batch_norm_layers = nn.ModuleList([])
-        self.embedding_layers = nn.ModuleList([])
+        if cols_to_embed is not None: self.embedding_layers = nn.ModuleList([])
 
         self.create_linear_and_batch_norm_layers()
         self.create_embedding_layers()
 
-        self.initialise_all_parameters()
+        self.initialise_all_parameters(self.linear_layers + self.embedding_layers)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
+        self.check_input_and_output_dim_valid()
         self.check_linear_hidden_units_valid()
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()
@@ -53,18 +53,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         for embedding_dimension in self.embedding_dimensions:
             input_dim, output_dim = embedding_dimension
             self.embedding_layers.extend([nn.Embedding(input_dim, output_dim)])
-
-    def initialise_all_parameters(self):
-        """Initialises all the parameters of the network"""
-        for parameters in self.linear_layers + self.embedding_layers:
-            if self.initialiser == "Xavier":
-                nn.init.xavier_normal_(parameters.weight)
-            elif self.initialiser == "He":
-                nn.init.kaiming_normal_(parameters.weight)
-            elif self.initialiser == "Default":
-                continue
-            else:
-                raise NotImplementedError("There is only support for activations 'Xavier', 'He', 'Default'")
 
     def forward(self, x):
 

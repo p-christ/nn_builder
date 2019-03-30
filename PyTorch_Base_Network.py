@@ -3,7 +3,9 @@ import torch.nn as nn
 class PyTorch_Base_Network(object):
 
     def __init__(self):
-        raise NotImplementedError("This is an abstract class, it isn't meant to be instantiated")
+        self.str_to_activations_converter = self.create_str_to_activations_converter()
+        self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
+
 
     def create_str_to_activations_converter(self):
         """Creates a dictionary which converts strings to activations"""
@@ -25,15 +27,21 @@ class PyTorch_Base_Network(object):
                                         "xavier_normal": nn.init.xavier_normal_,
                                         "kaiming_uniform": nn.init.kaiming_uniform_,
                                         "kaiming_normal": nn.init.kaiming_normal_, "he": nn.init.kaiming_normal_,
-                                        "orthogonal": nn.init.orthogonal_, "sparse": nn.init.sparse_}
-
+                                        "orthogonal": nn.init.orthogonal_, "sparse": nn.init.sparse_, "default": None}
         return str_to_initialiser_converter
+
+    def check_input_and_output_dim_valid(self):
+        """Checks that user input for input_dim and output_dim is valid"""
+        for dim in [self.input_dim, self.output_dim]:
+            assert isinstance(dim, int), "input_dim and output_dim must be integers"
+            assert dim > 0, "input_dim and output_dim must be 1 or higher"
 
     def check_linear_hidden_units_valid(self):
         """Checks that user input for hidden_units is valid"""
         assert isinstance(self.linear_hidden_units, list), "hidden_units must be a list"
         for hidden_unit in self.linear_hidden_units:
             assert isinstance(hidden_unit, int), "hidden_units must be a list of integers"
+            assert hidden_unit > 0, "Every element of hidden_units must be 1 or higher"
 
     def check_activations_valid(self):
         """Checks that user input for hidden_activations and output_activation is valid"""
@@ -60,3 +68,8 @@ class PyTorch_Base_Network(object):
         """Checks that user input for initialiser is valid"""
         valid_initialisers = set(self.str_to_initialiser_converter.keys())
         assert self.initialiser.lower() in valid_initialisers, "initialiser must be from list {}".format(valid_initialisers)
+
+    def initialise_all_parameters(self, parameters_list):
+        """Initialises the list of parameters given"""
+        for parameters in parameters_list:
+            self.str_to_initialiser_converter[self.initialiser.lower()](parameters.weight)

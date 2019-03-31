@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23a6e8dc-8ac2-458d-9d58-ea9921f6be62" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.cache/v/cache/lastfailed" beforeDir="false" afterPath="$PROJECT_DIR$/.cache/v/cache/lastfailed" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PyTorch_Base_Network.py" beforeDir="false" afterPath="$PROJECT_DIR$/PyTorch_Base_Network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PyTorch_NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/PyTorch_NN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tests/test_PyTorch_NN.py" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/test_PyTorch_NN.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,15 +37,15 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="3" />
-          <entry key="md" value="112" />
-          <entry key="py" value="5474" />
+          <entry key="md" value="187" />
+          <entry key="py" value="7573" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Markdown" value="112" />
+          <entry key="Markdown" value="187" />
           <entry key="PLAIN_TEXT" value="3" />
-          <entry key="Python" value="5474" />
+          <entry key="Python" value="7573" />
         </counts>
       </usages-collector>
     </session>
@@ -55,8 +56,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="225">
-                <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+              <first_editor relative-caret-position="255">
+                <caret line="17" column="69" selection-start-line="17" selection-start-column="69" selection-end-line="17" selection-end-column="69" />
               </first_editor>
               <second_editor />
             </state>
@@ -66,15 +67,15 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PyTorch_NN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-379">
-              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+            <state relative-caret-position="1043">
+              <caret line="126" lean-forward="true" selection-start-line="110" selection-end-line="126" />
               <folding>
-                <element signature="e#0#21#0" expanded="true" />
-                <marker date="1553972119079" expanded="true" signature="175:2592" ph="..." />
-                <marker date="1553972119079" expanded="true" signature="1274:1279" ph="..." />
-                <marker date="1553972119079" expanded="true" signature="1595:1596" ph="..." />
-                <marker date="1553972119079" expanded="true" signature="1596:1601" ph="..." />
-                <marker date="1553972119079" expanded="true" signature="2437:2556" ph="..." />
+                <element signature="e#0#12#0" expanded="true" />
+                <marker date="1554048466943" expanded="true" signature="207:4527" ph="..." />
+                <marker date="1554048466943" expanded="true" signature="1402:1407" ph="..." />
+                <marker date="1554048466943" expanded="true" signature="1723:1724" ph="..." />
+                <marker date="1554048466943" expanded="true" signature="1724:1729" ph="..." />
+                <marker date="1554048466943" expanded="true" signature="2841:3021" ph="..." />
               </folding>
             </state>
           </provider>
@@ -83,11 +84,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PyTorch_Base_Network.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1140">
-              <caret line="76" column="46" lean-forward="true" selection-start-line="76" selection-start-column="46" selection-end-line="76" selection-end-column="46" />
+            <state relative-caret-position="161">
+              <caret line="63" column="39" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="39" />
               <folding>
-                <marker date="1553972119083" expanded="true" signature="258:264" ph="..." />
-                <marker date="1553972119083" expanded="true" signature="258:2466" ph="..." />
+                <marker date="1554047869436" expanded="true" signature="258:264" ph="..." />
+                <marker date="1554047869436" expanded="true" signature="258:2538" ph="..." />
               </folding>
             </state>
           </provider>
@@ -96,11 +97,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tests/test_PyTorch_NN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" column="50" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
+            <state relative-caret-position="510">
+              <caret line="34" selection-start-line="34" selection-end-line="34" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
-                <marker date="1553970875012" expanded="true" signature="1119:1447" ph="..." />
+                <marker date="1554045884771" expanded="true" signature="1149:1489" ph="..." />
+                <marker date="1554045884771" expanded="true" signature="1688:2214" ph="..." />
               </folding>
             </state>
           </provider>
@@ -117,8 +119,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>str_to_activations_converter</find>
       <find>self.str_to_activations_converter.keys</find>
+      <find>str_to_activations_converter</find>
+      <find>TypeErro</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -127,11 +130,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/Pytorch_NN.py" />
         <option value="$PROJECT_DIR$/Tests/Test_PyTorch_NN.py" />
         <option value="$PROJECT_DIR$/Tests/test_PyTorch_NN.py" />
         <option value="$PROJECT_DIR$/PyTorch_Base_Network.py" />
+        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/PyTorch_NN.py" />
       </list>
     </option>
@@ -276,49 +279,50 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Tests/test_PyTorch_NN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <marker date="1554045884771" expanded="true" signature="1149:1489" ph="..." />
+            <marker date="1554045884771" expanded="true" signature="1688:2214" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="225">
-            <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+          <first_editor relative-caret-position="255">
+            <caret line="17" column="69" selection-start-line="17" selection-start-column="69" selection-end-line="17" selection-end-column="69" />
           </first_editor>
           <second_editor />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Tests/test_PyTorch_NN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="50" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-            <marker date="1553970875012" expanded="true" signature="1119:1447" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/PyTorch_Base_Network.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1140">
-          <caret line="76" column="46" lean-forward="true" selection-start-line="76" selection-start-column="46" selection-end-line="76" selection-end-column="46" />
+        <state relative-caret-position="161">
+          <caret line="63" column="39" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="39" />
           <folding>
-            <marker date="1553972119083" expanded="true" signature="258:264" ph="..." />
-            <marker date="1553972119083" expanded="true" signature="258:2466" ph="..." />
+            <marker date="1554047869436" expanded="true" signature="258:264" ph="..." />
+            <marker date="1554047869436" expanded="true" signature="258:2538" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PyTorch_NN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-379">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="1043">
+          <caret line="126" lean-forward="true" selection-start-line="110" selection-end-line="126" />
           <folding>
-            <element signature="e#0#21#0" expanded="true" />
-            <marker date="1553972119079" expanded="true" signature="175:2592" ph="..." />
-            <marker date="1553972119079" expanded="true" signature="1274:1279" ph="..." />
-            <marker date="1553972119079" expanded="true" signature="1595:1596" ph="..." />
-            <marker date="1553972119079" expanded="true" signature="1596:1601" ph="..." />
-            <marker date="1553972119079" expanded="true" signature="2437:2556" ph="..." />
+            <element signature="e#0#12#0" expanded="true" />
+            <marker date="1554048466943" expanded="true" signature="207:4527" ph="..." />
+            <marker date="1554048466943" expanded="true" signature="1402:1407" ph="..." />
+            <marker date="1554048466943" expanded="true" signature="1723:1724" ph="..." />
+            <marker date="1554048466943" expanded="true" signature="1724:1729" ph="..." />
+            <marker date="1554048466943" expanded="true" signature="2841:3021" ph="..." />
           </folding>
         </state>
       </provider>

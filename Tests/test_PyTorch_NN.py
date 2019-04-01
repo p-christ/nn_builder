@@ -10,7 +10,6 @@ X_for_embedding = torch.LongTensor(N, 2).random_(0, 14)
 y = X[:, 0] > 0
 y = y.float()
 
-
 def test_linear_hidden_units_user_input():
     """Tests whether network rejects an invalid linear_hidden_units input from user"""
     inputs_that_should_fail = ["a", ["a", "b"], [2, 4, "ss"], [-2], 2]
@@ -131,9 +130,7 @@ def test_incorporate_embeddings():
                                  output_dim=5,
                                  embedding_dimensions=[[50, 3],
                                                        [55, 4]])
-
     out = nn_instance.incorporate_embeddings(X, X_for_embedding)
-
     assert out.shape == (N, X.shape[1]+3+4)
 
 def test_batch_norm_layers():
@@ -174,10 +171,8 @@ def solves_simple_problem(X, y, nn_instance):
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""
-    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.9999)
+    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.9999)
     assert nn_instance.dropout_layer.p == 0.9999
     assert not solves_simple_problem(X, y, nn_instance)
-    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.01)
+    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.01)
     assert solves_simple_problem(X, y, nn_instance)
-
-test_incorporate_embeddings()

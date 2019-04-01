@@ -3,7 +3,6 @@ import numpy as np
 import torch.nn as nn
 from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
 
-
 #TODO
 # 1) Allow different dropout values per layer
 # 2) Allow embedding layer dropout
@@ -15,7 +14,7 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None", hidden_activations="relu",
                  dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, embedding_dimensions: list =[], print_model_summary=True):
 
-        super(Neural_Network, self).__init__()
+        nn.Module.__init__(self)
         PyTorch_Base_Network.__init__(self)
 
         self.input_dim = input_dim
@@ -111,8 +110,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
         to then be put through the linear layers"""
         assert x_for_embeddings.type() == "torch.LongTensor", "Data for embedding must be of type Long"
-
-        print("INCORPORATING EMBEDDINGS!!!")
         all_embedded_data = []
         for embedding_var in range(x_for_embeddings.shape[1]):
             data = x_for_embeddings[:, embedding_var]
@@ -121,25 +118,3 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
         x = torch.cat((x, all_embedded_data), dim=1)
         return x
-
-
-
-
-# batch norm on first layer option...
-
-
-#
-# z = []
-#
-#
-# nn1 = Neural_Network(input_dim = 12, linear_hidden_units = [2, 2], hidden_activations="relu",
-#                     output_dim=3, output_activation="relu", initialiser="he", cols_to_embed=[0, 5],
-#                     embedding_dimensions=[ [20, 4], [30, 9]], batch_norm=True
-#                     )
-#
-# x = torch.randn((25, 12)) + 5.0
-
-#
-
-
-# nn.

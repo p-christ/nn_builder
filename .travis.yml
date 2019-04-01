@@ -9,7 +9,6 @@ install:
   - pip install numpy -q
   - pip install torch -q
 
-
 script:
   - export PYTHONPATH="$PYTHONPATH:$PWD"
   - pytest Tests/*.py

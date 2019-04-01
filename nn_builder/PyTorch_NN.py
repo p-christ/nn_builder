@@ -13,8 +13,7 @@ from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
 class Neural_Network(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network"""
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None", hidden_activations="relu",
-                 dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, cols_to_embed: list =[],
-                 embedding_dimensions: list =[], print_model_summary=True):
+                 dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, embedding_dimensions: list =[], print_model_summary=True):
 
         super(Neural_Network, self).__init__()
         PyTorch_Base_Network.__init__(self)
@@ -27,7 +26,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         self.initialiser = initialiser
         self.batch_norm = batch_norm
 
-        self.cols_to_embed = cols_to_embed
         self.embedding_dimensions = embedding_dimensions
 
         self.check_all_user_inputs_valid()
@@ -73,10 +71,12 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         return embedding_layers
 
     def initialise_all_parameters(self):
+        """Initialises the parameters in the linear and embedding layers"""
         self.initialise_parameters(self.linear_layers)
         self.initialise_parameters(self.embedding_layers)
 
     def get_activation(self, activations, ix=None):
+        """Gets the activation function"""
         if isinstance(activations, list):
             return self.str_to_activations_converter[activations[ix].lower()]
         return self.str_to_activations_converter[activations.lower()]
@@ -92,9 +92,9 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
             print(self.linear_layers[layer_ix])
             if self.batch_norm and layer_ix != len(self.linear_layers) - 1: print(self.batch_norm_layers[layer_ix])
 
-    def forward(self, x):
+    def forward(self, x, x_for_embeddings=None):
         """Forward pass for the network"""
-        if len(self.embedding_dimensions) > 0: x = self.incorporate_embeddings(x)
+        if len(self.embedding_dimensions) > 0: x = self.incorporate_embeddings(x, x_for_embeddings)
         for layer_ix in range(len(self.linear_hidden_units)):
             linear_layer = self.linear_layers[layer_ix]
             activation = self.get_activation(self.hidden_activations, layer_ix)
@@ -107,23 +107,19 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         if final_activation is not None: x = final_activation(x)
         return x
 
-    def incorporate_embeddings(self, x):
+    def incorporate_embeddings(self, x, x_for_embeddings):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
         to then be put through the linear layers"""
+        assert x_for_embeddings.type() == "torch.LongTensor", "Data for embedding must be of type Long"
 
-        data_to_be_embedded = x[:, self.cols_to_embed]
-
+        print("INCORPORATING EMBEDDINGS!!!")
         all_embedded_data = []
-
-        for embedding_var in range(data_to_be_embedded.shape[1]):
-            data = data_to_be_embedded[:, embedding_var]
-            data = data.long()
+        for embedding_var in range(x_for_embeddings.shape[1]):
+            data = x_for_embeddings[:, embedding_var]
             embedded_data = self.embedding_layers[embedding_var](data)
             all_embedded_data.append(embedded_data)
-
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
-        data_not_to_be_embedded = x[:, [col for col in range(x.shape[1]) if col not in self.cols_to_embed]]
-        x = torch.cat((all_embedded_data, data_not_to_be_embedded), dim=1)
+        x = torch.cat((x, all_embedded_data), dim=1)
         return x
 
 

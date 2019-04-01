@@ -1,11 +1,10 @@
 import torch.nn as nn
 
 class PyTorch_Base_Network(object):
-
+    """Base class for PyTorch neural network classes"""
     def __init__(self):
         self.str_to_activations_converter = self.create_str_to_activations_converter()
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
-
 
     def create_str_to_activations_converter(self):
         """Creates a dictionary which converts strings to activations"""
@@ -58,12 +57,7 @@ class PyTorch_Base_Network(object):
 
     def check_embedding_dimensions_valid(self):
         """Checks that user input for embedding_dimensions is valid"""
-
-        assert isinstance(self.cols_to_embed, list), "cols_to_embed must be a list"
-        for col in self.cols_to_embed:
-            assert isinstance(col, int)
         assert isinstance(self.embedding_dimensions, list), "embedding_dimensions must be a list"
-        assert len(self.cols_to_embed) == len(self.embedding_dimensions), "embedding_dimensions and cols_to_embed must be same length"
         for embedding_dim in self.embedding_dimensions:
             assert len(embedding_dim) == 2 and isinstance(embedding_dim, list), \
                 "Each element of embedding_dimensions must be of form (input_dim, output_dim)"

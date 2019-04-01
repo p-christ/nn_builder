@@ -5,7 +5,8 @@ import torch.optim as optim
 from nn_builder.PyTorch_NN import Neural_Network
 
 N = 25
-X = torch.randn((N, 3))
+X = torch.randn((N, 2))
+X_for_embedding = torch.LongTensor(N, 2).random_(0, 14)
 y = X[:, 0] > 0
 y = y.float()
 
@@ -114,7 +115,7 @@ def test_embedding_layers():
     """Tests whether create_embedding_layers method works correctly"""
     for embedding_in_dim_1, embedding_out_dim_1, embedding_in_dim_2, embedding_out_dim_2 in zip(range(5, 8), range(3, 6), range(1, 4), range(24, 27)):
         nn_instance = Neural_Network(input_dim=5, linear_hidden_units=[5],
-                                     output_dim=5, cols_to_embed = [4, 5],
+                                     output_dim=5,
                                      embedding_dimensions =[[embedding_in_dim_1, embedding_out_dim_1], [embedding_in_dim_2, embedding_out_dim_2]])
         for layer in nn_instance.embedding_layers:
             assert isinstance(layer, nn.Embedding)
@@ -123,6 +124,17 @@ def test_embedding_layers():
         assert nn_instance.embedding_layers[0].embedding_dim == embedding_out_dim_1
         assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
         assert nn_instance.embedding_layers[1].embedding_dim == embedding_out_dim_2
+
+def test_incorporate_embeddings():
+    """Tests the method incorporate_embeddings"""
+    nn_instance = Neural_Network(input_dim=5, linear_hidden_units=[5],
+                                 output_dim=5,
+                                 embedding_dimensions=[[50, 3],
+                                                       [55, 4]])
+
+    out = nn_instance.incorporate_embeddings(X, X_for_embedding)
+
+    assert out.shape == (N, X.shape[1]+3+4)
 
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""
@@ -140,18 +152,19 @@ def test_batch_norm_layers():
 def test_model_trains():
     """Tests whether a small range of networks can solve a simple task"""
     for output_activation in ["sigmoid", "None"]:
-        nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1,
+        nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=1,
                                      output_activation=output_activation, dropout=0.01, batch_norm=True)
         assert solves_simple_problem(X, y, nn_instance)
     z = X[:, 0:1] > 0
     z =  torch.cat([z ==1, z==0], dim=1).float()
-    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=2,
+    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=2,
                                  output_activation="softmax", dropout=0.01, batch_norm=True)
     assert solves_simple_problem(X, z, nn_instance)
 
 def solves_simple_problem(X, y, nn_instance):
+    """Checks if a given network is able to solve a simple problem"""
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
-    for ix in range(300):
+    for ix in range(800):
         out = nn_instance.forward(X)
         loss = torch.sum((out.squeeze() - y) ** 2) / 25.0
         optimizer.zero_grad()
@@ -161,8 +174,10 @@ def solves_simple_problem(X, y, nn_instance):
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""
-    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.9999)
+    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.9999)
     assert nn_instance.dropout_layer.p == 0.9999
     assert not solves_simple_problem(X, y, nn_instance)
-    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.01)
+    nn_instance = Neural_Network(input_dim=X.shape[1], linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.01)
     assert solves_simple_problem(X, y, nn_instance)
+
+test_incorporate_embeddings()

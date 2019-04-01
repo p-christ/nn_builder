@@ -4,6 +4,12 @@ import torch.nn as nn
 import torch.optim as optim
 from nn_builder.PyTorch_NN import Neural_Network
 
+N = 25
+X = torch.randn((N, 3))
+y = X[:, 0] > 0
+y = y.float()
+
+
 def test_linear_hidden_units_user_input():
     """Tests whether network rejects an invalid linear_hidden_units input from user"""
     inputs_that_should_fail = ["a", ["a", "b"], [2, 4, "ss"], [-2], 2]
@@ -13,7 +19,7 @@ def test_linear_hidden_units_user_input():
 
 def test_input_dim_output_dim_user_input():
     """Tests whether network rejects an invalid input_dim or output_dim input from user"""
-    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, set([2])]
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}]
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
             Neural_Network(input_dim=input_value, linear_hidden_units=[2], hidden_activations="relu", output_dim=2, output_activation="relu")
@@ -22,7 +28,7 @@ def test_input_dim_output_dim_user_input():
 
 def test_activations_user_input():
     """Tests whether network rejects an invalid hidden_activations or output_activation from user"""
-    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, set([2]), "Xavier_"]
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
             Neural_Network(input_dim=2, linear_hidden_units=[2], hidden_activations=input_value, output_dim=2,
@@ -32,7 +38,7 @@ def test_activations_user_input():
 
 def test_initialiser_user_input():
     """Tests whether network rejects an invalid initialiser from user"""
-    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, set([2]), "Xavier_"]
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
             Neural_Network(input_dim=2, linear_hidden_units=[2], hidden_activations="relu", output_dim=2,
@@ -92,11 +98,9 @@ def test_linear_layers():
         nn_instance = Neural_Network(input_dim=input_dim, linear_hidden_units=hidden_units,
                                      hidden_activations="relu",
                                      output_dim=output_dim, output_activation="relu", initialiser="xavier", print_model_summary=False)
-
         for layer in nn_instance.linear_layers:
             assert isinstance(layer, nn.Linear)
         assert len(nn_instance.linear_layers) == len(hidden_units) + 1
-
         assert nn_instance.linear_layers[0].in_features == input_dim
         assert nn_instance.linear_layers[0].out_features == hidden_units[0]
         assert nn_instance.linear_layers[1].in_features == hidden_units[0]
@@ -112,11 +116,9 @@ def test_embedding_layers():
         nn_instance = Neural_Network(input_dim=5, linear_hidden_units=[5],
                                      output_dim=5, cols_to_embed = [4, 5],
                                      embedding_dimensions =[[embedding_in_dim_1, embedding_out_dim_1], [embedding_in_dim_2, embedding_out_dim_2]])
-
         for layer in nn_instance.embedding_layers:
             assert isinstance(layer, nn.Embedding)
         assert len(nn_instance.embedding_layers) == 2
-
         assert nn_instance.embedding_layers[0].num_embeddings == embedding_in_dim_1
         assert nn_instance.embedding_layers[0].embedding_dim == embedding_out_dim_1
         assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
@@ -128,39 +130,26 @@ def test_batch_norm_layers():
         nn_instance = Neural_Network(input_dim=input_dim, linear_hidden_units=hidden_units,
                                      hidden_activations="relu",
                                      output_dim=output_dim, output_activation="relu", initialiser="xavier", print_model_summary=False)
-
         for layer in nn_instance.batch_norm_layers:
             assert isinstance(layer, nn.BatchNorm1d)
         assert len(nn_instance.batch_norm_layers) == len(hidden_units)
-
         assert nn_instance.batch_norm_layers[0].num_features == hidden_units[0]
         assert nn_instance.batch_norm_layers[1].num_features == hidden_units[1]
         assert nn_instance.batch_norm_layers[2].num_features == hidden_units[2]
 
-
 def test_model_trains():
     """Tests whether a small range of networks can solve a simple task"""
-    N = 25
-    X = torch.randn((N, 3))
-    y = X[:, 0] > 0
-    y = y.float()
-
     for output_activation in ["sigmoid", "None"]:
-        nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, output_activation=output_activation)
-        optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
-        for ix in range(300):
-            out = nn_instance.forward(X)
-            loss = torch.sum((out.squeeze() - y)**2) / 25.0
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-        assert loss < 0.01
-
-
-    y = X[:, 0:1] > 0
-    y =  torch.cat([y ==1, y==0], dim=1).float()
+        nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1,
+                                     output_activation=output_activation, dropout=0.01, batch_norm=True)
+        assert solves_simple_problem(X, y, nn_instance)
+    z = X[:, 0:1] > 0
+    z =  torch.cat([z ==1, z==0], dim=1).float()
     nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=2,
-                                 output_activation="softmax")
+                                 output_activation="softmax", dropout=0.01, batch_norm=True)
+    assert solves_simple_problem(X, z, nn_instance)
+
+def solves_simple_problem(X, y, nn_instance):
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
     for ix in range(300):
         out = nn_instance.forward(X)
@@ -168,9 +157,12 @@ def test_model_trains():
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-    assert loss < 0.01
+    return loss < 0.01
 
-
-
-
-test_model_trains()
+def test_dropout():
+    """Tests whether dropout layer reads in probability correctly"""
+    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.9999)
+    assert nn_instance.dropout_layer.p == 0.9999
+    assert not solves_simple_problem(X, y, nn_instance)
+    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, dropout=0.01)
+    assert solves_simple_problem(X, y, nn_instance)

@@ -11,8 +11,7 @@ from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
 # 4) Allow batch norm for input layer
 
 class Neural_Network(nn.Module, PyTorch_Base_Network):
-    """Creates a PyTorch neural network """
-
+    """Creates a PyTorch neural network"""
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None", hidden_activations="relu",
                  dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, cols_to_embed: list =[],
                  embedding_dimensions: list =[], print_model_summary=True):
@@ -60,7 +59,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         linear_layers.extend([nn.Linear(hidden_unit, self.output_dim)])
         return linear_layers
 
-
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
         batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.linear_hidden_units])
@@ -88,7 +86,6 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         print("-------------")
         print(self.embedding_layers)
         print(" ")
-
         print("Linear layers")
         print("-------------")
         for layer_ix in range(len(self.linear_layers)):
@@ -96,26 +93,23 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
             if self.batch_norm and layer_ix != len(self.linear_layers) - 1: print(self.batch_norm_layers[layer_ix])
 
     def forward(self, x):
-
-        if len(self.embedding_dimensions) > 0:
-            x = self.incorporate_embeddings(x)
-
+        """Forward pass for the network"""
+        if len(self.embedding_dimensions) > 0: x = self.incorporate_embeddings(x)
         for layer_ix in range(len(self.linear_hidden_units)):
             linear_layer = self.linear_layers[layer_ix]
             activation = self.get_activation(self.hidden_activations, layer_ix)
             x = activation(linear_layer(x))
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
             x = self.dropout_layer(x)
-
         final_activation = self.get_activation(self.output_activation)
         final_layer = self.linear_layers[-1]
         x = final_layer(x)
-
         if final_activation is not None: x = final_activation(x)
-
         return x
 
     def incorporate_embeddings(self, x):
+        """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
+        to then be put through the linear layers"""
 
         data_to_be_embedded = x[:, self.cols_to_embed]
 

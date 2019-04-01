@@ -1,7 +1,7 @@
 import pytest
 import torch
 import torch.nn as nn
-
+import torch.optim as optim
 from PyTorch_NN import Neural_Network
 
 def test_linear_hidden_units_user_input():
@@ -122,9 +122,6 @@ def test_embedding_layers():
         assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
         assert nn_instance.embedding_layers[1].embedding_dim == embedding_out_dim_2
 
-
-
-
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""
     for input_dim, output_dim, hidden_units in zip( range(5, 8), range(9, 12), [[2, 9, 2], [3, 5, 6], [9, 12, 2]]):
@@ -141,4 +138,25 @@ def test_batch_norm_layers():
         assert nn_instance.batch_norm_layers[2].num_features == hidden_units[2]
 
 
+def test_model_trains():
 
+    N = 25
+    X = torch.randn((N, 3))
+    y = X[:, 0] > 0
+    y = y.float()
+
+    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, output_activation="sigmoid")
+    optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
+    for ix in range(1000):
+        out = nn_instance.forward(X)
+        loss = torch.sum((out - y)**2)
+        # print(out)
+        # print(y.float())
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        print(loss)
+
+
+test_model_trains()

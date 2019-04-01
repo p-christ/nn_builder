@@ -106,11 +106,24 @@ def test_linear_layers():
         assert nn_instance.linear_layers[3].in_features == hidden_units[2]
         assert nn_instance.linear_layers[3].out_features == output_dim
 
-
-
 def test_embedding_layers():
     """Tests whether create_embedding_layers method works correctly"""
-    pass
+    for embedding_in_dim_1, embedding_out_dim_1, embedding_in_dim_2, embedding_out_dim_2 in zip(range(5, 8), range(3, 6), range(1, 4), range(24, 27)):
+        nn_instance = Neural_Network(input_dim=5, linear_hidden_units=[5],
+                                     output_dim=5, cols_to_embed = [4, 5],
+                                     embedding_dimensions =[[embedding_in_dim_1, embedding_out_dim_1], [embedding_in_dim_2, embedding_out_dim_2]])
+
+        for layer in nn_instance.embedding_layers:
+            assert isinstance(layer, nn.Embedding)
+        assert len(nn_instance.embedding_layers) == 2
+
+        assert nn_instance.embedding_layers[0].num_embeddings == embedding_in_dim_1
+        assert nn_instance.embedding_layers[0].embedding_dim == embedding_out_dim_1
+        assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
+        assert nn_instance.embedding_layers[1].embedding_dim == embedding_out_dim_2
+
+
+
 
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""

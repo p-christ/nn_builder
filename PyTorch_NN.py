@@ -14,7 +14,7 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network """
 
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None", hidden_activations="relu",
-                 dropout: float = 0.0, initialiser: str ="default", batch_norm: bool =False, cols_to_embed: list =[],
+                 dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, cols_to_embed: list =[],
                  embedding_dimensions: list =[], print_model_summary=True):
 
         super(Neural_Network, self).__init__()

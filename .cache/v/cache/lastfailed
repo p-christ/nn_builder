@@ -1,3 +1,4 @@
 {
-  "Tests/Test_PyTorch_NN.py": true
+  "Tests/Test_PyTorch_NN.py": true,
+  "Tests/test_PyTorch_NN.py::test_batch_norm_layers": true
 }

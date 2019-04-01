@@ -13,7 +13,7 @@ script:
   - export PYTHONPATH="$PYTHONPATH:$PWD"
   - export PYTHONPATH="${PYTHONPATH}:/home/travis/build/p-christ/Neural-Network-Builder/Tests"
   - export PYTHONPATH="${PYTHONPATH}:/home/travis/build/p-christ/Neural-Network-Builder"
-  - pytest Tests/*.py
+  - python -m pytest /home/travis/build/p-christ/Neural-Network-Builder/Tests/
 
 
 

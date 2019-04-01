@@ -15,7 +15,7 @@ class PyTorch_Base_Network(object):
                                         "sigmoid": nn.Sigmoid(), "softplus": nn.Softplus(), "logsoftmax": nn.LogSoftmax(),
                                         "softshrink": nn.Softshrink(), "softsign": nn.Softsign(), "tanh": nn.Tanh(),
                                         "tanhshrink": nn.Tanhshrink(), "softmin": nn.Softmin(), "softmax": nn.Softmax(),
-                                        "softmax2d": nn.Softmax2d() }
+                                        "softmax2d": nn.Softmax2d(), "none": None}
         return str_to_activations_converter
 
     def create_str_to_initialiser_converter(self):
@@ -46,7 +46,7 @@ class PyTorch_Base_Network(object):
     def check_activations_valid(self):
         """Checks that user input for hidden_activations and output_activation is valid"""
         valid_activations_strings = self.str_to_activations_converter.keys()
-        assert self.output_activation in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
+        assert self.output_activation.lower() in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
         assert isinstance(self.hidden_activations, str) or isinstance(self.hidden_activations, list), "hidden_activations must be a string or a list of strings"
         if isinstance(self.hidden_activations, str):
             assert self.hidden_activations.lower() in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)

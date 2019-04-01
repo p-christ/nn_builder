@@ -2,7 +2,7 @@ import pytest
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from PyTorch_NN import Neural_Network
+from nn_builder.PyTorch_NN import Neural_Network
 
 def test_linear_hidden_units_user_input():
     """Tests whether network rejects an invalid linear_hidden_units input from user"""
@@ -139,24 +139,38 @@ def test_batch_norm_layers():
 
 
 def test_model_trains():
-
+    """Tests whether a small range of networks can solve a simple task"""
     N = 25
     X = torch.randn((N, 3))
     y = X[:, 0] > 0
     y = y.float()
 
-    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, output_activation="sigmoid")
+    for output_activation in ["sigmoid", "None"]:
+        nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=1, output_activation=output_activation)
+        optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
+        for ix in range(300):
+            out = nn_instance.forward(X)
+            loss = torch.sum((out.squeeze() - y)**2) / 25.0
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        assert loss < 0.01
+
+
+    y = X[:, 0:1] > 0
+    y =  torch.cat([y ==1, y==0], dim=1).float()
+    nn_instance = Neural_Network(input_dim=3, linear_hidden_units=[10, 10, 10], output_dim=2,
+                                 output_activation="softmax")
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
-    for ix in range(1000):
+    for ix in range(300):
         out = nn_instance.forward(X)
-        loss = torch.sum((out - y)**2)
-        # print(out)
-        # print(y.float())
+        loss = torch.sum((out.squeeze() - y) ** 2) / 25.0
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+    assert loss < 0.01
 
-        print(loss)
+
 
 
 test_model_trains()

@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import torch.nn as nn
-from PyTorch_Base_Network import PyTorch_Base_Network
+from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
 
 
 #TODO

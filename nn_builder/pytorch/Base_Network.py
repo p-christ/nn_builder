@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-class PyTorch_Base_Network(object):
+class Base_Network(object):
     """Base class for PyTorch neural network classes"""
     def __init__(self):
         self.str_to_activations_converter = self.create_str_to_activations_converter()

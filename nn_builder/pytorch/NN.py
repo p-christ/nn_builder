@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import torch.nn as nn
-from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
+from nn_builder.pytorch.Base_Network import Base_Network
 
 #TODO
 # 1) Allow different dropout values per layer
@@ -9,13 +9,14 @@ from nn_builder.PyTorch_Base_Network import PyTorch_Base_Network
 # 3) Introduce a y_range set of values
 # 4) Allow batch norm for input layer
 
-class Neural_Network(nn.Module, PyTorch_Base_Network):
+class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network"""
-    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None", hidden_activations="relu",
-                 dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False, embedding_dimensions: list =[], print_model_summary=True):
+    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
+                 hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
+                 embedding_dimensions: list =[], print_model_summary: bool =False):
 
         nn.Module.__init__(self)
-        PyTorch_Base_Network.__init__(self)
+        Base_Network.__init__(self)
 
         self.input_dim = input_dim
         self.linear_hidden_units = linear_hidden_units
@@ -81,10 +82,11 @@ class Neural_Network(nn.Module, PyTorch_Base_Network):
         return self.str_to_activations_converter[activations.lower()]
 
     def print_model_summary(self):
-        print("Embedding layers")
-        print("-------------")
-        print(self.embedding_layers)
-        print(" ")
+        if len(self.embedding_layers) > 0:
+            print("Embedding layers")
+            print("-------------")
+            print(self.embedding_layers)
+            print(" ")
         print("Linear layers")
         print("-------------")
         for layer_ix in range(len(self.linear_layers)):

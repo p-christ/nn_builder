@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: executable-file
+Version: 0.1
+Summary: Build neural networks in 1 line
+Home-page: https://github.com/p-christ/nn_builder
+Author: Petros Christodoulou
+Author-email: p.christodoulou2@gmail.com
+License: UNKNOWN
+Description: # Neural-Network-Builder
+        
+        Creates custom PyTorch neural networks in 1 line according to your specifications. 
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown

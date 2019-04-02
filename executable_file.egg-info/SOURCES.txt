@@ -1,0 +1,13 @@
+README.md
+executable_file
+setup.py
+executable_file.egg-info/PKG-INFO
+executable_file.egg-info/SOURCES.txt
+executable_file.egg-info/dependency_links.txt
+executable_file.egg-info/top_level.txt
+nn_builder/__init__.py
+nn_builder/pytorch/Base_Network.py
+nn_builder/pytorch/NN.py
+nn_builder/pytorch/__init__.py
+tests/__init__.py
+tests/test_PyTorch_NN.py

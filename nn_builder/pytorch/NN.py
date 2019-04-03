@@ -8,6 +8,7 @@ from nn_builder.pytorch.Base_Network import Base_Network
 # 2) Allow embedding layer dropout
 # 3) Introduce a y_range set of values
 # 4) Allow batch norm for input layer
+# 5) Convert numpy arrays to pytorch arrays
 
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network"""

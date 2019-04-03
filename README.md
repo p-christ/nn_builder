@@ -27,7 +27,11 @@ NN then takes the following fields:
 `
 1. ***input_dim***: integer to indicate the dimension of the input into the network
 1. ***linear_hidden_units***: list of integers to indicate the width and number of linear hidden layers you want in your network
-1. 
+1. ***output_dim***: integer to indicate the dimension of the output of the network
+1. ***output_activation***: string to indicate the activation function you want the output to go through. Default is no activation 
+and then for example "softmax" puts it through a softmax activation, and "sigmoid" through a sigmoid activation.
+1. ***hidden_activations***: string or list of string to indicate the activations you want used on the output of hidden layers (not including the output layer),
+default is ReLU and for example "tanh" would have tanh applied on all hidden layer activations
 1. print_model_summary: boolean to indicate whether you want a model summary printed after model is created
 `
 

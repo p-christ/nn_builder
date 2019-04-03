@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
-Name: executable-file
-Version: 0.1
+Name: nn-builder
+Version: 0.0.1
 Summary: Build neural networks in 1 line
 Home-page: https://github.com/p-christ/nn_builder
 Author: Petros Christodoulou

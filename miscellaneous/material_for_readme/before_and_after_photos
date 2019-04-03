@@ -1,0 +1,25 @@
+from nn_builder.pytorch.NN import NN
+
+model = NN(input_dim=25, linear_hidden_units=[150, 100, 50], output_dim=1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from nn_builder.pytorch.NN import NN
+
+model = NN(input_dim=25, linear_hidden_units=[150, 100, 50, 50, 50, 50],
+           output_dim=5, output_activation="softmax", dropout=0.5,
+           initialiser="xavier")

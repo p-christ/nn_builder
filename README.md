@@ -20,11 +20,9 @@ For more complicated networks the difference becomes even greater:
 
 ### 1. PyTorch NN Module
 
-The PyTorch NN module lets you build feedforward (rather than CNNs or RNNs) PyTorch neural networks in one line. To import the PyTorch NN module run: 
+The PyTorch NN module lets you build feedforward (rather than CNNs or RNNs) PyTorch neural networks in one line. 
 
-`from nn_builder.pytorch.NN import NN`
-
-NN then takes the following fields:
+First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arguments:
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
@@ -42,6 +40,10 @@ NN then takes the following fields:
 
 See this [colab notebook](https://colab.research.google.com/drive/1abxTEaUrJqbTuk8e8tOa3y9DYQQVrF_N) for demonstrations 
 of how to use this module.  
+
+### 2. Other Modules
+
+Coming soon.
 
 ## Contributing
 

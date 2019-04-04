@@ -8,13 +8,12 @@ from nn_builder.pytorch.Base_Network import Base_Network
 # 2) Allow embedding layer dropout
 # 3) Introduce a y_range set of values
 # 4) Allow batch norm for input layer
-# 5) Convert numpy arrays to pytorch arrays
 
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network"""
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 embedding_dimensions: list =[], print_model_summary: bool =False):
+                 embedding_dimensions: list =[], y_range: tuple = (), print_model_summary: bool =False):
 
         nn.Module.__init__(self)
         Base_Network.__init__(self)
@@ -26,6 +25,7 @@ class NN(nn.Module, Base_Network):
         self.output_activation = output_activation
         self.initialiser = initialiser
         self.batch_norm = batch_norm
+        self.y_range = y_range
 
         self.embedding_dimensions = embedding_dimensions
 
@@ -107,12 +107,16 @@ class NN(nn.Module, Base_Network):
         final_layer = self.linear_layers[-1]
         x = final_layer(x)
         if final_activation is not None: x = final_activation(x)
+        if self.y_range: x = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(x)
         return x
 
     def incorporate_embeddings(self, x, x_for_embeddings):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
         to then be put through the linear layers"""
-        assert x_for_embeddings.type() == "torch.LongTensor", "Data for embedding must be of type Long"
+        try:
+            assert x_for_embeddings.type() == "torch.LongTensor", "Data for embedding must be of type Long"
+        except AttributeError:
+            raise ValueError("Data for embedding must be a torch tensor of type Long")
         all_embedded_data = []
         for embedding_var in range(x_for_embeddings.shape[1]):
             data = x_for_embeddings[:, embedding_var]

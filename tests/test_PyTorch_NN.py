@@ -1,5 +1,8 @@
+# Run from home directory with python -m pytest tests
 import pytest
 import torch
+import random
+import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.NN import NN
@@ -160,7 +163,7 @@ def test_model_trains():
 
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
-    optimizer = optim.Adam(nn_instance.parameters(), lr=0.1)
+    optimizer = optim.Adam(nn_instance.parameters(), lr=0.05)
     for ix in range(800):
         out = nn_instance.forward(X)
         loss = torch.sum((out.squeeze() - y) ** 2) / 25.0
@@ -176,3 +179,21 @@ def test_dropout():
     assert not solves_simple_problem(X, y, nn_instance)
     nn_instance = NN(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.01)
     assert solves_simple_problem(X, y, nn_instance)
+
+def test_y_range():
+    """Tests whether setting a y range works correctly"""
+    for _ in range(100):
+        val1 = random.random() - 3.0*random.random()
+        val2 = random.random() + 2.0*random.random()
+        lower_bound = min(val1, val2)
+        upper_bound = max(val1, val2)
+        nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3, y_range=(lower_bound, upper_bound))
+        random_data = torch.randn(15, 5)
+        out = nn_instance.forward(random_data)
+
+        assert torch.sum(out > lower_bound).item() == 3*15, "lower {} vs. {} ".format(lower_bound, out)
+        assert torch.sum(out < upper_bound).item() == 3*15, "upper {} vs. {} ".format(upper_bound, out)
+
+
+
+

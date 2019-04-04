@@ -7,11 +7,11 @@
 **nn_builder creates neural networks in 1 line**. It makes it easier for you to create neural networks and quickly experiment
 with different architectures. 
 
-On the left is the code you would need to write to create a PyTorch neural network equivalent to the one line of code on the right using nn_builder: 
+On the left is the large amount of code you would need to write to create a PyTorch neural network equivalent to the only one line of code on the right using nn_builder: 
 
 ![Screenshot](miscellaneous/material_for_readme/simple_use_case.png)
 
-For more complicated networks the difference becomes even greater:
+For more complicated networks the difference is even greater:
 
 ![Screenshot](miscellaneous/material_for_readme/more_complicated_use_case.png)
 

@@ -45,10 +45,11 @@ of how to use this module.
 
 ## Contributing
 
-Anyone is very welcome to contribute via a pull request. Please:
+Anyone is very welcome to contribute via a pull request. Please see the [Issues](https://github.com/p-christ/nn_builder/issues) 
+page for ideas on the best areas to contribute to and try to:
 1. Add tests to the tests folder that cover any code you write
 1. Write comments for every function
-1. If you add functionality then create a colab notebook demonstrating how it works
+1. Create a colab notebook demonstrating how any extra functionality you created works 
 
  
 

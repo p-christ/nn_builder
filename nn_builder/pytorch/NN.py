@@ -6,11 +6,28 @@ from nn_builder.pytorch.Base_Network import Base_Network
 #TODO
 # 1) Allow different dropout values per layer
 # 2) Allow embedding layer dropout
-# 3) Introduce a y_range set of values
 # 4) Allow batch norm for input layer
 
 class NN(nn.Module, Base_Network):
-    """Creates a PyTorch neural network"""
+    """Creates a PyTorch neural network
+    Args:
+          input_dim: Integer to indicate the dimension of the input into the network
+          linear_hidden_units: List of integers to indicate the width and number of linear hidden layers you want in your network
+          output_dim: Integer to indicate the dimension of the output of the network
+          output_activation: String to indicate the activation function you want the output to go through
+          hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
+                              (not including the output layer). Default is ReLU.
+          dropout: Float to indicate what dropout probability you want applied after each hidden layer
+          initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
+                       initialisers are supported. PyTorch's default initialisation is the default.
+          batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
+          embedding_dimensions: If you have categorical variables you want embedded before flowing through the network then
+                                you specify the embedding dimensions here with a list like so: [ [embedding_input_dim_1, embedding_output_dim_1],
+                                [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
+          y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
+                   output values to in regression tasks. Default is no range restriction
+          print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
+    """
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  embedding_dimensions: list =[], y_range: tuple = (), print_model_summary: bool =False):

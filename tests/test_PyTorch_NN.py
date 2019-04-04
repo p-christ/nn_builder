@@ -163,10 +163,10 @@ def test_model_trains():
 
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
-    optimizer = optim.Adam(nn_instance.parameters(), lr=0.05)
+    optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
     for ix in range(800):
         out = nn_instance.forward(X)
-        loss = torch.sum((out.squeeze() - y) ** 2) / 250.0
+        loss = torch.sum((out.squeeze() - y) ** 2) / N
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

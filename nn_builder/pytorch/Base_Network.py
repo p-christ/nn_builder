@@ -68,6 +68,14 @@ class Base_Network(object):
         assert isinstance(self.initialiser, str), "initialiser must be a string from list {}".format(valid_initialisers)
         assert self.initialiser.lower() in valid_initialisers, "initialiser must be from list {}".format(valid_initialisers)
 
+    def check_y_range_values_valid(self):
+        """Checks that user input for y_range is valid"""
+        if self.y_range:
+            assert isinstance(self.y_range, tuple) and len(self.y_range) == 2, "y_range must be a tuple of 2 floats or integers"
+            for elem in range(2):
+                assert isinstance(self.y_range[elem], float) or isinstance(self.y_range[elem], int), "y_range must be a tuple of 2 floats or integers"
+            assert self.y_range[0] <= self.y_range[1], "y_range's first element must be smaller than the second element"
+
     def initialise_parameters(self, parameters_list: nn.ModuleList):
         """Initialises the list of parameters given"""
         initialiser = self.str_to_initialiser_converter[self.initialiser.lower()]

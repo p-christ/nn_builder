@@ -47,6 +47,7 @@ class NN(nn.Module, Base_Network):
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
+        self.check_y_range_values_valid()
 
     def create_linear_layers(self):
         """Creates the linear layers in the network"""

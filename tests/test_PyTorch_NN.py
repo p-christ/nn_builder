@@ -180,6 +180,16 @@ def test_dropout():
     nn_instance = NN(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.01)
     assert solves_simple_problem(X, y, nn_instance)
 
+def test_y_range_user_input():
+    """Tests whether network rejects invalid y_range inputs"""
+    invalid_y_range_inputs = [ (4, 1), (2, 4, 8), [2, 4], (np.array(2.0), 6.9)]
+    for y_range_value in invalid_y_range_inputs:
+        with pytest.raises(AssertionError):
+            print(y_range_value)
+            nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3,
+                             y_range=y_range_value)
+
+
 def test_y_range():
     """Tests whether setting a y range works correctly"""
     for _ in range(100):
@@ -190,7 +200,6 @@ def test_y_range():
         nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3, y_range=(lower_bound, upper_bound))
         random_data = torch.randn(15, 5)
         out = nn_instance.forward(random_data)
-
         assert torch.sum(out > lower_bound).item() == 3*15, "lower {} vs. {} ".format(lower_bound, out)
         assert torch.sum(out < upper_bound).item() == 3*15, "upper {} vs. {} ".format(upper_bound, out)
 

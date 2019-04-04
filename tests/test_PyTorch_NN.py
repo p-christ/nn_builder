@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.NN import NN
 
-N = 25
+N = 250
 X = torch.randn((N, 2))
 X_for_embedding = torch.LongTensor(N, 2).random_(0, 14)
 y = X[:, 0] > 0
@@ -166,11 +166,11 @@ def solves_simple_problem(X, y, nn_instance):
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.05)
     for ix in range(800):
         out = nn_instance.forward(X)
-        loss = torch.sum((out.squeeze() - y) ** 2) / 25.0
+        loss = torch.sum((out.squeeze() - y) ** 2) / 250.0
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-    return loss < 0.01
+    return loss < 0.1
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""
@@ -201,7 +201,4 @@ def test_y_range():
         out = nn_instance.forward(random_data)
         assert torch.sum(out > lower_bound).item() == 3*15, "lower {} vs. {} ".format(lower_bound, out)
         assert torch.sum(out < upper_bound).item() == 3*15, "upper {} vs. {} ".format(upper_bound, out)
-
-
-
 

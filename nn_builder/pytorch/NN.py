@@ -143,3 +143,5 @@ class NN(nn.Module, Base_Network):
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
         x = torch.cat((x, all_embedded_data), dim=1)
         return x
+
+

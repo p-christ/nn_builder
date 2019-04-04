@@ -177,7 +177,7 @@ def test_dropout():
     nn_instance = NN(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.9999)
     assert nn_instance.dropout_layer.p == 0.9999
     assert not solves_simple_problem(X, y, nn_instance)
-    nn_instance = NN(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.01)
+    nn_instance = NN(input_dim=X.shape[1], linear_hidden_units=[10, 10], output_dim=1, dropout=0.00001)
     assert solves_simple_problem(X, y, nn_instance)
 
 def test_y_range_user_input():
@@ -188,7 +188,6 @@ def test_y_range_user_input():
             print(y_range_value)
             nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3,
                              y_range=y_range_value)
-
 
 def test_y_range():
     """Tests whether setting a y range works correctly"""

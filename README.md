@@ -1,5 +1,7 @@
 # Neural Network Builder (nn_builder)
 
+![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master)
+
 `pip install nn_builder`
 
 nn_builder creates neural networks in 1 line. 

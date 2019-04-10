@@ -140,7 +140,7 @@ def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""
     for input_dim, output_dim, hidden_units in zip( range(5, 8), range(9, 12), [[2, 9, 2], [3, 5, 6], [9, 12, 2]]):
         nn_instance = NN(input_dim=input_dim, linear_hidden_units=hidden_units,
-                                     hidden_activations="relu",
+                                     hidden_activations="relu", batch_norm=True,
                                      output_dim=output_dim, output_activation="relu", initialiser="xavier", print_model_summary=False)
         for layer in nn_instance.batch_norm_layers:
             assert isinstance(layer, nn.BatchNorm1d)

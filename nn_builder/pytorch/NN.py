@@ -49,7 +49,7 @@ class NN(nn.Module, Base_Network):
         self.check_all_user_inputs_valid()
 
         self.linear_layers = self.create_linear_layers()
-        self.batch_norm_layers = self.create_batch_norm_layers()
+        if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.embedding_layers = self.create_embedding_layers()
 
         self.dropout_layer = nn.Dropout(p=dropout)
@@ -81,7 +81,7 @@ class NN(nn.Module, Base_Network):
         for hidden_unit in self.linear_hidden_units:
             linear_layers.extend([nn.Linear(input_dim, hidden_unit)])
             input_dim = hidden_unit
-        linear_layers.extend([nn.Linear(hidden_unit, self.output_dim)])
+        linear_layers.extend([nn.Linear(input_dim, self.output_dim)])
         return linear_layers
 
     def create_batch_norm_layers(self):

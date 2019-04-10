@@ -1,4 +1,5 @@
 import torch
+import random
 import numpy as np
 import torch.nn as nn
 from nn_builder.pytorch.Base_Network import Base_Network
@@ -30,11 +31,10 @@ class NN(nn.Module, Base_Network):
     """
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 embedding_dimensions: list =[], y_range: tuple = (), print_model_summary: bool =False):
-
+                 embedding_dimensions: list =[], y_range: tuple = (), random_seed=0, print_model_summary: bool =False):
+        self.set_all_random_seeds(random_seed)
         nn.Module.__init__(self)
         Base_Network.__init__(self)
-
         self.input_dim = input_dim
         self.linear_hidden_units = linear_hidden_units
         self.hidden_activations = hidden_activations
@@ -56,6 +56,14 @@ class NN(nn.Module, Base_Network):
         self.initialise_all_parameters()
 
         if print_model_summary: self.print_model_summary()
+
+    def set_all_random_seeds(self, random_seed):
+        """Sets all possible random seeds so results can be reproduced"""
+        torch.backends.cudnn.deterministic = True
+        torch.manual_seed(random_seed)
+        random.seed(random_seed)
+        np.random.seed(random_seed)
+        if torch.cuda.is_available(): torch.cuda.manual_seed_all(random_seed)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

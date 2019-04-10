@@ -45,6 +45,7 @@ class Base_Network(object):
     def check_activations_valid(self):
         """Checks that user input for hidden_activations and output_activation is valid"""
         valid_activations_strings = self.str_to_activations_converter.keys()
+        if self.output_activation is None: self.output_activation = "None"
         assert self.output_activation.lower() in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
         assert isinstance(self.hidden_activations, str) or isinstance(self.hidden_activations, list), "hidden_activations must be a string or a list of strings"
         if isinstance(self.hidden_activations, str):

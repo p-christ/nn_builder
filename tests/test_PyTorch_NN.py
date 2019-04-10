@@ -202,3 +202,6 @@ def test_y_range():
         assert torch.sum(out > lower_bound).item() == 3*15, "lower {} vs. {} ".format(lower_bound, out)
         assert torch.sum(out < upper_bound).item() == 3*15, "upper {} vs. {} ".format(upper_bound, out)
 
+def test_deals_with_None_activation():
+    """Tests whether is able to handle user inputting None as output activation"""
+    nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3, output_activation=None)

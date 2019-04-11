@@ -131,7 +131,6 @@ class NN(nn.Module, Base_Network):
     def forward(self, x):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
-
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix in range(len(self.linear_hidden_units)):
             linear_layer = self.linear_layers[layer_ix]
@@ -153,8 +152,10 @@ class NN(nn.Module, Base_Network):
             data = x[:, embedding_dim]
             data_long = data.long()
             assert all(data_long >= 0), "All data to be embedded must be integers 0 and above -- {}".format(data_long)
-            assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, "Data columns to be embedded should be integers"
-
+            assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, """Data columns to be embedded should be integer 
+                                                                                values 0 and above to represent the different 
+                                                                                classes"""
+        if len(self.columns_of_data_to_be_embedded) < x.shape[1]: assert isinstance(x, torch.FloatTensor)
         self.checked_forward_input_data_once = True #So that it doesn't check again
 
     def incorporate_embeddings(self, x):

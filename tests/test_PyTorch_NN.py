@@ -230,3 +230,20 @@ def test_y_range():
 def test_deals_with_None_activation():
     """Tests whether is able to handle user inputting None as output activation"""
     nn_instance = NN(input_dim=5, linear_hidden_units=[10, 10], output_dim=3, output_activation=None)
+
+def test_check_input_data_into_forward_once():
+    """Tests that check_input_data_into_forward_once method only runs once"""
+    data_to_throw_error = torch.randn(N, 2)
+    X = torch.randn(N, 2) * 5.0 + 20.0
+    y = (X[:, 0] >= 20) * (X[:, 1] <= 20)
+    X = X.long()
+    nn_instance = NN(input_dim=2, linear_hidden_units=[5],
+                     output_dim=1,
+                     columns_of_data_to_be_embedded=[0, 1],
+                     embedding_dimensions=[[50, 3],
+                                           [55, 3]])
+    with pytest.raises(AssertionError):
+        nn_instance.forward(data_to_throw_error)
+    with pytest.raises(RuntimeError):
+        nn_instance.forward(X)
+        nn_instance.forward(data_to_throw_error)

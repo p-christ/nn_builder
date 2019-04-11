@@ -22,6 +22,8 @@ class NN(nn.Module, Base_Network):
         - initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
                        initialisers are supported. PyTorch's default initialisation is the default.
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
+        - columns_of_data_to_be_embedded: List to indicate the columns numbers of the data that you want to be put through an embedding layer
+                                          before being fed through the other layers of the network. Default option is no embeddings
         - embedding_dimensions: If you have categorical variables you want embedded before flowing through the network then
                                 you specify the embedding dimensions here with a list like so: [ [embedding_input_dim_1, embedding_output_dim_1],
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
@@ -31,7 +33,8 @@ class NN(nn.Module, Base_Network):
     """
     def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 embedding_dimensions: list =[], y_range: tuple = (), random_seed=0, print_model_summary: bool =False):
+                 columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
+                 random_seed=0, print_model_summary: bool =False):
         self.set_all_random_seeds(random_seed)
         nn.Module.__init__(self)
         Base_Network.__init__(self)
@@ -44,6 +47,8 @@ class NN(nn.Module, Base_Network):
         self.batch_norm = batch_norm
         self.y_range = y_range
 
+        self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
+        self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
 
         self.check_all_user_inputs_valid()
@@ -54,6 +59,9 @@ class NN(nn.Module, Base_Network):
 
         self.dropout_layer = nn.Dropout(p=dropout)
         self.initialise_all_parameters()
+
+        # Flag we use to run checks on the input data into forward the first time it is entered
+        self.checked_forward_input_data_once = False
 
         if print_model_summary: self.print_model_summary()
 
@@ -120,9 +128,11 @@ class NN(nn.Module, Base_Network):
             print(self.linear_layers[layer_ix])
             if self.batch_norm and layer_ix != len(self.linear_layers) - 1: print(self.batch_norm_layers[layer_ix])
 
-    def forward(self, x, x_for_embeddings=None):
+    def forward(self, x):
         """Forward pass for the network"""
-        if len(self.embedding_dimensions) > 0: x = self.incorporate_embeddings(x, x_for_embeddings)
+        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
+
+        if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix in range(len(self.linear_hidden_units)):
             linear_layer = self.linear_layers[layer_ix]
             activation = self.get_activation(self.hidden_activations, layer_ix)
@@ -136,18 +146,25 @@ class NN(nn.Module, Base_Network):
         if self.y_range: x = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(x)
         return x
 
-    def incorporate_embeddings(self, x, x_for_embeddings):
+    def check_input_data_into_forward_once(self, x):
+        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
+        so that we don't keep checking as this would slow down the model too much"""
+        for embedding_dim in self.columns_of_data_to_be_embedded:
+            data = x[:, embedding_dim]
+            data_long = data.long()
+            assert all(data_long >= 0), "All data to be embedded must be integers 0 and above -- {}".format(data_long)
+            assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, "Data columns to be embedded should be integers"
+
+        self.checked_forward_input_data_once = True #So that it doesn't check again
+
+    def incorporate_embeddings(self, x):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
         to then be put through the linear layers"""
-        try:
-            assert x_for_embeddings.type() == "torch.LongTensor", "Data for embedding must be of type Long"
-        except AttributeError:
-            raise ValueError("Data for embedding must be a torch tensor of type Long")
         all_embedded_data = []
-        for embedding_var in range(x_for_embeddings.shape[1]):
-            data = x_for_embeddings[:, embedding_var]
-            embedded_data = self.embedding_layers[embedding_var](data)
+        for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
+            data = x[:, embedding_var].long()
+            embedded_data = self.embedding_layers[embedding_layer_ix](data)
             all_embedded_data.append(embedded_data)
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
-        x = torch.cat((x, all_embedded_data), dim=1)
+        x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=1)
         return x

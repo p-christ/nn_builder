@@ -34,6 +34,7 @@ First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arg
 | *dropout* | Float to indicate what dropout probability you want applied after each hidden layer | 0 |
 | *initialiser* | String to indicate which initialiser you want used to initialise all the parameters. All PyTorch initialisers are supported. | PyTorch Default |
 | *batch_norm* | Boolean to indicate whether you want batch norm applied to the output of every hidden layer | False |
+| *columns_of_data_to_be_embedded* | List to indicate the columns numbers of the data that you want to be put through an embedding layer before being fed through the other layers of the network | No embeddings |
 | *embedding_dimensions* | If you have categorical variables you want embedded before flowing through the network then you specify the embedding dimensions here with a list like so: [ [embedding_input_dim_1, embedding_output_dim_1], [embedding_input_dim_2, embedding_output_dim_2] ...] | No embeddings |
 | *y_range* | Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the output values to in regression tasks | No range |
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |

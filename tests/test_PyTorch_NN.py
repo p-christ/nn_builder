@@ -8,8 +8,8 @@ import torch.optim as optim
 from nn_builder.pytorch.NN import NN
 
 N = 250
-X = torch.randn((N, 2))
-X_for_embedding = torch.LongTensor(N, 2).random_(0, 14)
+X = torch.randn((N, 5))
+X[:, [2, 4]] += 10.0
 y = X[:, 0] > 0
 y = y.float()
 
@@ -127,14 +127,39 @@ def test_embedding_layers():
         assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
         assert nn_instance.embedding_layers[1].embedding_dim == embedding_out_dim_2
 
+def test_non_integer_embeddings_rejected():
+    """Tests whether an error is raised if user tries to provide non-integer data to be embedded"""
+    with pytest.raises(AssertionError):
+        nn_instance = NN(input_dim=5, linear_hidden_units=[5],
+                         output_dim=5,
+                         columns_of_data_to_be_embedded=[2, 4],
+                         embedding_dimensions=[[50, 3],
+                                               [55, 4]])
+        out = nn_instance.forward(X)
+
 def test_incorporate_embeddings():
     """Tests the method incorporate_embeddings"""
+    X_new = X
+    X_new[:, [2, 4]] = torch.round(X_new[:, [2, 4]])
     nn_instance = NN(input_dim=5, linear_hidden_units=[5],
                                  output_dim=5,
+                                 columns_of_data_to_be_embedded=[2, 4],
                                  embedding_dimensions=[[50, 3],
                                                        [55, 4]])
-    out = nn_instance.incorporate_embeddings(X, X_for_embedding)
-    assert out.shape == (N, X.shape[1]+3+4)
+    out = nn_instance.incorporate_embeddings(X)
+    assert out.shape == (N, X.shape[1]+3+4-2)
+
+def test_embedding_network_can_solve_simple_problem():
+    """Tests whether network can solve simple problem using embeddings"""
+    X = torch.randn(N, 2) * 5.0 + 20.0
+    y = (X[:, 0] >= 20) * (X[:, 1] <= 20)
+    X = X.long()
+    nn_instance = NN(input_dim=2, linear_hidden_units=[5],
+                     output_dim=1,
+                     columns_of_data_to_be_embedded=[0, 1],
+                     embedding_dimensions=[[50, 3],
+                                           [55, 3]])
+    assert solves_simple_problem(X, y.float(), nn_instance)
 
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""

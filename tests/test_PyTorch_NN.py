@@ -103,15 +103,13 @@ def test_linear_layers():
                                      output_dim=output_dim, output_activation="relu", initialiser="xavier", print_model_summary=False)
         for layer in nn_instance.linear_layers:
             assert isinstance(layer, nn.Linear)
-        assert len(nn_instance.linear_layers) == len(hidden_units) + 1
         assert nn_instance.linear_layers[0].in_features == input_dim
         assert nn_instance.linear_layers[0].out_features == hidden_units[0]
         assert nn_instance.linear_layers[1].in_features == hidden_units[0]
         assert nn_instance.linear_layers[1].out_features == hidden_units[1]
         assert nn_instance.linear_layers[2].in_features == hidden_units[1]
         assert nn_instance.linear_layers[2].out_features == hidden_units[2]
-        assert nn_instance.linear_layers[3].in_features == hidden_units[2]
-        assert nn_instance.linear_layers[3].out_features == output_dim
+        assert len(nn_instance.linear_layers) == 3
 
 def test_embedding_layers():
     """Tests whether create_embedding_layers method works correctly"""

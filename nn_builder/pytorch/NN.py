@@ -33,7 +33,7 @@ class NN(nn.Module, Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim, output_activation,
+    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -98,6 +98,7 @@ class NN(nn.Module, Base_Network):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
         input_dim = self.linear_hidden_units[-1]
+        if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
         for output_dim in self.output_dim:
             output_layers.extend([nn.Linear(input_dim, output_dim)])
         return output_layers
@@ -123,10 +124,8 @@ class NN(nn.Module, Base_Network):
     def get_activation(self, activations, ix=None):
         """Gets the activation function"""
         if isinstance(activations, list):
-            return self.str_to_activations_converter[activations[ix].lower()]
-        else:
-            if activations is None: return activations
-        return self.str_to_activations_converter[activations.lower()]
+            return self.str_to_activations_converter[str(activations[ix]).lower()]
+        return self.str_to_activations_converter[str(activations).lower()]
 
     def print_model_summary(self):
         if len(self.embedding_layers) > 0:
@@ -134,11 +133,17 @@ class NN(nn.Module, Base_Network):
             print("-------------")
             print(self.embedding_layers)
             print(" ")
+        print("-------------")
         print("Linear layers")
         print("-------------")
         for layer_ix in range(len(self.linear_layers)):
             print(self.linear_layers[layer_ix])
-            if self.batch_norm and layer_ix != len(self.linear_layers) - 1: print(self.batch_norm_layers[layer_ix])
+            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
+        print("-------------")
+        print("Output Layers")
+        print("-------------")
+        for layer_ix in range(len(self.output_layers)):
+            print(self.output_layers[layer_ix])
 
     def forward(self, x):
         """Forward pass for the network"""
@@ -151,7 +156,7 @@ class NN(nn.Module, Base_Network):
 
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
-            activation = self.get_activation(self.output_activation[output_layer_ix])
+            activation = self.get_activation(self.output_activation, output_layer_ix)
             temp_output = output_layer(x)
             if activation is not None: temp_output = activation(temp_output)
             if out is None:

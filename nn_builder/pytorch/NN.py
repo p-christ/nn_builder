@@ -14,8 +14,10 @@ class NN(nn.Module, Base_Network):
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
         - linear_hidden_units: List of integers to indicate the width and number of linear hidden layers you want in your network
-        - output_dim: Integer to indicate the dimension of the output of the network
-        - output_activation: String to indicate the activation function you want the output to go through
+        - output_dim: Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers
+                      if you want multiple output heads
+        - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
+                             strings if you want multiple output heads
         - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
                               (not including the output layer). Default is ReLU.
         - dropout: Float to indicate what dropout probability you want applied after each hidden layer
@@ -31,7 +33,7 @@ class NN(nn.Module, Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim: int, output_activation: str ="None",
+    def __init__(self, input_dim: int, linear_hidden_units: list, output_dim, output_activation,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -54,6 +56,7 @@ class NN(nn.Module, Base_Network):
         self.check_all_user_inputs_valid()
 
         self.linear_layers = self.create_linear_layers()
+        self.output_layers = self.create_output_layers()
         if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.embedding_layers = self.create_embedding_layers()
 
@@ -89,8 +92,15 @@ class NN(nn.Module, Base_Network):
         for hidden_unit in self.linear_hidden_units:
             linear_layers.extend([nn.Linear(input_dim, hidden_unit)])
             input_dim = hidden_unit
-        linear_layers.extend([nn.Linear(input_dim, self.output_dim)])
         return linear_layers
+
+    def create_output_layers(self):
+        """Creates the output layers in the network"""
+        output_layers = nn.ModuleList([])
+        input_dim = self.linear_hidden_units[-1]
+        for output_dim in self.output_dim:
+            output_layers.extend([nn.Linear(input_dim, output_dim)])
+        return output_layers
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
@@ -114,6 +124,8 @@ class NN(nn.Module, Base_Network):
         """Gets the activation function"""
         if isinstance(activations, list):
             return self.str_to_activations_converter[activations[ix].lower()]
+        else:
+            if activations is None: return activations
         return self.str_to_activations_converter[activations.lower()]
 
     def print_model_summary(self):
@@ -132,18 +144,23 @@ class NN(nn.Module, Base_Network):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
-        for layer_ix in range(len(self.linear_hidden_units)):
-            linear_layer = self.linear_layers[layer_ix]
-            activation = self.get_activation(self.hidden_activations, layer_ix)
-            x = activation(linear_layer(x))
+        for layer_ix, linear_layer in enumerate(self.linear_layers):
+            x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
             x = self.dropout_layer(x)
-        final_activation = self.get_activation(self.output_activation)
-        final_layer = self.linear_layers[-1]
-        x = final_layer(x)
-        if final_activation is not None: x = final_activation(x)
-        if self.y_range: x = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(x)
-        return x
+
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            activation = self.get_activation(self.output_activation[output_layer_ix])
+            temp_output = output_layer(x)
+            if activation is not None: temp_output = activation(temp_output)
+            if out is None:
+                out = temp_output
+            else:
+                out = torch.cat((out, temp_output), dim=1)
+
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        return out
 
     def check_input_data_into_forward_once(self, x):
         """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
@@ -156,6 +173,7 @@ class NN(nn.Module, Base_Network):
                                                                                 values 0 and above to represent the different 
                                                                                 classes"""
         if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor)
+        assert len(x.shape) == 2, "X should be a 2-dimensional tensor"
         self.checked_forward_input_data_once = True #So that it doesn't check again
 
     def incorporate_embeddings(self, x):

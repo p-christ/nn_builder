@@ -31,7 +31,12 @@ class Base_Network(object):
 
     def check_input_and_output_dim_valid(self):
         """Checks that user input for input_dim and output_dim is valid"""
-        for dim in [self.input_dim, self.output_dim]:
+        if not isinstance(self.output_dim, list):
+            out_dimensions = [self.output_dim]
+        else:
+            out_dimensions = self.output_dim
+            assert len(self.output_dim) == len(self.output_activation), "Output_dim and output_activation must be the same length"
+        for dim in [self.input_dim] + out_dimensions:
             assert isinstance(dim, int), "input_dim and output_dim must be integers"
             assert dim > 0, "input_dim and output_dim must be 1 or higher"
 
@@ -46,7 +51,13 @@ class Base_Network(object):
         """Checks that user input for hidden_activations and output_activation is valid"""
         valid_activations_strings = self.str_to_activations_converter.keys()
         if self.output_activation is None: self.output_activation = "None"
-        assert self.output_activation.lower() in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
+        if isinstance(self.output_activation, list):
+            for activation in self.output_activation:
+                if activation is not None:
+                    assert activation.lower() in set(valid_activations_strings), "Output activations must be string from list {}".format(valid_activations_strings)
+            assert len(self.output_activation) == len(self.output_dim), "Must be same amount of output activations as output dimensions"
+        else:
+            assert self.output_activation.lower() in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
         assert isinstance(self.hidden_activations, str) or isinstance(self.hidden_activations, list), "hidden_activations must be a string or a list of strings"
         if isinstance(self.hidden_activations, str):
             assert self.hidden_activations.lower() in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)

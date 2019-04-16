@@ -34,8 +34,9 @@ class Base_Network(object):
         if not isinstance(self.output_dim, list):
             out_dimensions = [self.output_dim]
         else:
+            assert isinstance(self.output_activation, list), "Output activation must be a list of output_dim is a list"
             out_dimensions = self.output_dim
-            assert len(self.output_dim) == len(self.output_activation), "Output_dim and output_activation must be the same length"
+            assert len(self.output_dim) == len(self.output_activation), "If one is a list then output_dim and output_activation must be list of same length"
         for dim in [self.input_dim] + out_dimensions:
             assert isinstance(dim, int), "input_dim and output_dim must be integers"
             assert dim > 0, "input_dim and output_dim must be 1 or higher"

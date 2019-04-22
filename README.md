@@ -1,11 +1,14 @@
 # Neural Network Builder (nn_builder)
 
-![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master)
+![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
-`pip install nn_builder`
 
 **nn_builder creates neural networks in 1 line**. It makes it easier for you to create neural networks and quickly experiment
 with different architectures. 
+
+`pip install nn_builder`
+
+
 
 On the left is the large amount of code you would need to write to create a PyTorch neural network equivalent to the only one line of code on the right using nn_builder: 
 

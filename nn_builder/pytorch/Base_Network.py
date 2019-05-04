@@ -1,3 +1,7 @@
+import random
+import numpy as np
+import torch
+
 import torch.nn as nn
 
 class Base_Network(object):
@@ -95,3 +99,11 @@ class Base_Network(object):
         if initialiser != "use_default":
             for parameters in parameters_list:
                 initialiser(parameters.weight)
+
+    def set_all_random_seeds(self, random_seed):
+        """Sets all possible random seeds so results can be reproduced"""
+        torch.backends.cudnn.deterministic = True
+        torch.manual_seed(random_seed)
+        random.seed(random_seed)
+        np.random.seed(random_seed)
+        if torch.cuda.is_available(): torch.cuda.manual_seed_all(random_seed)

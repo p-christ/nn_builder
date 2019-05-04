@@ -68,14 +68,6 @@ class NN(nn.Module, Base_Network):
 
         if print_model_summary: self.print_model_summary()
 
-    def set_all_random_seeds(self, random_seed):
-        """Sets all possible random seeds so results can be reproduced"""
-        torch.backends.cudnn.deterministic = True
-        torch.manual_seed(random_seed)
-        random.seed(random_seed)
-        np.random.seed(random_seed)
-        if torch.cuda.is_available(): torch.cuda.manual_seed_all(random_seed)
-
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
         self.check_input_and_output_dim_valid()

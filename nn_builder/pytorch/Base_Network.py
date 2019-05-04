@@ -33,7 +33,6 @@ class Base_Network(object):
         # Flag we use to run checks on the input data into forward the first time it is entered
         self.checked_forward_input_data_once = False
 
-
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
         raise ValueError("Must be implemented")
@@ -52,6 +51,11 @@ class Base_Network(object):
 
     def forward(self, input_data):
         """Runs a forward pass of the network"""
+        raise ValueError("Must be implemented")
+
+    def check_input_data_into_forward_once(self, input_data):
+        """Checks the input data into the network is of the right form. Only runs the first time data is provided
+        otherwise would slow down training too much"""
         raise ValueError("Must be implemented")
 
     def create_str_to_activations_converter(self):
@@ -87,7 +91,7 @@ class Base_Network(object):
         if not isinstance(self.output_dim, list):
             out_dimensions = [self.output_dim]
         else:
-            assert isinstance(self.output_activation, list), "Output activation must be a list of output_dim is a list"
+            assert isinstance(self.output_activation, list), "Output activation must be a list if output_dim is a list"
             out_dimensions = self.output_dim
             assert len(self.output_dim) == len(self.output_activation), "If one is a list then output_dim and output_activation must be list of same length"
         for dim in out_dimensions:
@@ -206,3 +210,9 @@ class Base_Network(object):
         random.seed(random_seed)
         np.random.seed(random_seed)
         if torch.cuda.is_available(): torch.cuda.manual_seed_all(random_seed)
+
+    def get_activation(self, activations, ix=None):
+        """Gets the activation function"""
+        if isinstance(activations, list):
+            return self.str_to_activations_converter[str(activations[ix]).lower()]
+        return self.str_to_activations_converter[str(activations).lower()]

@@ -90,13 +90,8 @@ class NN(nn.Module, Base_Network):
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
         self.initialise_parameters(self.hidden_layers)
+        self.initialise_parameters(self.output_layers)
         self.initialise_parameters(self.embedding_layers)
-
-    def get_activation(self, activations, ix=None):
-        """Gets the activation function"""
-        if isinstance(activations, list):
-            return self.str_to_activations_converter[str(activations[ix]).lower()]
-        return self.str_to_activations_converter[str(activations).lower()]
 
     def print_model_summary(self):
         if len(self.embedding_layers) > 0:

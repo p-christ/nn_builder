@@ -89,14 +89,25 @@ class CNN(nn.Module, Base_Network):
                 raise ValueError("Wrong layer name")
         return cnn_hidden_layers
 
-    # def create_output_layers(self):
-    #     """Creates the output layers in the network"""
-    #     output_layers = nn.ModuleList([])
-    #     input_dim = self.hidden_layers_info[-1]
-    #     if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
-    #     for output_dim in self.output_dim:
-    #         output_layers.extend([nn.Linear(input_dim, output_dim)])
-    #     return output_layers
+    def create_output_layers(self):
+        """Creates the output layers in the network"""
+        output_layers = nn.ModuleList([])
+        if self.hidden_layers_info[-1][0].lower() in ["adaptivemaxpool", "adaptiveavgpool"]:
+            input_dim = self.hidden_layers[-1].output_size[0] * self.hidden_layers[-1].output_size[1]
+        elif self.hidden_layers_info[-1][0].lower() == "linear":
+            input_dim = self.hidden_layers[-1].out_features
+        else:
+            raise ValueError("Don't know dimensions for output layer. Must use adaptivemaxpool, adaptiveavgpool, or linear as final output layer")
+        if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
+        for output_dim in self.output_dim:
+            output_layers.extend([nn.Linear(input_dim, output_dim)])
+        return output_layers
+
+    def initialise_all_parameters(self):
+        """Initialises the parameters in the linear and embedding layers"""
+        self.initialise_parameters(self.hidden_layers)
+        self.initialise_parameters(self.output_layers)
+
     #
     #
 

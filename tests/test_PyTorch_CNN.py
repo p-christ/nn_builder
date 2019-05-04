@@ -69,6 +69,46 @@ def test_hidden_layers_created_correctly():
     assert cnn.hidden_layers[6].in_features == 222
     assert cnn.hidden_layers[6].out_features == 2222
 
+
+def test_output_layers_created_correctly():
+    """Tests that create_output_layers works correctly"""
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["avgpool", 32, 42, 22], ["adaptivemaxpool", 3, 34],
+              ["adaptiveavgpool", 23, 44], ["linear", 2, 22], ["linear", 222, 2222]]
+
+    cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+              output_activation="relu")
+
+    assert cnn.output_layers[0].in_features == 2222
+    assert cnn.output_layers[0].out_features == 2
+
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["avgpool", 32, 42, 22], ["adaptivemaxpool", 3, 34],
+              ["adaptiveavgpool", 23, 44]]
+
+    cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=7,
+              output_activation="relu")
+
+    assert cnn.output_layers[0].in_features == 23 * 44
+    assert cnn.output_layers[0].out_features == 7
+
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["avgpool", 32, 42, 22], ["adaptivemaxpool", 3, 34]]
+
+
+    cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=6,
+              output_activation="relu")
+
+    assert cnn.output_layers[0].in_features == 3 * 34
+    assert cnn.output_layers[0].out_features == 6
+
+    cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=[6, 22],
+              output_activation=["softmax", None])
+
+    assert cnn.output_layers[0].in_features == 3 * 34
+    assert cnn.output_layers[0].out_features == 6
+    assert cnn.output_layers[1].in_features == 3 * 34
+    assert cnn.output_layers[1].out_features == 22
+
+
+
 def test_output_dim_user_input():
     """Tests whether network rejects an invalid output_dim input from user"""
     inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}]

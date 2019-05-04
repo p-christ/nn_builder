@@ -123,14 +123,19 @@ class CNN(nn.Module, Base_Network):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
             else:
+                if type(layer) == nn.Linear and not flattened:
+                    x = x.reshape(x.shape[0], -1) #flattens the tensor so can fit into a linear layer
+                    flattened = True
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
                 x = self.dropout_layer(x)
 
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
+            if type(output_layer) == nn.Linear: data = x.reshape(x.shape[0], -1) #flattens the tensor so can fit into a linear layer
+            else: data = x
             activation = self.get_activation(self.output_activation, output_layer_ix)
-            temp_output = output_layer(x)
+            temp_output = output_layer(data)
             if activation is not None: temp_output = activation(temp_output)
             if out is None:
                 out = temp_output

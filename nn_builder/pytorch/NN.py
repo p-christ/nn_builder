@@ -13,7 +13,7 @@ class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - hidden_layers: List of integers to indicate the width and number of linear hidden layers you want in your network
+        - hidden_layers_info: List of integers to indicate the width and number of linear hidden layers you want in your network
         - output_dim: Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers
                       if you want multiple output heads
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
@@ -33,40 +33,18 @@ class NN(nn.Module, Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, hidden_layers: list, output_dim, output_activation=None,
+    def __init__(self, input_dim: int, hidden_layers_info: list, output_dim, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
-        self.set_all_random_seeds(random_seed)
         nn.Module.__init__(self)
-        Base_Network.__init__(self)
-        self.input_dim = input_dim
-        self.hidden_layers = hidden_layers
-        self.hidden_activations = hidden_activations
-        self.output_dim = output_dim
-        self.output_activation = output_activation
-        self.initialiser = initialiser
-        self.batch_norm = batch_norm
-        self.y_range = y_range
-
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
-
-        self.check_all_user_inputs_valid()
-
-        self.linear_layers = self.create_linear_layers()
-        self.output_layers = self.create_output_layers()
-        if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.embedding_layers = self.create_embedding_layers()
+        Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
+                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
-        self.dropout_layer = nn.Dropout(p=dropout)
-        self.initialise_all_parameters()
-
-        # Flag we use to run checks on the input data into forward the first time it is entered
-        self.checked_forward_input_data_once = False
-
-        if print_model_summary: self.print_model_summary()
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
@@ -78,11 +56,11 @@ class NN(nn.Module, Base_Network):
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
-    def create_linear_layers(self):
+    def create_hidden_layers(self):
         """Creates the linear layers in the network"""
         linear_layers = nn.ModuleList([])
         input_dim = int(self.input_dim - len(self.embedding_dimensions) + np.sum([output_dims[1] for output_dims in self.embedding_dimensions]))
-        for hidden_unit in self.hidden_layers:
+        for hidden_unit in self.hidden_layers_info:
             linear_layers.extend([nn.Linear(input_dim, hidden_unit)])
             input_dim = hidden_unit
         return linear_layers
@@ -90,7 +68,7 @@ class NN(nn.Module, Base_Network):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
-        input_dim = self.hidden_layers[-1]
+        input_dim = self.hidden_layers_info[-1]
         if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
         for output_dim in self.output_dim:
             output_layers.extend([nn.Linear(input_dim, output_dim)])
@@ -98,7 +76,7 @@ class NN(nn.Module, Base_Network):
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
-        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.hidden_layers])
+        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.hidden_layers_info])
         return batch_norm_layers
 
     def create_embedding_layers(self):
@@ -111,7 +89,7 @@ class NN(nn.Module, Base_Network):
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
-        self.initialise_parameters(self.linear_layers)
+        self.initialise_parameters(self.hidden_layers)
         self.initialise_parameters(self.embedding_layers)
 
     def get_activation(self, activations, ix=None):
@@ -129,8 +107,8 @@ class NN(nn.Module, Base_Network):
         print("-------------")
         print("Linear layers")
         print("-------------")
-        for layer_ix in range(len(self.linear_layers)):
-            print(self.linear_layers[layer_ix])
+        for layer_ix in range(len(self.hidden_layers)):
+            print(self.hidden_layers[layer_ix])
             if self.batch_norm: print(self.batch_norm_layers[layer_ix])
         print("-------------")
         print("Output Layers")
@@ -142,7 +120,7 @@ class NN(nn.Module, Base_Network):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
-        for layer_ix, linear_layer in enumerate(self.linear_layers):
+        for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
             x = self.dropout_layer(x)

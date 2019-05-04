@@ -70,7 +70,8 @@ class NN(nn.Module, Base_Network):
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        self.check_input_and_output_dim_valid()
+        self.check_input_dim_valid()
+        self.check_output_dim_valid()
         self.check_linear_hidden_units_valid()
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()

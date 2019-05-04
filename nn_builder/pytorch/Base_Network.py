@@ -33,17 +33,22 @@ class Base_Network(object):
                                         "orthogonal": nn.init.orthogonal_, "sparse": nn.init.sparse_, "default": "use_default"}
         return str_to_initialiser_converter
 
-    def check_input_and_output_dim_valid(self):
-        """Checks that user input for input_dim and output_dim is valid"""
+    def check_input_dim_valid(self):
+        """Checks that user input for input_dim is valid"""
+        assert isinstance(self.input_dim, int), "input_dim must be an integer"
+        assert self.input_dim > 0, "input_dim must be 1 or higher"
+
+    def check_output_dim_valid(self):
+        """Checks that user input for output_dim is valid"""
         if not isinstance(self.output_dim, list):
             out_dimensions = [self.output_dim]
         else:
             assert isinstance(self.output_activation, list), "Output activation must be a list of output_dim is a list"
             out_dimensions = self.output_dim
             assert len(self.output_dim) == len(self.output_activation), "If one is a list then output_dim and output_activation must be list of same length"
-        for dim in [self.input_dim] + out_dimensions:
-            assert isinstance(dim, int), "input_dim and output_dim must be integers"
-            assert dim > 0, "input_dim and output_dim must be 1 or higher"
+        for dim in out_dimensions:
+            assert isinstance(dim, int), "output_dim must be integers"
+            assert dim > 0, "output_dim must be 1 or higher"
 
     def check_linear_hidden_units_valid(self):
         """Checks that user input for hidden_units is valid"""

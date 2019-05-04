@@ -47,8 +47,8 @@ class Base_Network(object):
 
     def check_linear_hidden_units_valid(self):
         """Checks that user input for hidden_units is valid"""
-        assert isinstance(self.linear_hidden_units, list), "hidden_units must be a list"
-        for hidden_unit in self.linear_hidden_units:
+        assert isinstance(self.hidden_layers, list), "hidden_units must be a list"
+        for hidden_unit in self.hidden_layers:
             assert isinstance(hidden_unit, int), "hidden_units must be a list of integers"
             assert hidden_unit > 0, "Every element of hidden_units must be 1 or higher"
 
@@ -67,7 +67,7 @@ class Base_Network(object):
         if isinstance(self.hidden_activations, str):
             assert self.hidden_activations.lower() in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)
         elif isinstance(self.hidden_activations, list):
-            assert len(self.hidden_activations) == len(self.linear_hidden_units), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
+            assert len(self.hidden_activations) == len(self.hidden_layers), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
             for activation in self.hidden_activations:
                 assert isinstance(activation, str), "hidden_activations must be a string or list of strings"
                 assert activation.lower() in set(valid_activations_strings), "each element in hidden_activations must be from list {}".format(valid_activations_strings)

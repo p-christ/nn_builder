@@ -42,6 +42,7 @@ class CNN(nn.Module, Base_Network):
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
+        self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
         Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
                               hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                               print_model_summary)
@@ -54,13 +55,6 @@ class CNN(nn.Module, Base_Network):
         self.check_activations_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
-
-    # - ["conv", out_channels, kernel_size, stride, padding]
-    # - ["maxpool", kernel_size, stride, padding]
-    # - ["avgpool", kernel_size, stride, padding]
-    # - ["adaptivemaxpool", output height, output width]
-    # - ["adaptiveavgpool", output height, output width]
-    # - ["linear", in, out]
 
     def create_hidden_layers(self):
         """Creates the linear layers in the network"""
@@ -105,8 +99,7 @@ class CNN(nn.Module, Base_Network):
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
-        layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
-        initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in layer_types_with_no_parameters]
+        initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in self.valid_layer_types_with_no_parameters]
         self.initialise_parameters(initialisable_layers)
         self.initialise_parameters(self.output_layers)
 
@@ -122,5 +115,35 @@ class CNN(nn.Module, Base_Network):
         return batch_norm_layers
 
     def forward(self, x):
-        pass
+        """Forward pass for the network"""
+        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
+        flattened=False
+
+        for layer_ix, layer in enumerate(self.hidden_layers):
+            if type(layer) in self.valid_layer_types_with_no_parameters:
+                x = layer(x)
+            else:
+                x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
+                if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
+                x = self.dropout_layer(x)
+
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            activation = self.get_activation(self.output_activation, output_layer_ix)
+            temp_output = output_layer(x)
+            if activation is not None: temp_output = activation(temp_output)
+            if out is None:
+                out = temp_output
+            else:
+                out = torch.cat((out, temp_output), dim=1)
+
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        return out
+
+    def check_input_data_into_forward_once(self, x):
+        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
+        so that we don't keep checking as this would slow down the model too much"""
+        assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
+        assert x.shape[1] == self.input_dim
+        self.checked_forward_input_data_once = True #So that it doesn't check again
 

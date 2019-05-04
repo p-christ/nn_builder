@@ -155,6 +155,13 @@ class Base_Network(object):
             else:
                 raise ValueError("Invalid layer name")
 
+        rest_must_be_linear = False
+        for ix, layer in enumerate(self.hidden_layers_info):
+            print(layer)
+            if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
+            if layer[0].lower() == "linear":
+                rest_must_be_linear = True
+
     def check_activations_valid(self):
         """Checks that user input for hidden_activations and output_activation is valid"""
         valid_activations_strings = self.str_to_activations_converter.keys()

@@ -45,7 +45,6 @@ class NN(nn.Module, Base_Network):
         Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
-
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
         self.check_input_dim_valid()

@@ -150,15 +150,30 @@ def test_batch_norm_layers():
     assert cnn.batch_norm_layers[0].num_features == 2
 
 
-    layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["maxpool", 3, 4, 2], ["conv", 12, 4, 3, 2], ["adaptivemaxpool", 3, 34]]
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["conv", 12, 4, 3, 2], ["adaptivemaxpool", 3, 34], ["linear", 22, 55]]
     cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
               output_activation="relu", initialiser="xavier", batch_norm=True)
-
     assert len(cnn.batch_norm_layers) == 3
     assert cnn.batch_norm_layers[0].num_features == 2
-    assert cnn.batch_norm_layers[1].num_features == 55
-    assert cnn.batch_norm_layers[2].num_features == 12
+    assert cnn.batch_norm_layers[1].num_features == 12
+    assert cnn.batch_norm_layers[2].num_features == 55
 
+def test_linear_layers_only_come_at_end():
+    """Tests that it throws an error if user tries to provide list of hidden layers that include linear layers where they
+    don't only come at the end"""
+
+    layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
+    with pytest.raises(AssertionError):
+        cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+                  output_activation="relu", initialiser="xavier", batch_norm=True)
+
+    layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55]]
+    assert CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+                      output_activation="relu", initialiser="xavier", batch_norm=True)
+
+    layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["linear", 22, 55], ["linear", 22, 55]]
+    assert CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+               output_activation="relu", initialiser="xavier", batch_norm=True)
 
 
 def test_output_activation():

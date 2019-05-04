@@ -55,7 +55,7 @@ class CNN(nn.Module, Base_Network):
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
-    # - ["conv", channels, kernel_size, stride, padding]
+    # - ["conv", out_channels, kernel_size, stride, padding]
     # - ["maxpool", kernel_size, stride, padding]
     # - ["avgpool", kernel_size, stride, padding]
     # - ["adaptivemaxpool", output height, output width]
@@ -105,11 +105,21 @@ class CNN(nn.Module, Base_Network):
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
-        self.initialise_parameters(self.hidden_layers)
+        layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
+        initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in layer_types_with_no_parameters]
+        self.initialise_parameters(initialisable_layers)
         self.initialise_parameters(self.output_layers)
 
-    #
-    #
+    def create_batch_norm_layers(self):
+        """Creates the batch norm layers in the network"""
+        batch_norm_layers = nn.ModuleList([])
+        for layer in self.hidden_layers_info:
+            layer_type = layer[0].lower()
+            if layer_type == "conv":
+                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
+            elif layer_type == "linear":
+                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[2])])
+        return batch_norm_layers
 
     def forward(self, x):
         pass

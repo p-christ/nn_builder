@@ -107,8 +107,6 @@ def test_output_layers_created_correctly():
     assert cnn.output_layers[1].in_features == 3 * 34
     assert cnn.output_layers[1].out_features == 22
 
-
-
 def test_output_dim_user_input():
     """Tests whether network rejects an invalid output_dim input from user"""
     inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}]
@@ -136,6 +134,33 @@ def test_initialiser_user_input():
 
         CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations="relu", output_dim=2,
             output_activation="relu", initialiser="xavier")
+
+def test_batch_norm_layers():
+    """Tests whether batch_norm_layers method works correctly"""
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
+    cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+            output_activation="relu", initialiser="xavier", batch_norm=False)
+    with pytest.raises(AttributeError):
+        print(cnn.batch_norm_layers)
+
+    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
+    cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+              output_activation="relu", initialiser="xavier", batch_norm=True)
+    assert len(cnn.batch_norm_layers) == 1
+    assert cnn.batch_norm_layers[0].num_features == 2
+
+
+    layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["maxpool", 3, 4, 2], ["conv", 12, 4, 3, 2], ["adaptivemaxpool", 3, 34]]
+    cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
+              output_activation="relu", initialiser="xavier", batch_norm=True)
+
+    assert len(cnn.batch_norm_layers) == 3
+    assert cnn.batch_norm_layers[0].num_features == 2
+    assert cnn.batch_norm_layers[1].num_features == 55
+    assert cnn.batch_norm_layers[2].num_features == 12
+
+
+
 def test_output_activation():
     """Tests whether network outputs data that has gone through correct activation function"""
     RANDOM_ITERATIONS = 20
@@ -168,3 +193,6 @@ def test_output_activation():
         out = CNN_instance.forward(data)
         assert not all(out.squeeze() >= 0)
         assert not round(torch.sum(out.squeeze()).item(), 3) == 1.0
+
+
+

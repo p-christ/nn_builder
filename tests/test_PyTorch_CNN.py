@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.CNN import CNN
 
-
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
     inputs_that_should_fail = [['maxpool', 33, 22, 33], [['a']], [[222, 222, 222, 222]], [["conv", 2, 2, -1]], [["conv", 2, 2]], [["conv", 2, 2, 55, 999, 33]],
@@ -221,7 +220,6 @@ def test_output_activation():
         assert not all(out.squeeze() >= 0)
         assert not round(torch.sum(out.squeeze()).item(), 3) == 1.0
 
-
 def test_y_range():
     """Tests whether setting a y range works correctly"""
     for _ in range(100):
@@ -258,3 +256,12 @@ def test_check_input_data_into_forward_once():
         CNN_instance.forward(data_not_to_throw_error)
         CNN_instance.forward(data_to_throw_error)
 
+def test_y_range_user_input():
+    """Tests whether network rejects invalid y_range inputs"""
+    invalid_y_range_inputs = [ (4, 1), (2, 4, 8), [2, 4], (np.array(2.0), 6.9)]
+    for y_range_value in invalid_y_range_inputs:
+        with pytest.raises(AssertionError):
+            print(y_range_value)
+            CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                           hidden_activations="relu", y_range=y_range_value,
+                           output_dim=5, initialiser="xavier")

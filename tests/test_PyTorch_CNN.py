@@ -222,4 +222,18 @@ def test_output_activation():
         assert not round(torch.sum(out.squeeze()).item(), 3) == 1.0
 
 
+def test_y_range():
+    """Tests whether setting a y range works correctly"""
+    for _ in range(100):
+        val1 = random.random() - 3.0*random.random()
+        val2 = random.random() + 2.0*random.random()
+        lower_bound = min(val1, val2)
+        upper_bound = max(val1, val2)
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                           hidden_activations="relu", y_range=(lower_bound, upper_bound),
+                           output_dim=5, initialiser="xavier")
+        random_data = torch.randn((10, 1, 20, 20))
+        out = CNN_instance.forward(random_data)
+        assert torch.sum(out > lower_bound).item() == 10*5, "lower {} vs. {} ".format(lower_bound, out)
+        assert torch.sum(out < upper_bound).item() == 10*5, "upper {} vs. {} ".format(upper_bound, out)
 

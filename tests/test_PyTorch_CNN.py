@@ -237,3 +237,24 @@ def test_y_range():
         assert torch.sum(out > lower_bound).item() == 10*5, "lower {} vs. {} ".format(lower_bound, out)
         assert torch.sum(out < upper_bound).item() == 10*5, "upper {} vs. {} ".format(upper_bound, out)
 
+def test_deals_with_None_activation():
+    """Tests whether is able to handle user inputting None as output activation"""
+    assert CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                           hidden_activations="relu", output_activation=None,
+                           output_dim=5, initialiser="xavier")
+
+def test_check_input_data_into_forward_once():
+    """Tests that check_input_data_into_forward_once method only runs once"""
+    CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                       hidden_activations="relu",
+                       output_dim=5, output_activation="relu", initialiser="xavier")
+
+    data_not_to_throw_error = torch.randn((1, 1, 20, 20))
+    data_to_throw_error = torch.randn((1, 2, 20, 20))
+
+    with pytest.raises(AssertionError):
+        CNN_instance.forward(data_to_throw_error)
+    with pytest.raises(RuntimeError):
+        CNN_instance.forward(data_not_to_throw_error)
+        CNN_instance.forward(data_to_throw_error)
+

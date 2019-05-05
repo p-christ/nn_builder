@@ -140,11 +140,13 @@ class Base_Network(object):
             elif layer_type_name == "maxpool":
                 assert len(layer) == 4, error_msg_maxpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer
+                if layer[1] != layer[2]: print("NOTE that your maxpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
                 assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
             elif layer_type_name == "avgpool":
                 assert len(layer) == 4, error_msg_avgpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_avgpool_layer
                 assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
+                if layer[1] != layer[2]:print("NOTE that your avgpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
             elif layer_type_name == "adaptivemaxpool":
                 assert len(layer) == 3, error_msg_adaptivemaxpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_adaptivemaxpool_layer
@@ -160,7 +162,6 @@ class Base_Network(object):
 
         rest_must_be_linear = False
         for ix, layer in enumerate(self.hidden_layers_info):
-            print(layer)
             if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
             if layer[0].lower() == "linear":
                 rest_must_be_linear = True

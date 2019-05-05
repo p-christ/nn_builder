@@ -333,6 +333,19 @@ def test_model_trains():
                        output_dim=1, initialiser="xavier")
     assert solves_simple_problem(X, y, CNN_instance)
 
+def test_max_pool_working():
+    """Tests whether max pool layers work properly"""
+    N = 250
+    X = torch.randn((N, 1, 8, 8))
+    X[0:125, 0, 3, 3] = 999.99
+    y = X[:, 0, 3, 3] > 5.0
+    y = y.float()
+
+
+    CNN_instance = CNN(hidden_layers_info=[["maxpool", 2, 2, 0], ["maxpool", 2, 2, 0], ["maxpool", 2, 2, 0]],
+                       hidden_activations="relu", output_layer_input_dim=1,
+                       output_dim=1, initialiser="xavier")
+    assert CNN_instance(X).shape == (N, 1)
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""

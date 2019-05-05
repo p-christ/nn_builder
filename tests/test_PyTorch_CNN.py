@@ -6,6 +6,8 @@ import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.CNN import CNN
+import torch.optim as optim
+from torchvision import datasets, transforms
 
 N = 250
 X = torch.randn((N, 1, 5, 5))
@@ -372,3 +374,45 @@ def solves_simple_problem(X, y, nn_instance):
         optimizer.step()
     print("LOSS ", loss)
     return loss < 0.1
+
+def test_MNIST_progress():
+    """Tests that network made using CNN module can make progress on MNIST"""
+    batch_size = 128
+    train_loader = torch.utils.data.DataLoader(
+        datasets.MNIST(root="input/", train=True, download=True,
+                       transform=transforms.Compose([
+                           transforms.ToTensor(),
+                           transforms.Normalize((0.1307,), (0.3081,))
+                       ])),
+        batch_size=batch_size, shuffle=True)
+
+    cnn = CNN(hidden_layers_info=[["conv", 20, 5, 1, 0],
+                                  ["maxpool", 2, 2, 0],
+                                  ["conv", 50, 5, 1, 0],
+                                  ["maxpool", 2, 2, 0],
+                                  ["linear", 4 * 4 * 50, 500]], hidden_activations="relu",
+              output_activation="softmax", output_dim=10, initialiser="xavier")
+
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(cnn.parameters(), lr=0.001)
+
+    ix = 0
+    accuracies = []
+    for data, target in train_loader:
+        ix += 1
+
+        output = cnn(data)
+        loss = loss_fn(output, target)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+        correct = pred.eq(target.view_as(pred)).sum().item()
+        print("Accuracy {}".format(correct / batch_size))
+        accuracies.append(correct / batch_size)
+
+        if ix > 200:
+            break
+
+    assert accuracies[-1] > 0.7, "Accuracy not good enough {}".format(accuracies[-1])

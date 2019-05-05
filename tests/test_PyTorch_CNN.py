@@ -7,6 +7,15 @@ import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.CNN import CNN
 
+N = 250
+X = torch.randn((N, 1, 5, 5))
+X[0:500, :, :, 4] += 10.0
+y = X[:, 0, 4, 4] > 0
+y = y.float()
+
+print(y)
+
+
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
     inputs_that_should_fail = [['maxpool', 33, 22, 33], [['a']], [[222, 222, 222, 222]], [["conv", 2, 2, -1]], [["conv", 2, 2]], [["conv", 2, 2, 55, 999, 33]],
@@ -86,24 +95,24 @@ def test_output_layers_created_correctly():
     cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=7,
               output_activation="relu")
 
-    assert cnn.output_layers[0].in_features == 23 * 44
+    assert cnn.output_layers[0].in_features == 23 * 44 * 2
     assert cnn.output_layers[0].out_features == 7
 
-    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["avgpool", 32, 42, 22], ["adaptivemaxpool", 3, 34]]
+    layers = [["conv", 5, 4, 3, 2], ["maxpool", 3, 4, 2], ["avgpool", 32, 42, 22], ["adaptivemaxpool", 3, 34]]
 
 
     cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=6,
               output_activation="relu")
 
-    assert cnn.output_layers[0].in_features == 3 * 34
+    assert cnn.output_layers[0].in_features == 3 * 34 * 5
     assert cnn.output_layers[0].out_features == 6
 
     cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=[6, 22],
               output_activation=["softmax", None])
 
-    assert cnn.output_layers[0].in_features == 3 * 34
+    assert cnn.output_layers[0].in_features == 3 * 34 * 5
     assert cnn.output_layers[0].out_features == 6
-    assert cnn.output_layers[1].in_features == 3 * 34
+    assert cnn.output_layers[1].in_features == 3 * 34 * 5
     assert cnn.output_layers[1].out_features == 22
 
 def test_output_dim_user_input():
@@ -265,3 +274,31 @@ def test_y_range_user_input():
             CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
                            hidden_activations="relu", y_range=y_range_value,
                            output_dim=5, initialiser="xavier")
+
+def test_model_trains():
+    """Tests whether a small range of networks can solve a simple task"""
+    for output_activation in ["sigmoid", "None"]:
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                           hidden_activations="relu", output_activation=output_activation, dropout=0.01,
+                           output_dim=1, initialiser="xavier")
+        assert solves_simple_problem(X, y, CNN_instance)
+
+    z = X[:, 0:1, 4:5, 4:5] > 0
+    z =  torch.cat([z ==1, z==0], dim=1).float()
+    z = z.squeeze(-1).squeeze(-1)
+    nn_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+                           hidden_activations="relu", output_activation="softmax", dropout=0.01,
+                           output_dim=2, initialiser="xavier")
+    assert solves_simple_problem(X, z, nn_instance)
+
+def solves_simple_problem(X, y, nn_instance):
+    """Checks if a given network is able to solve a simple problem"""
+    optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
+    for ix in range(800):
+        out = nn_instance.forward(X)
+        loss = torch.sum((out.squeeze() - y) ** 2) / N
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    print("LOSS ", loss)
+    return loss < 0.1

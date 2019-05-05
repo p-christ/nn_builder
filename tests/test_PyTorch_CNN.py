@@ -335,11 +335,16 @@ def test_model_trains():
 
 def test_model_trains_linear_layer():
     """Tests whether a small range of networks can solve a simple task"""
-
-    CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["linear", 45, 10]],
-                       hidden_activations="relu", output_activation=None,
+    CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["linear", 45, 10], ["linear", 10, 10]],
+                       hidden_activations="relu", output_activation="sigmoid",
                        output_dim=1, initialiser="xavier")
     assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["linear", 25, 10], ["linear", 10, 10]],
+                       hidden_activations="relu", output_activation="sigmoid",
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
 
 def test_max_pool_working():
     """Tests whether max pool layers work properly"""

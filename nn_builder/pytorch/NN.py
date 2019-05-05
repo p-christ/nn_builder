@@ -9,6 +9,9 @@ from nn_builder.pytorch.Base_Network import Base_Network
 # 2) Allow embedding layer dropout
 # 4) Allow batch norm for input layer
 
+# change it so it infers the input dimension... and then dimensions of all layers
+
+
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network
     Args:

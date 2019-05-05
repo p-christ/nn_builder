@@ -223,3 +223,7 @@ class Base_Network(object):
         if isinstance(activations, list):
             return self.str_to_activations_converter[str(activations[ix]).lower()]
         return self.str_to_activations_converter[str(activations).lower()]
+
+    def flatten_tensor(self, tensor):
+        """Flattens a tensor of shape (a, b, c, d, ...) into (a, b * c * d * .. )"""
+        return tensor.reshape(tensor.shape[0], -1)

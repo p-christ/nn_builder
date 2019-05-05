@@ -17,6 +17,8 @@ class CNN(nn.Module, Base_Network):
                          - ["adaptivemaxpool", output height, output width]
                          - ["adaptiveavgpool", output height, output width]
                          - ["linear", in, out]
+        - output_layer_input_dim: Integer to indicate dimension of input into output layer. Only needed if the final hidden layer you
+                                  provide is not adaptivemaxpool, adaptiveavgpool or linear
         - output_dim: Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers
                       if you want multiple output heads
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
@@ -37,12 +39,13 @@ class CNN(nn.Module, Base_Network):
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, hidden_layers_info, output_dim, input_dim=1, output_activation=None, hidden_activations="relu",
+    def __init__(self, hidden_layers_info, output_dim, output_layer_input_dim=None, input_dim=1, output_activation=None, hidden_activations="relu",
                  dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
+        self.output_layer_input_dim = output_layer_input_dim
         Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
                               hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                               print_model_summary)
@@ -86,12 +89,14 @@ class CNN(nn.Module, Base_Network):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
-        if self.hidden_layers_info[-1][0].lower() in ["adaptivemaxpool", "adaptiveavgpool"]:
+        if self.output_layer_input_dim is not None:
+            input_dim = self.output_layer_input_dim
+        elif self.hidden_layers_info[-1][0].lower() in ["adaptivemaxpool", "adaptiveavgpool"]:
             input_dim = self.hidden_layers[-1].output_size[0] * self.hidden_layers[-1].output_size[1]
         elif self.hidden_layers_info[-1][0].lower() == "linear":
             input_dim = self.hidden_layers[-1].out_features
         else:
-            raise ValueError("Don't know dimensions for output layer. Must use adaptivemaxpool, adaptiveavgpool, or linear as final output layer")
+            raise ValueError("Don't know dimensions for output layer. Must use adaptivemaxpool, adaptiveavgpool, or linear as final hidden layer")
         if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
         for output_dim in self.output_dim:
             output_layers.extend([nn.Linear(input_dim, output_dim)])
@@ -124,24 +129,20 @@ class CNN(nn.Module, Base_Network):
                 x = layer(x)
             else:
                 if type(layer) == nn.Linear and not flattened:
-                    x = x.reshape(x.shape[0], -1) #flattens the tensor so can fit into a linear layer
+                    x = self.flatten_tensor(x)
                     flattened = True
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
                 x = self.dropout_layer(x)
 
+        if not flattened: x = self.flatten_tensor(x)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
-            if type(output_layer) == nn.Linear: data = x.reshape(x.shape[0], -1) #flattens the tensor so can fit into a linear layer
-            else: data = x
             activation = self.get_activation(self.output_activation, output_layer_ix)
-            temp_output = output_layer(data)
+            temp_output = output_layer(x)
             if activation is not None: temp_output = activation(temp_output)
-            if out is None:
-                out = temp_output
-            else:
-                out = torch.cat((out, temp_output), dim=1)
-
+            if out is None: out = temp_output
+            else: out = torch.cat((out, temp_output), dim=1)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
 

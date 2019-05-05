@@ -135,7 +135,8 @@ class Base_Network(object):
             assert layer_type_name in self.valid_cnn_hidden_layer_types, "Layer name {} not valid, use one of {}".format(layer_type_name, self.valid_cnn_hidden_layer_types)
             if layer_type_name == "conv":
                 assert len(layer) == 5, error_msg_conv_layer
-                for ix in range(4): assert isinstance(layer[ix+1], int) and layer[ix+1] > 0, error_msg_conv_layer
+                for ix in range(3): assert isinstance(layer[ix+1], int) and layer[ix+1] > 0, error_msg_conv_layer
+                assert isinstance(layer[4], int) and layer[4] >= 0, error_msg_conv_layer
             elif layer_type_name == "maxpool":
                 assert len(layer) == 4, error_msg_maxpool_layer
                 for ix in range(3): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer

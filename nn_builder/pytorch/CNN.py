@@ -89,10 +89,17 @@ class CNN(nn.Module, Base_Network):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
+        print("GOT HERE 1")
         if self.output_layer_input_dim is not None:
             input_dim = self.output_layer_input_dim
         elif self.hidden_layers_info[-1][0].lower() in ["adaptivemaxpool", "adaptiveavgpool"]:
+            print("GOT HERE")
             input_dim = self.hidden_layers[-1].output_size[0] * self.hidden_layers[-1].output_size[1]
+            for layer_info_ix in range(len(self.hidden_layers_info)):
+                layer_info = self.hidden_layers_info[-(1+layer_info_ix)]
+                if layer_info[0].lower() == "conv":
+                    input_dim = input_dim * layer_info[1]
+                    break
         elif self.hidden_layers_info[-1][0].lower() == "linear":
             input_dim = self.hidden_layers[-1].out_features
         else:

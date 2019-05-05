@@ -20,7 +20,7 @@ def test_user_hidden_layers_input_rejections():
         print(input)
         with pytest.raises(AssertionError):
             CNN(input_dim=1, hidden_layers_info=input, hidden_activations="relu", output_dim=2,
-                output_activation="relu")
+                output_activation="relu", output_layer_input_dim=2)
 
 def test_user_hidden_layers_input_acceptances():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
@@ -35,9 +35,9 @@ def test_user_hidden_layers_input_acceptances():
     for ix, input in enumerate(inputs_that_should_work):
         print(input)
         CNN(input_dim=1, hidden_layers_info=input, hidden_activations="relu", output_dim=2,
-            output_activation="relu")
+            output_activation="relu", output_layer_input_dim=2)
         CNN(input_dim=1, hidden_layers_info=inputs_that_should_work[ix] + inputs_that_should_work[min(ix + 1, len(inputs_that_should_work) - 1)],
-            hidden_activations="relu", output_dim=2, output_activation="relu")
+            hidden_activations="relu", output_dim=2, output_activation="relu", output_layer_input_dim=2)
 
 def test_hidden_layers_created_correctly():
     """Tests that create_hidden_layers works correctly"""
@@ -130,29 +130,29 @@ def test_initialiser_user_input():
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
             CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations="relu", output_dim=2,
-                output_activation="relu", initialiser=input_value)
+                output_activation="relu", initialiser=input_value, output_layer_input_dim=2)
 
         CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations="relu", output_dim=2,
-            output_activation="relu", initialiser="xavier")
+            output_activation="relu", initialiser="xavier", output_layer_input_dim=2)
 
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""
     layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
     cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-            output_activation="relu", initialiser="xavier", batch_norm=False)
+            output_activation="relu", initialiser="xavier", batch_norm=False, output_layer_input_dim=2)
     with pytest.raises(AttributeError):
         print(cnn.batch_norm_layers)
 
     layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
     cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-              output_activation="relu", initialiser="xavier", batch_norm=True)
+              output_activation="relu", initialiser="xavier", batch_norm=True, output_layer_input_dim=2)
     assert len(cnn.batch_norm_layers) == 1
     assert cnn.batch_norm_layers[0].num_features == 2
 
 
     layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["conv", 12, 4, 3, 2], ["adaptivemaxpool", 3, 34], ["linear", 22, 55]]
     cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-              output_activation="relu", initialiser="xavier", batch_norm=True)
+              output_activation="relu", initialiser="xavier", batch_norm=True, output_layer_input_dim=2)
     assert len(cnn.batch_norm_layers) == 3
     assert cnn.batch_norm_layers[0].num_features == 2
     assert cnn.batch_norm_layers[1].num_features == 12
@@ -161,40 +161,51 @@ def test_batch_norm_layers():
 def test_linear_layers_only_come_at_end():
     """Tests that it throws an error if user tries to provide list of hidden layers that include linear layers where they
     don't only come at the end"""
-
     layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
     with pytest.raises(AssertionError):
         cnn = CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-                  output_activation="relu", initialiser="xavier", batch_norm=True)
+                  output_activation="relu", initialiser="xavier", batch_norm=True, output_layer_input_dim=2)
 
     layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55]]
     assert CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-                      output_activation="relu", initialiser="xavier", batch_norm=True)
+                      output_activation="relu", initialiser="xavier", batch_norm=True, output_layer_input_dim=2)
 
     layers = [["conv", 2, 4, 3, 2], ["linear", 22, 55], ["linear", 22, 55], ["linear", 22, 55]]
     assert CNN(hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
-               output_activation="relu", initialiser="xavier", batch_norm=True)
-
+               output_activation="relu", initialiser="xavier", batch_norm=True, output_layer_input_dim=2)
 
 def test_output_activation():
     """Tests whether network outputs data that has gone through correct activation function"""
     RANDOM_ITERATIONS = 20
     for _ in range(RANDOM_ITERATIONS):
-        data = torch.randn((1, 100))
-        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]],
+        data = torch.randn((1, 1, 20, 20))
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
                            hidden_activations="relu",
                            output_dim=5, output_activation="relu", initialiser="xavier")
         out = CNN_instance.forward(data)
         assert all(out.squeeze() >= 0)
 
-        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]],
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 20, 1, 0]],
+                           hidden_activations="relu", output_layer_input_dim=2,
+                           output_dim=5, output_activation="relu", initialiser="xavier")
+        out = CNN_instance.forward(data)
+        assert all(out.squeeze() >= 0)
+
+        CNN_instance = CNN(hidden_layers_info=[["conv", 5, 20, 1, 0], ["linear", 5, 22]],
+                           hidden_activations="relu",
+                           output_dim=5, output_activation="relu", initialiser="xavier")
+        out = CNN_instance.forward(data)
+        assert all(out.squeeze() >= 0)
+
+        CNN_instance = CNN(hidden_layers_info=[["conv", 5, 20, 1, 0], ["linear", 5, 22]],
                            hidden_activations="relu",
                            output_dim=5, output_activation="sigmoid", initialiser="xavier")
         out = CNN_instance.forward(data)
         assert all(out.squeeze() >= 0)
         assert all(out.squeeze() <= 1)
+        assert round(torch.sum(out.squeeze()).item(), 3) != 1.0
 
-        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]],
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
                            hidden_activations="relu",
                            output_dim=5, output_activation="softmax", initialiser="xavier")
         out = CNN_instance.forward(data)
@@ -202,9 +213,10 @@ def test_output_activation():
         assert all(out.squeeze() <= 1)
         assert round(torch.sum(out.squeeze()).item(), 3) == 1.0
 
-        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 3331, 2]],
+
+        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
                            hidden_activations="relu",
-                           output_dim=25)
+                           output_dim=5, initialiser="xavier")
         out = CNN_instance.forward(data)
         assert not all(out.squeeze() >= 0)
         assert not round(torch.sum(out.squeeze()).item(), 3) == 1.0

@@ -333,6 +333,9 @@ def test_model_trains():
                        output_dim=1, initialiser="xavier")
     assert solves_simple_problem(X, y, CNN_instance)
 
+def test_model_trains_linear_layer():
+    """Tests whether a small range of networks can solve a simple task"""
+
     CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["linear", 45, 10]],
                        hidden_activations="relu", output_activation=None,
                        output_dim=1, initialiser="xavier")
@@ -343,10 +346,6 @@ def test_max_pool_working():
     N = 250
     X = torch.randn((N, 1, 8, 8))
     X[0:125, 0, 3, 3] = 999.99
-    y = X[:, 0, 3, 3] > 5.0
-    y = y.float()
-
-
     CNN_instance = CNN(hidden_layers_info=[["maxpool", 2, 2, 0], ["maxpool", 2, 2, 0], ["maxpool", 2, 2, 0]],
                        hidden_activations="relu", output_layer_input_dim=1,
                        output_dim=1, initialiser="xavier")

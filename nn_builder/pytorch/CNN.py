@@ -1,9 +1,6 @@
 import torch
-import random
-import numpy as np
 import torch.nn as nn
 from nn_builder.pytorch.Base_Network import Base_Network
-
 
 class CNN(nn.Module, Base_Network):
     """Creates a PyTorch convolutional neural network
@@ -29,11 +26,6 @@ class CNN(nn.Module, Base_Network):
         - initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
                        initialisers are supported. PyTorch's default initialisation is the default.
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
-        - columns_of_data_to_be_embedded: List to indicate the columns numbers of the data that you want to be put through an embedding layer
-                                          before being fed through the other layers of the network. Default option is no embeddings
-        - embedding_dimensions: If you have categorical variables you want embedded before flowing through the network then
-                                you specify the embedding dimensions here with a list like so: [ [embedding_input_dim_1, embedding_output_dim_1],
-                                [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.

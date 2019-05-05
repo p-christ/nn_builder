@@ -44,7 +44,7 @@ class CNN(nn.Module, Base_Network):
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
-        self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool1d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
+        self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
         self.output_layer_input_dim = output_layer_input_dim
         Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
                               hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
@@ -141,6 +141,7 @@ class CNN(nn.Module, Base_Network):
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
                 x = self.dropout_layer(x)
+
 
         if not flattened: x = self.flatten_tensor(x)
         out = None

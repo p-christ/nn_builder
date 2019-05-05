@@ -9,12 +9,9 @@ from nn_builder.pytorch.CNN import CNN
 
 N = 250
 X = torch.randn((N, 1, 5, 5))
-X[0:500, :, :, 4] += 10.0
-y = X[:, 0, 4, 4] > 0
+X[0:125, 0, 3, 3] += 20.0
+y = X[:, 0, 3, 3] > 5.0
 y = y.float()
-
-print(y)
-
 
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
@@ -55,25 +52,34 @@ def test_hidden_layers_created_correctly():
     cnn = CNN(input_dim=3, hidden_layers_info=layers, hidden_activations="relu", output_dim=2,
               output_activation="relu")
 
+    assert type(cnn.hidden_layers[0]) == nn.Conv2d
     assert cnn.hidden_layers[0].in_channels == 3
     assert cnn.hidden_layers[0].out_channels == 2
     assert cnn.hidden_layers[0].kernel_size == (4, 4)
     assert cnn.hidden_layers[0].stride == (3, 3)
     assert cnn.hidden_layers[0].padding == (2, 2)
 
+    assert type(cnn.hidden_layers[1]) == nn.MaxPool2d
     assert cnn.hidden_layers[1].kernel_size == 3
     assert cnn.hidden_layers[1].stride == 4
     assert cnn.hidden_layers[1].padding == 2
 
+    assert type(cnn.hidden_layers[2]) == nn.AvgPool2d
     assert cnn.hidden_layers[2].kernel_size == 32
     assert cnn.hidden_layers[2].stride == 42
     assert cnn.hidden_layers[2].padding == 22
 
+    assert type(cnn.hidden_layers[3]) == nn.AdaptiveMaxPool2d
     assert cnn.hidden_layers[3].output_size == (3, 34)
+
+    assert type(cnn.hidden_layers[4]) == nn.AdaptiveAvgPool2d
     assert cnn.hidden_layers[4].output_size == (23, 44)
+
+    assert type(cnn.hidden_layers[5]) == nn.Linear
     assert cnn.hidden_layers[5].in_features == 2
     assert cnn.hidden_layers[5].out_features == 22
 
+    assert type(cnn.hidden_layers[6]) == nn.Linear
     assert cnn.hidden_layers[6].in_features == 222
     assert cnn.hidden_layers[6].out_features == 2222
 
@@ -278,18 +284,69 @@ def test_y_range_user_input():
 def test_model_trains():
     """Tests whether a small range of networks can solve a simple task"""
     for output_activation in ["sigmoid", "None"]:
-        CNN_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
-                           hidden_activations="relu", output_activation=output_activation, dropout=0.01,
+        CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1]],
+                           hidden_activations="relu", output_activation=output_activation,
                            output_dim=1, initialiser="xavier")
         assert solves_simple_problem(X, y, CNN_instance)
 
-    z = X[:, 0:1, 4:5, 4:5] > 0
+    z = X[:, 0:1, 3:4, 3:4] > 5.0
     z =  torch.cat([z ==1, z==0], dim=1).float()
     z = z.squeeze(-1).squeeze(-1)
-    nn_instance = CNN(hidden_layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2]],
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0]], output_layer_input_dim=25,
                            hidden_activations="relu", output_activation="softmax", dropout=0.01,
                            output_dim=2, initialiser="xavier")
-    assert solves_simple_problem(X, z, nn_instance)
+    assert solves_simple_problem(X, z, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0]], output_layer_input_dim=25,
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0]], output_layer_input_dim=25,
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier", batch_norm=True)
+    assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0], ["maxpool", 1, 1, 0]], output_layer_input_dim=25,
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0], ["avgpool", 1, 1, 0]], output_layer_input_dim=25,
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["adaptivemaxpool", 2, 2]],
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["adaptiveavgpool", 2, 2]],
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+    CNN_instance = CNN(hidden_layers_info=[["conv", 5, 3, 1, 0], ["linear", 45, 10]],
+                       hidden_activations="relu", output_activation=None,
+                       output_dim=1, initialiser="xavier")
+    assert solves_simple_problem(X, y, CNN_instance)
+
+
+def test_dropout():
+    """Tests whether dropout layer reads in probability correctly"""
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1]],
+                           hidden_activations="relu", output_activation="sigmoid", dropout=0.9999,
+                           output_dim=1, initialiser="xavier")
+    assert CNN_instance.dropout_layer.p == 0.9999
+    assert not solves_simple_problem(X, y, CNN_instance)
+    CNN_instance = CNN(hidden_layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1]],
+                           hidden_activations="relu", output_activation=None, dropout=0.0000001,
+                           output_dim=1, initialiser="xavier")
+    assert CNN_instance.dropout_layer.p == 0.0000001
+    assert solves_simple_problem(X, y, CNN_instance)
+
 
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""

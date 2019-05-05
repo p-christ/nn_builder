@@ -118,9 +118,9 @@ class Base_Network(object):
         error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_cnn_hidden_layer_types)
         error_msg_conv_layer = """Conv layer must be of form ['conv', channels, kernel_size, stride, padding] where the 
                                final 4 elements are non-negative integers"""
-        error_msg_maxpool_layer = """Maxpool layer must be of form ['maxpool', kernel_size, stride] where the 
+        error_msg_maxpool_layer = """Maxpool layer must be of form ['maxpool', kernel_size, stride, padding] where the 
                                        final 2 elements are non-negative integers"""
-        error_msg_avgpool_layer = """Avgpool layer must be of form ['avgpool', kernel_size, stride] where the 
+        error_msg_avgpool_layer = """Avgpool layer must be of form ['avgpool', kernel_size, stride, padding] where the 
                                                final 2 elements are non-negative integers"""
         error_msg_adaptivemaxpool_layer = """Adaptivemaxpool layer must be of form ['adaptivemaxpool', output height, output width]"""
         error_msg_adaptiveavgpool_layer = """Adaptiveavgpool layer must be of form ['adaptiveavgpool', output height, output width]"""
@@ -139,10 +139,12 @@ class Base_Network(object):
                 assert isinstance(layer[4], int) and layer[4] >= 0, error_msg_conv_layer
             elif layer_type_name == "maxpool":
                 assert len(layer) == 4, error_msg_maxpool_layer
-                for ix in range(3): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer
+                for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer
+                assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
             elif layer_type_name == "avgpool":
                 assert len(layer) == 4, error_msg_avgpool_layer
-                for ix in range(3): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_avgpool_layer
+                for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_avgpool_layer
+                assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
             elif layer_type_name == "adaptivemaxpool":
                 assert len(layer) == 3, error_msg_adaptivemaxpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_adaptivemaxpool_layer

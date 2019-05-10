@@ -3,7 +3,7 @@
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 
-**nn_builder creates neural networks in 1 line**. It saves you time by removing the need for boilerplate code when making neural networks. 
+**nn_builder builds neural networks in 1 line**. It saves you time by removing the need for boilerplate code when making neural networks. 
 It is also well tested so you know you aren't making mistakes when creating a network this way. 
 
 ### Install

@@ -1,16 +1,13 @@
 # Run from home directory with python -m pytest tests
 import shutil
-
 import pytest
 import torch
 import random
 import numpy as np
 import torch.nn as nn
-import torch.optim as optim
 from nn_builder.pytorch.CNN import CNN
 import torch.optim as optim
 from torchvision import datasets, transforms
-import os
 
 N = 250
 X = torch.randn((N, 1, 5, 5))
@@ -345,7 +342,6 @@ def test_model_trains_linear_layer():
                        output_dim=1, initialiser="xavier")
     assert solves_simple_problem(X, y, CNN_instance)
 
-
 def test_max_pool_working():
     """Tests whether max pool layers work properly"""
     N = 250
@@ -423,6 +419,4 @@ def test_MNIST_progress():
             break
 
     shutil.rmtree("input/", ignore_errors=False, onerror=None)
-
-
     assert accuracies[-1] > 0.7, "Accuracy not good enough {}".format(accuracies[-1])

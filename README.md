@@ -3,21 +3,25 @@
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 
-**nn_builder creates neural networks in 1 line**. It makes it easier for you to create neural networks and quickly experiment
-with different architectures.  
+**nn_builder creates neural networks in 1 line**. It saves you time by removing the need for boilerplate code when making neural networks. 
+It is also well tested so you know you aren't making mistakes when creating a network this way. 
+
+### Install
 
 `pip install nn_builder`
 
+### Example
 
-
-On the left is the large amount of code you would need to write to create a PyTorch neural network equivalent to the only one line of code on the right using nn_builder: 
+On the left is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
+ created in only one line of code on the right using nn_builder: 
 
 ![Screenshot](miscellaneous/material_for_readme/more_complicated_use_case.png)
 
+### Usage
 
-## Usage
+Types of network supported so far: PyTorch NN and PyTorch CNN. Soon we will add PyTorch RNN and Tensorflow networks. 
 
-### 1. PyTorch NN Module
+#### 1. PyTorch NN Module
 
 The PyTorch NN module lets you build feedforward (rather than CNNs or RNNs) PyTorch neural networks in one line. 
 
@@ -41,9 +45,12 @@ First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arg
 See this [colab notebook](https://colab.research.google.com/drive/1abxTEaUrJqbTuk8e8tOa3y9DYQQVrF_N) for demonstrations 
 of how to use this module.  
 
-### 2. Other Modules
+#### 2. PyTorch CNN Module
 
-Coming soon.
+The PyTorch CNN module lets you build convolutional PyTorch neural networks in one line. 
+
+First run `from nn_builder.pytorch.CNN import CNN` and then CNN takes the below arguments:
+
 
 ## Contributing
 

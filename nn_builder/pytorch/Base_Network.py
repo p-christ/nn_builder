@@ -207,6 +207,28 @@ class Base_Network(object):
                 assert isinstance(self.y_range[elem], float) or isinstance(self.y_range[elem], int), "y_range must be a tuple of 2 floats or integers"
             assert self.y_range[0] <= self.y_range[1], "y_range's first element must be smaller than the second element"
 
+    def check_timesteps_to_output_valid(self):
+        """Checks that user input for timesteps_to_output is valid"""
+        assert self.timesteps_to_output in ["all", "last"]
+
+    def check_rnn_hidden_layers_valid(self):
+        """Checks that the hidden_layers_info given by user for an RNN are valid choices"""
+        error_msg = "Layer must be of form ['gru', hidden_size], ['lstm', hidden_size] or ['linear', hidden_size]"
+        seen_linear_layer = False
+        for layer in self.hidden_layers_info:
+            assert len(layer) == 2
+            assert isinstance(layer[0], str) and layer[0].lower() in ["gru", "lstm", "linear"], error_msg
+            assert isinstance(layer[1], int) and layer[1] > 0, error_msg
+            if layer[0].lower() == "linear":
+                assert not seen_linear_layer, "After the first linear layers all subsequent layers must be linear too"
+                seen_linear_layer = True
+
+        #
+        #
+        # -
+        # -
+        # -
+
     def initialise_parameters(self, parameters_list: nn.ModuleList):
         """Initialises the list of parameters given"""
         initialiser = self.str_to_initialiser_converter[self.initialiser.lower()]

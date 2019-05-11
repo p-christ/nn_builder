@@ -6,15 +6,14 @@ import torch.nn as nn
 
 class Base_Network(object):
     """Base class for PyTorch neural network classes"""
-    def __init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
+    def __init__(self, input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary):
         self.set_all_random_seeds(random_seed)
         self.str_to_activations_converter = self.create_str_to_activations_converter()
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
         self.input_dim = input_dim
-        self.hidden_layers_info = hidden_layers_info
+        self.layers = layers
         self.hidden_activations = hidden_activations
-        self.output_dim = output_dim
         self.output_activation = output_activation
         self.dropout = dropout
         self.initialiser = initialiser
@@ -26,6 +25,8 @@ class Base_Network(object):
 
         self.hidden_layers = self.create_hidden_layers()
         self.output_layers = self.create_output_layers()
+
+
         if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.dropout_layer = nn.Dropout(p=dropout)
         self.initialise_all_parameters()
@@ -35,23 +36,19 @@ class Base_Network(object):
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        raise ValueError("Must be implemented")
+        raise NotImplementedError
 
-    def create_hidden_layers(self):
+    def create_layers(self):
         """Creates the hidden layers in the network"""
-        raise ValueError("Must be implemented")
+        raise NotImplementedError
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
-        raise ValueError("Must be implemented")
-
-    def create_output_layers(self):
-        """Creates the hidden layers in the network"""
-        raise ValueError("Must be implemented")
+        raise NotImplementedError
 
     def forward(self, input_data):
         """Runs a forward pass of the network"""
-        raise ValueError("Must be implemented")
+        raise NotImplementedError
 
     def check_input_data_into_forward_once(self, input_data):
         """Checks the input data into the network is of the right form. Only runs the first time data is provided
@@ -86,26 +83,19 @@ class Base_Network(object):
         assert isinstance(self.input_dim, int), "input_dim must be an integer"
         assert self.input_dim > 0, "input_dim must be 1 or higher"
 
-    def check_output_dim_valid(self):
-        """Checks that user input for output_dim is valid"""
-        if not isinstance(self.output_dim, list):
-            out_dimensions = [self.output_dim]
-        else:
-            assert isinstance(self.output_activation, list), "Output activation must be a list if output_dim is a list"
-            out_dimensions = self.output_dim
-            assert len(self.output_dim) == len(self.output_activation), "If one is a list then output_dim and output_activation must be list of same length"
-        for dim in out_dimensions:
-            assert isinstance(dim, int), "output_dim must be integers"
-            assert dim > 0, "output_dim must be 1 or higher"
+    # def check_output_dim_valid(self):
+    #     """Checks that user input for output_dim is valid"""
+    #     if not isinstance(self.output_dim, list):
+    #         out_dimensions = [self.output_dim]
+    #     else:
+    #         assert isinstance(self.output_activation, list), "Output activation must be a list if output_dim is a list"
+    #         out_dimensions = self.output_dim
+    #         assert len(self.output_dim) == len(self.output_activation), "If one is a list then output_dim and output_activation must be list of same length"
+    #     for dim in out_dimensions:
+    #         assert isinstance(dim, int), "output_dim must be integers"
+    #         assert dim > 0, "output_dim must be 1 or higher"
 
-    def check_linear_hidden_units_valid(self):
-        """Checks that user input for hidden_units is valid"""
-        assert isinstance(self.hidden_layers_info, list), "hidden_units must be a list"
-        for hidden_unit in self.hidden_layers_info:
-            assert isinstance(hidden_unit, int), "hidden_units must be a list of integers"
-            assert hidden_unit > 0, "Every element of hidden_units must be 1 or higher"
-
-    def check_cnn_hidden_layers_valid(self):
+    def check_CNN_layers_valid(self):
         """Checks that the user inputs for cnn_hidden_layers were valid. cnn_hidden_layers must be a list of layers where
         each layer must be of one of these forms:
         - ["conv", channels, kernel_size, stride, padding]
@@ -126,9 +116,9 @@ class Base_Network(object):
         error_msg_adaptiveavgpool_layer = """Adaptiveavgpool layer must be of form ['adaptiveavgpool', output height, output width]"""
         error_msg_linear_layer = """Linear layer must be of form ['linear', in, out] where in and out are non-negative integers"""
 
-        assert isinstance(self.hidden_layers_info, list), "hidden_layers must be a list"
+        assert isinstance(self.layers, list), "hidden_layers must be a list"
 
-        for layer in self.hidden_layers_info:
+        for layer in self.layers:
             assert isinstance(layer, list), "Each layer must be a list"
             assert isinstance(layer[0], str), error_msg_layer_type
             layer_type_name = layer[0].lower()
@@ -161,7 +151,7 @@ class Base_Network(object):
                 raise ValueError("Invalid layer name")
 
         rest_must_be_linear = False
-        for ix, layer in enumerate(self.hidden_layers_info):
+        for ix, layer in enumerate(self.layers):
             if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
             if layer[0].lower() == "linear":
                 rest_must_be_linear = True
@@ -174,14 +164,13 @@ class Base_Network(object):
             for activation in self.output_activation:
                 if activation is not None:
                     assert activation.lower() in set(valid_activations_strings), "Output activations must be string from list {}".format(valid_activations_strings)
-            assert len(self.output_activation) == len(self.output_dim), "Must be same amount of output activations as output dimensions"
         else:
             assert self.output_activation.lower() in set(valid_activations_strings), "Output activation must be string from list {}".format(valid_activations_strings)
         assert isinstance(self.hidden_activations, str) or isinstance(self.hidden_activations, list), "hidden_activations must be a string or a list of strings"
         if isinstance(self.hidden_activations, str):
             assert self.hidden_activations.lower() in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)
         elif isinstance(self.hidden_activations, list):
-            assert len(self.hidden_activations) == len(self.hidden_layers_info), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
+            assert len(self.hidden_activations) == len(self.layers), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
             for activation in self.hidden_activations:
                 assert isinstance(activation, str), "hidden_activations must be a string or list of strings"
                 assert activation.lower() in set(valid_activations_strings), "each element in hidden_activations must be from list {}".format(valid_activations_strings)
@@ -212,10 +201,10 @@ class Base_Network(object):
         assert self.timesteps_to_output in ["all", "last"]
 
     def check_rnn_hidden_layers_valid(self):
-        """Checks that the hidden_layers_info given by user for an RNN are valid choices"""
+        """Checks that the layers given by user for an RNN are valid choices"""
         error_msg = "Layer must be of form ['gru', hidden_size], ['lstm', hidden_size] or ['linear', hidden_size]"
         seen_linear_layer = False
-        for layer in self.hidden_layers_info:
+        for layer in self.layers:
             assert len(layer) == 2
             assert isinstance(layer[0], str) and layer[0].lower() in ["gru", "lstm", "linear"], error_msg
             assert isinstance(layer[1], int) and layer[1] > 0, error_msg

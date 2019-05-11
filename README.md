@@ -32,8 +32,7 @@ First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arg
 | Field | Description | Default |
 | :---: | :----------: | :---: |
 | *input_dim*| Integer to indicate the dimension of the input into the network | N/A |
-| *linear_hidden_units* | List of integers to indicate the width and number of linear hidden layers you want in your network | N/A |
-| *output_dim* | Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers if you want multiple output heads | N/A |                      
+| *layers* | List of integers to indicate the width and number of linear layers you want in your network | N/A |
 | *output_activation* | String to indicate the activation function you want the output to go through. Provide a list of strings if you want multiple output heads | No activation |                              
 | *hidden_activations* | String or list of string to indicate the activations you want used on the output of hidden layers (not including the output layer), default is ReLU and for example "tanh" would have tanh applied on all hidden layer activations | ReLU after every hidden layer |
 | *dropout* | Float to indicate what dropout probability you want applied after each hidden layer | 0 |

@@ -1,28 +1,17 @@
 import torch
-import random
 import numpy as np
 import torch.nn as nn
 from nn_builder.pytorch.Base_Network import Base_Network
-
-#TODO
-# 1) Allow different dropout values per layer
-# 2) Allow embedding layer dropout
-# 4) Allow batch norm for input layer
-
-# change it so it infers the input dimension... and then dimensions of all layers
-
 
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - hidden_layers_info: List of integers to indicate the width and number of linear hidden layers you want in your network
-        - output_dim: Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers
-                      if you want multiple output heads
-        - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
-                             strings if you want multiple output heads
+        - layers: List of integers to indicate the width and number of linear layers you want in your network
         - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
                               (not including the output layer). Default is ReLU.
+        - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
+                             strings if you want multiple output heads
         - dropout: Float to indicate what dropout probability you want applied after each hidden layer
         - initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
                        initialisers are supported. PyTorch's default initialisation is the default.
@@ -36,7 +25,7 @@ class NN(nn.Module, Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, hidden_layers_info: list, output_dim, output_activation=None,
+    def __init__(self, input_dim: int, layers: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -45,24 +34,43 @@ class NN(nn.Module, Base_Network):
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
+        Base_Network.__init__(self, input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
         self.check_input_dim_valid()
-        self.check_output_dim_valid()
-        self.check_linear_hidden_units_valid()
+        self.check_NN_layers_valid()
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
+    def check_NN_layers_valid(self):
+        """Checks that user input for hidden_units is valid"""
+        assert isinstance(self.layers, list), "hidden_units must be a list"
+        list_error_msg = "neurons must be a list of integers"
+        integer_error_msg = "Every element of hidden_units must be 1 or higher"
+        activation_error_msg = "The number of output activations provided should match the number of output layers"
+        for neurons in self.layers[:-1]:
+            assert isinstance(neurons, int), list_error_msg
+            assert neurons > 0, integer_error_msg
+        output_layer = self.layers[-1]
+        if isinstance(output_layer, list):
+            assert len(output_layer) == len(self.output_activation), activation_error_msg
+            for output_dim in output_layer:
+                assert isinstance(output_dim, int), list_error_msg
+                assert output_dim > 0, integer_error_msg
+        else:
+            assert isinstance(self.output_activation, str) or self.output_activation is None, activation_error_msg
+            assert isinstance(output_layer, int), list_error_msg
+            assert output_layer > 0, integer_error_msg
+
     def create_hidden_layers(self):
         """Creates the linear layers in the network"""
         linear_layers = nn.ModuleList([])
         input_dim = int(self.input_dim - len(self.embedding_dimensions) + np.sum([output_dims[1] for output_dims in self.embedding_dimensions]))
-        for hidden_unit in self.hidden_layers_info:
+        for hidden_unit in self.layers[:-1]:
             linear_layers.extend([nn.Linear(input_dim, hidden_unit)])
             input_dim = hidden_unit
         return linear_layers
@@ -70,15 +78,17 @@ class NN(nn.Module, Base_Network):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
-        input_dim = self.hidden_layers_info[-1]
-        if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
-        for output_dim in self.output_dim:
+        if len(self.layers) >= 2: input_dim = self.layers[-2]
+        else: input_dim = self.input_dim
+        if not isinstance(self.layers[-1], list): output_layer = [self.layers[-1]]
+        else: output_layer = self.layers[-1]
+        for output_dim in output_layer:
             output_layers.extend([nn.Linear(input_dim, output_dim)])
         return output_layers
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
-        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.hidden_layers_info])
+        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.layers[:-1]])
         return batch_norm_layers
 
     def create_embedding_layers(self):
@@ -121,7 +131,6 @@ class NN(nn.Module, Base_Network):
             x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
             x = self.dropout_layer(x)
-
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             activation = self.get_activation(self.output_activation, output_layer_ix)

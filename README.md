@@ -14,10 +14,10 @@ It is also well tested so you know you aren't making mistakes when creating a ne
 
 ### Example
 
-On the left is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
- created in only one line of code on the right using nn_builder: 
+On the right is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
+ created in only one line of code on the left using nn_builder: 
 
-![Screenshot](miscellaneous/material_for_readme/more_complicated_use_case.png)
+![Screenshot](miscellaneous/material_for_readme/nn_builder_use_case.png)
 
 ### Usage
 

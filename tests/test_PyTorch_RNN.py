@@ -13,9 +13,8 @@ from torchvision import datasets, transforms
 
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
-
     inputs_that_should_fail = [[["linearr", 33]], [["linear", 12, 33]], [["gru", 2, 33]], [["lstm", 2, 33]], [["lstmr", 33]],
-                               [["gruu", 33]], [["gru", 33], ["xxx", 33]] ]
+                               [["gruu", 33]], [["gru", 33], ["xxx", 33]], [["linear", 33], ["gru", 12], ["gru", 33]] ]
     for input in inputs_that_should_fail:
         with pytest.raises(AssertionError):
             RNN(input_dim=1, layers=input, hidden_activations="relu",
@@ -80,3 +79,50 @@ def test_output_layers_created_correctly():
 
     assert rnn.output_layers[1].in_features == 23
     assert rnn.output_layers[1].out_features == 15
+
+def test_output_dim_user_input():
+    """Tests whether network rejects an invalid output_dim input from user"""
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}]
+    for input_value in inputs_that_should_fail:
+        with pytest.raises(AssertionError):
+            RNN(input_dim=3, layers=[2, input_value], hidden_activations="relu",  output_activation="relu")
+        with pytest.raises(AssertionError):
+            RNN(input_dim=6, layers=input_value, hidden_activations="relu", output_activation="relu")
+
+def test_activations_user_input():
+    """Tests whether network rejects an invalid hidden_activations or output_activation from user"""
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
+    for input_value in inputs_that_should_fail:
+        with pytest.raises(AssertionError):
+            RNN(input_dim=4, layers=[["linear", 2]], hidden_activations=input_value,
+                output_activation="relu")
+            RNN(input_dim=4, layers=[["linear", 2]], hidden_activations="relu",
+                output_activation=input_value)
+
+def test_initialiser_user_input():
+    """Tests whether network rejects an invalid initialiser from user"""
+    inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
+    for input_value in inputs_that_should_fail:
+        with pytest.raises(AssertionError):
+            RNN(input_dim=4, layers=[["linear", 2]], hidden_activations="relu",
+                output_activation="relu", initialiser=input_value)
+
+            RNN(layers=[["linear", 2], ["linear", 2]], hidden_activations="relu",
+            output_activation="relu", initialiser="xavier", input_dim=4)
+
+def test_batch_norm_layers():
+    """Tests whether batch_norm_layers method works correctly"""
+    layers = [["gru", 20], ["lstm", 3], ["linear", 4], ["linear", 10]]
+    rnn = RNN(layers=layers, hidden_activations="relu", input_dim=5,
+              output_activation="relu", initialiser="xavier", batch_norm=True)
+    assert len(rnn.batch_norm_layers) == 3
+    assert rnn.batch_norm_layers[0].num_features == 20
+    assert rnn.batch_norm_layers[1].num_features == 3
+    assert rnn.batch_norm_layers[2].num_features == 4
+
+    # layers = [["gru", 20]]
+    # rnn = RNN(layers=layers, hidden_activations="relu", input_dim=5,
+    #           output_activation="relu", initialiser="xavier", batch_norm=True)
+    # assert len(rnn.batch_norm_layers) == 0
+
+

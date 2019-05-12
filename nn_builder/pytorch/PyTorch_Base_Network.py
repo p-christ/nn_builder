@@ -136,7 +136,12 @@ class PyTorch_Base_Network(Base_Network):
         initialiser = self.str_to_initialiser_converter[self.initialiser.lower()]
         if initialiser != "use_default":
             for parameters in parameters_list:
-                initialiser(parameters.weight)
+                if type(parameters) == nn.Linear:
+                    initialiser(parameters.weight)
+                elif type(parameters) in [nn.LSTM, nn.RNN, nn.GRU]:
+                    initialiser(parameters.weight_hh_l0)
+                    initialiser(parameters.weight_ih_l0)
+
 
     def flatten_tensor(self, tensor):
         """Flattens a tensor of shape (a, b, c, d, ...) into (a, b * c * d * .. )"""

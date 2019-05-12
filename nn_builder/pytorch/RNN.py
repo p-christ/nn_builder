@@ -58,10 +58,13 @@ class RNN(nn.Module, PyTorch_Base_Network):
         """Checks that layers provided by user are valid"""
         error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_RNN_hidden_layer_types)
         error_msg_layer_form = "Layer must be of form [layer_name, hidden_units]"
+        error_msg_layer_list = "Layers must be provided as a list"
+
+        assert isinstance(self.layers, list), error_msg_layer_list
 
         all_layers = self.layers[:-1]
         output_layer = self.layers[-1]
-        assert isinstance(output_layer, list), "layers must be a list"
+        assert isinstance(output_layer, list), error_msg_layer_list
         if isinstance(output_layer[0], list):
             for layer in output_layer:
                 all_layers.append(layer)
@@ -69,6 +72,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
             all_layers.append(output_layer)
 
         print("ALL LAYERS ", all_layers)
+        rest_must_be_linear = False
         for layer in all_layers:
             print("LAYER ", layer)
             assert isinstance(layer, list), "Each layer must be a list"
@@ -81,7 +85,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
             assert layer[1] > 0, "Must have hidden_units >= 1"
             assert len(layer) == 2, error_msg_layer_form
 
-            rest_must_be_linear = False
             if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
             if layer_type_name == "linear": rest_must_be_linear = True
 
@@ -121,6 +124,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
+        print("HIDDEN LAYERS to initialise", self.hidden_layers)
         self.initialise_parameters(self.hidden_layers)
         self.initialise_parameters(self.output_layers)
         self.initialise_parameters(self.embedding_layers)

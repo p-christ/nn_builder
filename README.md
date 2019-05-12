@@ -21,7 +21,7 @@ On the right is the large amount of code you would need to write to create a PyT
 
 ### Usage
 
-Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add PyTorch RNN and Tensorflow networks.
+Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.
 
 
 | **Network Type**         | **PyTorch**                       | **TensorFlow**                    |

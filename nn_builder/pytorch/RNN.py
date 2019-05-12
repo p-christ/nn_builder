@@ -15,7 +15,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
                               (not including the output layer). Default is ReLU.
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
                              strings if you want multiple output heads
-        - only_output_final_timestep: Boolean to indicate whether to only output data for the final timestep or not
         - dropout: Float to indicate what dropout probability you want applied after each hidden layer
         - initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
                        initialisers are supported. PyTorch's default initialisation is the default.
@@ -33,13 +32,12 @@ class RNN(nn.Module, PyTorch_Base_Network):
     def __init__(self, input_dim: int, layers: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False, only_output_final_timestep=False):
+                 random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        self.only_output_final_timestep = only_output_final_timestep
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation,
                                       hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
@@ -102,10 +100,10 @@ class RNN(nn.Module, PyTorch_Base_Network):
         layer_type_name = layer[0].lower()
         hidden_size = layer[1]
         if layer_type_name == "lstm":
-            RNN_hidden_layers.extend([nn.LSTM(input_size=input_dim, hidden_size=hidden_size)])
+            RNN_hidden_layers.extend([nn.LSTM(input_size=input_dim, hidden_size=hidden_size, batch_first=True)])
         elif layer_type_name == "gru":
             RNN_hidden_layers.extend(
-                [nn.GRU(input_size=input_dim, hidden_size=hidden_size)])
+                [nn.GRU(input_size=input_dim, hidden_size=hidden_size, batch_first=True)])
         elif layer_type_name == "linear":
             RNN_hidden_layers.extend([nn.Linear(input_dim, hidden_size)])
         else:
@@ -134,43 +132,69 @@ class RNN(nn.Module, PyTorch_Base_Network):
         batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=layer[1]) for layer in self.layers[:-1]])
         return batch_norm_layers
 
-    # def forward(self, x):
-    #     """Forward pass for the network"""
-    #     if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
-    #     flattened=False
-    #
-    #     for layer_ix, layer in enumerate(self.hidden_layers):
-    #         if type(layer) in self.valid_layer_types_with_no_parameters:
-    #             x = layer(x)
-    #         else:
-    #             if type(layer) == nn.Linear and not flattened:
-    #                 x = self.flatten_tensor(x)
-    #                 flattened = True
-    #             x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
-    #             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-    #             x = self.dropout_layer(x)
-    #
-    #     if not flattened: x = self.flatten_tensor(x)
-    #     out = None
-    #     for output_layer_ix, output_layer in enumerate(self.output_layers):
-    #         activation = self.get_activation(self.output_activation, output_layer_ix)
-    #         temp_output = output_layer(x)
-    #         if activation is not None: temp_output = activation(temp_output)
-    #         if out is None: out = temp_output
-    #         else: out = torch.cat((out, temp_output), dim=1)
-    #     if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
-    #     return out
-    #
-    # def check_input_data_into_forward_once(self, x):
-    #     """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
-    #     so that we don't keep checking as this would slow down the model too much"""
-    #     assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
-    #     assert x.shape[1] == self.input_dim
-    #     self.checked_forward_input_data_once = True #So that it doesn't check again
-    #
+    def get_activation(self, activations, ix=None):
+        """Gets the activation function"""
+        if isinstance(activations, list):
+            activation = self.str_to_activations_converter[str(activations[ix]).lower()]
+        else:
+            activation = self.str_to_activations_converter[str(activations).lower()]
+        return activation
 
-    def check_input_data_into_forward_once(self):
-        pass
+
+    def forward(self, x):
+        """Forward pass for the network"""
+        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
+
+        batch_size, seq_length, data_dimension = x.shape
+
+        for layer_ix, layer in enumerate(self.hidden_layers):
+            print("X shape ", x.shape)
+            if type(layer) == nn.Linear:
+                x = x.contiguous().view(batch_size * seq_length, -1)
+                activation = self.get_activation(self.hidden_activations, layer_ix)
+                x = activation(layer(x))
+                x = x.view(batch_size, seq_length, layer.out_features)
+            else:
+                x = layer(x)
+                x = x[0]
+            if self.batch_norm:
+                x.transpose_(1, 2)
+                x = self.batch_norm_layers[layer_ix](x)
+                x.transpose_(1, 2)
+            x = self.dropout_layer(x)
+
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            activation = self.get_activation(self.output_activation, output_layer_ix)
+
+            if type(output_layer) == nn.Linear:
+                x = x.contiguous().view(batch_size * seq_length, -1)
+                temp_output = output_layer(x)
+                if activation is not None:
+                    temp_output = activation(temp_output)
+                temp_output = temp_output.view(batch_size, seq_length, -1)
+                x = x.view(batch_size, seq_length, -1)
+            else:
+                temp_output = output_layer(x)
+                temp_output = temp_output[0]
+                if activation is not None:
+                    if type(activation) == nn.Softmax:
+                        temp_output = temp_output.contiguous().view(batch_size * seq_length, -1)
+                        temp_output = activation(temp_output)
+                        temp_output = temp_output.view(batch_size, seq_length, -1)
+                    else:
+                        temp_output = activation(temp_output)
+            if out is None: out = temp_output
+            else: out = torch.cat((out, temp_output), dim=2)
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        return out
+
+    def check_input_data_into_forward_once(self, x):
+        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
+        so that we don't keep checking as this would slow down the model too much"""
+        assert len(x.shape) == 3, "x should have the shape (batch_size, sequence_length, dimension)"
+        assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
+        self.checked_forward_input_data_once = True #So that it doesn't check again
 
     def print_model_summary(self):
         pass

@@ -1,11 +1,8 @@
 import random
 import numpy as np
 import torch
-
 import torch.nn as nn
-
 from nn_builder.Base_Network import Base_Network
-
 
 class PyTorch_Base_Network(Base_Network):
     """Base class for PyTorch neural network classes"""

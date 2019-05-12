@@ -1,7 +1,7 @@
 
 
 
-![nn_builder](miscellaneous/material_for_readme/nn_builder_new.png)
+![nn_builder](miscellaneous/material_for_readme/nn_builder_new_2.png)
 
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
 
@@ -27,15 +27,11 @@ On the right is the large amount of code you would need to write to create a PyT
 
 Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.
 
-<center>
-
 | **Network Type**         | **PyTorch**                       | **TensorFlow**                    |
 | --------------------------- | --------------------------------- | --------------------------------- |
 |             NN              | :heavy_check_mark:                | :x:                               |
 | CNN                         | :heavy_check_mark:                | :x:                               |
 | RNN                         | :heavy_check_mark:                | :x:                               |
-
-</center>
  
 
 #### 1. PyTorch NN Module

@@ -116,72 +116,17 @@ class RNN(nn.Module, PyTorch_Base_Network):
         return output_layers
 
 
-    #
-    # def create_hidden_layers(self):
-    #     """Creates the linear layers in the network"""
-    #     cnn_hidden_layers = nn.ModuleList([])
-    #     in_channels = self.input_dim
-    #     for layer in self.hidden_layers_info:
-    #         layer_name = layer[0].lower()
-    #         assert layer_name in self.valid_cnn_hidden_layer_types, "Layer name {} not valid, use one of {}".format(layer_name, self.valid_cnn_hidden_layer_types)
-    #         if layer_name == "conv":
-    #             cnn_hidden_layers.extend([nn.Conv2d(in_channels=in_channels, out_channels=layer[1], kernel_size=layer[2],
-    #                                          stride=layer[3], padding=layer[4])])
-    #             in_channels = layer[1]
-    #         elif layer_name == "maxpool":
-    #             cnn_hidden_layers.extend([nn.MaxPool2d(kernel_size=layer[1],
-    #                                          stride=layer[2], padding=layer[3])])
-    #         elif layer_name == "avgpool":
-    #             cnn_hidden_layers.extend([nn.AvgPool2d(kernel_size=layer[1],
-    #                                          stride=layer[2], padding=layer[3])])
-    #         elif layer_name == "adaptivemaxpool":
-    #             cnn_hidden_layers.extend([nn.AdaptiveMaxPool2d(output_size=(layer[1], layer[2]))])
-    #         elif layer_name == "adaptiveavgpool":
-    #             cnn_hidden_layers.extend([nn.AdaptiveAvgPool2d(output_size=(layer[1], layer[2]))])
-    #         elif layer_name == "linear":
-    #             cnn_hidden_layers.extend([nn.Linear(in_features=layer[1], out_features=layer[2])])
-    #         else:
-    #             raise ValueError("Wrong layer name")
-    #     return cnn_hidden_layers
-    #
-    # def create_output_layers(self):
-    #     """Creates the output layers in the network"""
-    #     output_layers = nn.ModuleList([])
-    #     if self.output_layer_input_dim is not None:
-    #         input_dim = self.output_layer_input_dim
-    #     elif self.hidden_layers_info[-1][0].lower() in ["adaptivemaxpool", "adaptiveavgpool"]:
-    #         input_dim = self.hidden_layers[-1].output_size[0] * self.hidden_layers[-1].output_size[1]
-    #         for layer_info_ix in range(len(self.hidden_layers_info)):
-    #             layer_info = self.hidden_layers_info[-(1+layer_info_ix)]
-    #             if layer_info[0].lower() == "conv":
-    #                 input_dim = input_dim * layer_info[1]
-    #                 break
-    #     elif self.hidden_layers_info[-1][0].lower() == "linear":
-    #         input_dim = self.hidden_layers[-1].out_features
-    #     else:
-    #         raise ValueError("Don't know dimensions for output layer. Must use adaptivemaxpool, adaptiveavgpool, or linear as final hidden layer")
-    #     if not isinstance(self.output_dim, list): self.output_dim = [self.output_dim]
-    #     for output_dim in self.output_dim:
-    #         output_layers.extend([nn.Linear(input_dim, output_dim)])
-    #     return output_layers
-    #
-    # def initialise_all_parameters(self):
-    #     """Initialises the parameters in the linear and embedding layers"""
-    #     initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in self.valid_layer_types_with_no_parameters]
-    #     self.initialise_parameters(initialisable_layers)
-    #     self.initialise_parameters(self.output_layers)
-    #
-    # def create_batch_norm_layers(self):
-    #     """Creates the batch norm layers in the network"""
-    #     batch_norm_layers = nn.ModuleList([])
-    #     for layer in self.hidden_layers_info:
-    #         layer_type = layer[0].lower()
-    #         if layer_type == "conv":
-    #             batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
-    #         elif layer_type == "linear":
-    #             batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[2])])
-    #     return batch_norm_layers
-    #
+    def initialise_all_parameters(self):
+        """Initialises the parameters in the linear and embedding layers"""
+        self.initialise_parameters(self.hidden_layers)
+        self.initialise_parameters(self.output_layers)
+        self.initialise_parameters(self.embedding_layers)
+
+    def create_batch_norm_layers(self):
+        """Creates the batch norm layers in the network"""
+        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=layer[1]) for layer in self.layers[:-1]])
+        return batch_norm_layers
+
     # def forward(self, x):
     #     """Forward pass for the network"""
     #     if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)

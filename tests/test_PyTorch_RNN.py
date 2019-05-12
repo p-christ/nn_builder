@@ -214,4 +214,54 @@ def test_output_activation():
         summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
         assert not all( summed_result == 1.0)
 
+def test_y_range():
+    """Tests whether setting a y range works correctly"""
+    for _ in range(100):
+        val1 = random.random() - 3.0*random.random()
+        val2 = random.random() + 2.0*random.random()
+        lower_bound = min(val1, val2)
+        upper_bound = max(val1, val2)
+        rnn = RNN(layers=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu", y_range=(lower_bound, upper_bound),
+                           initialiser="xavier", input_dim=22)
+        random_data = torch.randn((10, 11, 22))
+        out = rnn.forward(random_data)
+        out = out.reshape(1, -1).squeeze()
+        assert torch.sum(out > lower_bound).item() == 11*25*10, "lower {} vs. {} ".format(lower_bound, out)
+        assert torch.sum(out < upper_bound).item() == 11*25*10, "upper {} vs. {} ".format(upper_bound, out)
+
+def test_deals_with_None_activation():
+    """Tests whether is able to handle user inputting None as output activation"""
+    assert RNN(layers=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu", output_activation=None,
+                           initialiser="xavier", input_dim=5)
+
+def test_check_input_data_into_forward_once():
+    """Tests that check_input_data_into_forward_once method only runs once"""
+    rnn = RNN(layers=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                       hidden_activations="relu", input_dim=5,
+                       output_activation="relu", initialiser="xavier")
+
+    data_not_to_throw_error = torch.randn((1, 4, 5))
+    data_to_throw_error = torch.randn((1, 2, 20))
+
+    with pytest.raises(AssertionError):
+        rnn.forward(data_to_throw_error)
+    with pytest.raises(RuntimeError):
+        rnn.forward(data_not_to_throw_error)
+        rnn.forward(data_to_throw_error)
+
+
+def test_y_range_user_input():
+    """Tests whether network rejects invalid y_range inputs"""
+    invalid_y_range_inputs = [ (4, 1), (2, 4, 8), [2, 4], (np.array(2.0), 6.9)]
+    for y_range_value in invalid_y_range_inputs:
+        with pytest.raises(AssertionError):
+            print(y_range_value)
+            rnn = RNN(layers=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu", y_range=y_range_value, input_dim=5,
+                           initialiser="xavier")
+
+
+
 

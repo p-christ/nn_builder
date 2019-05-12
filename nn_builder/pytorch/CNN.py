@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from nn_builder.pytorch.Base_Network import Base_Network
+from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
 
-class CNN(nn.Module, Base_Network):
+class CNN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
         - input_dim: Tuple of integers to indicate the (channels, height, width) dimension of the input
@@ -27,15 +27,14 @@ class CNN(nn.Module, Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-
     def __init__(self, input_dim, layers, output_activation=None, hidden_activations="relu",
                  dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
-        Base_Network.__init__(self, input_dim, layers, output_activation, hidden_activations, dropout, initialiser,
-                              batch_norm, y_range, random_seed, print_model_summary)
+        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation, hidden_activations, dropout, initialiser,
+                                      batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
@@ -72,7 +71,6 @@ class CNN(nn.Module, Base_Network):
         error_msg_adaptiveavgpool_layer = """Adaptiveavgpool layer must be of form ['adaptiveavgpool', output height, output width]"""
         error_msg_linear_layer = """Linear layer must be of form ['linear', out] where out is a non-negative integers"""
         assert isinstance(self.layers, list), "layers must be a list"
-
 
         all_layers = self.layers[:-1]
         output_layer = self.layers[-1]
@@ -247,4 +245,17 @@ class CNN(nn.Module, Base_Network):
         assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
         assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
         self.checked_forward_input_data_once = True #So that it doesn't check again
+
+    def print_model_summary(self):
+        print("-------------")
+        print("Hidden layers")
+        print("-------------")
+        for layer_ix in range(len(self.hidden_layers)):
+            print(self.hidden_layers[layer_ix])
+            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
+        print("-------------")
+        print("Output Layers")
+        print("-------------")
+        for layer_ix in range(len(self.output_layers)):
+            print(self.output_layers[layer_ix])
 

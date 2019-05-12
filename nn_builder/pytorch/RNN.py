@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from nn_builder.pytorch.Base_Network import Base_Network
+from nn_builder.pytorch.Base_Network import PyTorch_Base_Network
 
-class RNN(nn.Module, Base_Network):
+class RNN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
@@ -33,9 +33,9 @@ class RNN(nn.Module, Base_Network):
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         self.timesteps_to_output = timesteps_to_output.lower()
-        Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
-                              hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
-                              print_model_summary)
+        PyTorch_Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
+                                      hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
+                                      print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

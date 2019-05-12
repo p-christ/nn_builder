@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 import torch.nn as nn
-from nn_builder.pytorch.Base_Network import Base_Network
+from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
 
-class NN(nn.Module, Base_Network):
+class NN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
@@ -34,12 +34,12 @@ class NN(nn.Module, Base_Network):
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        Base_Network.__init__(self, input_dim, layers, output_activation,
-                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
+        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation,
+                                      hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        self.check_input_dim_valid()
+        self.check_NN_input_dim_valid()
         self.check_NN_layers_valid()
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()
@@ -105,24 +105,6 @@ class NN(nn.Module, Base_Network):
         self.initialise_parameters(self.output_layers)
         self.initialise_parameters(self.embedding_layers)
 
-    def print_model_summary(self):
-        if len(self.embedding_layers) > 0:
-            print("Embedding layers")
-            print("-------------")
-            print(self.embedding_layers)
-            print(" ")
-        print("-------------")
-        print("Linear layers")
-        print("-------------")
-        for layer_ix in range(len(self.hidden_layers)):
-            print(self.hidden_layers[layer_ix])
-            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
-        print("-------------")
-        print("Output Layers")
-        print("-------------")
-        for layer_ix in range(len(self.output_layers)):
-            print(self.output_layers[layer_ix])
-
     def forward(self, x):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
@@ -169,3 +151,21 @@ class NN(nn.Module, Base_Network):
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
         x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=1)
         return x
+
+    def print_model_summary(self):
+        if len(self.embedding_layers) > 0:
+            print("Embedding layers")
+            print("-------------")
+            print(self.embedding_layers)
+            print(" ")
+        print("-------------")
+        print("Linear layers")
+        print("-------------")
+        for layer_ix in range(len(self.hidden_layers)):
+            print(self.hidden_layers[layer_ix])
+            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
+        print("-------------")
+        print("Output Layers")
+        print("-------------")
+        for layer_ix in range(len(self.output_layers)):
+            print(self.output_layers[layer_ix])

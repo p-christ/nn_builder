@@ -70,16 +70,22 @@ class CNN(nn.Module, Base_Network):
                                                final 2 elements are non-negative integers"""
         error_msg_adaptivemaxpool_layer = """Adaptivemaxpool layer must be of form ['adaptivemaxpool', output height, output width]"""
         error_msg_adaptiveavgpool_layer = """Adaptiveavgpool layer must be of form ['adaptiveavgpool', output height, output width]"""
-        error_msg_linear_layer = """Linear layer must be of form ['linear', in, out] where in and out are non-negative integers"""
-        error_msg_activation = "The number of output activations provided should match the number of output layers"
+        error_msg_linear_layer = """Linear layer must be of form ['linear', out] where out is a non-negative integers"""
         assert isinstance(self.layers, list), "layers must be a list"
 
 
         all_layers = self.layers[:-1]
         output_layer = self.layers[-1]
+        print("OUTPUT LAYER ", output_layer)
         assert isinstance(output_layer, list), "layers must be a list"
         if isinstance(output_layer[0], list):
-            for layer in output_layer: all_layers.append(layer)
+            for layer in output_layer:
+                all_layers.append(layer)
+                assert layer[0].lower() == "linear", "Final layer must be linear"
+        else:
+            all_layers.append(output_layer)
+            assert isinstance(output_layer[0], str), error_msg_layer_type
+            assert output_layer[0].lower() == "linear", "Final layer must be linear"
 
         print("ALL LAYERS ", all_layers)
         for layer in all_layers:
@@ -193,17 +199,19 @@ class CNN(nn.Module, Base_Network):
         """Initialises the parameters in the linear and embedding layers"""
         initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in self.valid_layer_types_with_no_parameters]
         self.initialise_parameters(nn.ModuleList(initialisable_layers))
-        self.initialise_parameters(self.output_layers)
+        output_initialisable_layers = [layer for layer in self.output_layers if
+                                not type(layer) in self.valid_layer_types_with_no_parameters]
+        self.initialise_parameters(output_initialisable_layers)
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
         batch_norm_layers = nn.ModuleList([])
-        for layer in self.layers:
+        for layer in self.layers[:-1]:
             layer_type = layer[0].lower()
             if layer_type == "conv":
                 batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
             elif layer_type == "linear":
-                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[2])])
+                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
         return batch_norm_layers
 
     def forward(self, x):
@@ -237,6 +245,6 @@ class CNN(nn.Module, Base_Network):
         """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
         so that we don't keep checking as this would slow down the model too much"""
         assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
-        assert x.shape[1] == self.input_dim
+        assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
         self.checked_forward_input_data_once = True #So that it doesn't check again
 

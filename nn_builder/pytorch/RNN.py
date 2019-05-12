@@ -69,10 +69,8 @@ class RNN(nn.Module, PyTorch_Base_Network):
         else:
             all_layers.append(output_layer)
 
-        print("ALL LAYERS ", all_layers)
         rest_must_be_linear = False
         for layer in all_layers:
-            print("LAYER ", layer)
             assert isinstance(layer, list), "Each layer must be a list"
             assert isinstance(layer[0], str), error_msg_layer_type
             layer_type_name = layer[0].lower()
@@ -88,7 +86,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
 
     def create_hidden_layers(self):
         """Creates the hidden layers in the network"""
-        print("HELLO")
         RNN_hidden_layers = nn.ModuleList([])
         input_dim = self.input_dim
         for layer in self.layers[:-1]:
@@ -122,7 +119,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
-        print("HIDDEN LAYERS to initialise", self.hidden_layers)
         self.initialise_parameters(self.hidden_layers)
         self.initialise_parameters(self.output_layers)
         self.initialise_parameters(self.embedding_layers)
@@ -148,7 +144,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
         batch_size, seq_length, data_dimension = x.shape
 
         for layer_ix, layer in enumerate(self.hidden_layers):
-            print("X shape ", x.shape)
             if type(layer) == nn.Linear:
                 x = x.contiguous().view(batch_size * seq_length, -1)
                 activation = self.get_activation(self.hidden_activations, layer_ix)

@@ -251,7 +251,6 @@ def test_check_input_data_into_forward_once():
         rnn.forward(data_not_to_throw_error)
         rnn.forward(data_to_throw_error)
 
-
 def test_y_range_user_input():
     """Tests whether network rejects invalid y_range inputs"""
     invalid_y_range_inputs = [ (4, 1), (2, 4, 8), [2, 4], (np.array(2.0), 6.9)]
@@ -263,5 +262,53 @@ def test_y_range_user_input():
                            initialiser="xavier")
 
 
+N = 250
+X = torch.randn((N, 5, 15))
+X[0:125, 0, 3] += 20.0
+y = X[:, 0, 3] > 5.0
+y = y.float()
 
+def solves_simple_problem(X, y, nn_instance):
+    """Checks if a given network is able to solve a simple problem"""
+    optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
+    for ix in range(800):
+        out = nn_instance.forward(X)
+        out = out[:, -1, :]
+        loss = torch.sum((out.squeeze() - y) ** 2) / N
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    print("LOSS ", loss)
+    return loss < 0.1
+
+def test_model_trains():
+    """Tests whether a small range of networks can solve a simple task"""
+    for output_activation in ["sigmoid", "None"]:
+        rnn = RNN(layers=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+                           hidden_activations="relu", output_activation=output_activation,
+                           initialiser="xavier")
+        assert solves_simple_problem(X, y, rnn)
+
+    z = X[:, 0:1, 3:4] > 5.0
+    z =  torch.cat([z ==1, z==0], dim=1).float()
+    z = z.squeeze(-1).squeeze(-1)
+    rnn = RNN(layers=[["gru", 20], ["lstm", 2]], input_dim=15,
+                           hidden_activations="relu", output_activation="softmax", dropout=0.01,
+                           initialiser="xavier")
+    assert solves_simple_problem(X, z, rnn)
+
+    rnn = RNN(layers=[["lstm", 20], ["linear", 1]], input_dim=15,
+                       hidden_activations="relu", output_activation=None,
+                       initialiser="xavier")
+    assert solves_simple_problem(X, y, rnn)
+
+    rnn = RNN(layers=[["lstm", 20], ["linear", 20], ["linear", 1]], input_dim=15,
+                       hidden_activations="relu", output_activation=None,
+                       initialiser="xavier", batch_norm=True)
+    assert solves_simple_problem(X, y, rnn)
+
+    rnn = RNN(layers=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]], input_dim=15,
+                       hidden_activations="relu", output_activation=None,
+                       initialiser="xavier")
+    assert solves_simple_problem(X, y, rnn)
 

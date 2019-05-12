@@ -312,3 +312,15 @@ def test_model_trains():
                        initialiser="xavier")
     assert solves_simple_problem(X, y, rnn)
 
+def test_dropout():
+    """Tests whether dropout layer reads in probability correctly"""
+    rnn = RNN(layers=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
+                           hidden_activations="relu", output_activation="sigmoid", dropout=0.9999,
+                           initialiser="xavier", input_dim=15)
+    assert rnn.dropout_layer.p == 0.9999
+    assert not solves_simple_problem(X, y, rnn)
+    rnn = RNN(layers=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
+                           hidden_activations="relu", output_activation=None, dropout=0.0000001,
+                           initialiser="xavier", input_dim=15)
+    assert rnn.dropout_layer.p == 0.0000001
+    assert solves_simple_problem(X, y, rnn)

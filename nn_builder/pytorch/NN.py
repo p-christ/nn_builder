@@ -91,14 +91,6 @@ class NN(nn.Module, PyTorch_Base_Network):
         batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.layers[:-1]])
         return batch_norm_layers
 
-    def create_embedding_layers(self):
-        """Creates the embedding layers in the network"""
-        embedding_layers = nn.ModuleList([])
-        for embedding_dimension in self.embedding_dimensions:
-            input_dim, output_dim = embedding_dimension
-            embedding_layers.extend([nn.Embedding(input_dim, output_dim)])
-        return embedding_layers
-
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
         self.initialise_parameters(self.hidden_layers)

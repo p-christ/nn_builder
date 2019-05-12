@@ -18,6 +18,14 @@ class PyTorch_Base_Network(Base_Network):
         """Creates a dropout layer"""
         return nn.Dropout(p=self.dropout)
 
+    def create_embedding_layers(self):
+        """Creates the embedding layers in the network"""
+        embedding_layers = nn.ModuleList([])
+        for embedding_dimension in self.embedding_dimensions:
+            input_dim, output_dim = embedding_dimension
+            embedding_layers.extend([nn.Embedding(input_dim, output_dim)])
+        return embedding_layers
+
     def create_str_to_activations_converter(self):
         """Creates a dictionary which converts strings to activations"""
         str_to_activations_converter = {"elu": nn.ELU(), "hardshrink": nn.Hardshrink(), "hardtanh": nn.Hardtanh(),

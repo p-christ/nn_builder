@@ -65,8 +65,12 @@ class RNN(nn.Module, PyTorch_Base_Network):
         if isinstance(output_layer[0], list):
             for layer in output_layer:
                 all_layers.append(layer)
+        else:
+            all_layers.append(output_layer)
 
+        print("ALL LAYERS ", all_layers)
         for layer in all_layers:
+            print("LAYER ", layer)
             assert isinstance(layer, list), "Each layer must be a list"
             assert isinstance(layer[0], str), error_msg_layer_type
             layer_type_name = layer[0].lower()
@@ -95,12 +99,12 @@ class RNN(nn.Module, PyTorch_Base_Network):
         layer_type_name = layer[0].lower()
         hidden_size = layer[1]
         if layer_type_name == "lstm":
-            RNN_hidden_layers.extend(nn.LSTM(input_size=input_dim, hidden_size=hidden_size))
+            RNN_hidden_layers.extend([nn.LSTM(input_size=input_dim, hidden_size=hidden_size)])
         elif layer_type_name == "gru":
             RNN_hidden_layers.extend(
-                nn.GRU(input_size=input_dim, hidden_size=hidden_size))
+                [nn.GRU(input_size=input_dim, hidden_size=hidden_size)])
         elif layer_type_name == "linear":
-            RNN_hidden_layers.extend(nn.Linear(input_dim, hidden_size))
+            RNN_hidden_layers.extend([nn.Linear(input_dim, hidden_size)])
         else:
             raise ValueError("Wrong layer names")
         input_dim = hidden_size
@@ -114,7 +118,6 @@ class RNN(nn.Module, PyTorch_Base_Network):
         for output_layer in self.layers[-1]:
             self.create_and_append_layer(input_dim, output_layer, output_layers)
         return output_layers
-
 
     def initialise_all_parameters(self):
         """Initialises the parameters in the linear and embedding layers"""
@@ -161,3 +164,9 @@ class RNN(nn.Module, PyTorch_Base_Network):
     #     assert x.shape[1] == self.input_dim
     #     self.checked_forward_input_data_once = True #So that it doesn't check again
     #
+
+    def check_input_data_into_forward_once(self):
+        pass
+
+    def print_model_summary(self):
+        pass

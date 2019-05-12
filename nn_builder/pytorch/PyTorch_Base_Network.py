@@ -14,32 +14,6 @@ class PyTorch_Base_Network(Base_Network):
         super().__init__(input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
-        # self.set_all_random_seeds(random_seed)
-        # self.str_to_activations_converter = self.create_str_to_activations_converter()
-        # self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
-        # self.input_dim = input_dim
-        # self.layers = layers
-        # self.hidden_activations = hidden_activations
-        # self.output_activation = output_activation
-        # self.dropout = dropout
-        # self.initialiser = initialiser
-        # self.batch_norm = batch_norm
-        # self.y_range = y_range
-        # if print_model_summary: self.print_model_summary()
-        #
-        # self.check_all_user_inputs_valid()
-        #
-        # self.hidden_layers = self.create_hidden_layers()
-        # self.output_layers = self.create_output_layers()
-        #
-        #
-        # if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
-        # self.dropout_layer = nn.Dropout(p=dropout)
-        # self.initialise_all_parameters()
-        #
-        # # Flag we use to run checks on the input data into forward the first time it is entered
-        # self.checked_forward_input_data_once = False
-
     def create_dropout_layer(self):
         """Creates a dropout layer"""
         return nn.Dropout(p=self.dropout)

@@ -1,51 +1,121 @@
 import torch
 import torch.nn as nn
-from nn_builder.pytorch.Base_Network import PyTorch_Base_Network
+from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
 
 class RNN(nn.Module, PyTorch_Base_Network):
-    """Creates a PyTorch convolutional neural network
+    """Creates a PyTorch recurrent neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - hidden_layers_info: List of layer specifications to specify the layers of the network. Each element of the list must be
-                         one of these forms:
-                         - ["gru", hidden_size]
-                         - ["lstm", hidden_size]
-                         - ["linear", hidden_size]
-        - timesteps_to_output: String to indicate whether you want the network to output at every timestep or just the last
-                               timestep. Options: ["all", "last"]
-        - output_dim: Integer to indicate the dimension of the output of the network if you want 1 output head. Provide a list of integers
-                      if you want multiple output heads
+        - layers: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
+                         one of these 3 forms:
+                         - ["lstm", hidden_units]
+                         - ["gru", hidden_units]
+                         - ["linear", hidden_units]
+        - hidden_activations: String or list of string to indicate the activations you want used on the output of linear hidden layers
+                              (not including the output layer). Default is ReLU.
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
                              strings if you want multiple output heads
-        - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
-                              (not including the output layer). Default is ReLU.
+        - only_output_final_timestep: Boolean to indicate whether to only output data for the final timestep or not
         - dropout: Float to indicate what dropout probability you want applied after each hidden layer
         - initialiser: String to indicate which initialiser you want used to initialise all the parameters. All PyTorch
                        initialisers are supported. PyTorch's default initialisation is the default.
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
+        - columns_of_data_to_be_embedded: List to indicate the columns numbers of the data that you want to be put through an embedding layer
+                                          before being fed through the other layers of the network. Default option is no embeddings
+        - embedding_dimensions: If you have categorical variables you want embedded before flowing through the network then
+                                you specify the embedding dimensions here with a list like so: [ [embedding_input_dim_1, embedding_output_dim_1],
+                                [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, input_dim, hidden_layers_info, output_dim, timesteps_to_output="last",  output_activation=None, hidden_activations="relu",
-                 dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+    def __init__(self, input_dim: int, layers: list, output_activation=None,
+                 hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
+                 columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
+                 random_seed=0, print_model_summary: bool =False, only_output_final_timestep=False):
         nn.Module.__init__(self)
-        self.timesteps_to_output = timesteps_to_output.lower()
-        PyTorch_Base_Network.__init__(self, input_dim, hidden_layers_info, output_dim, output_activation,
+        self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
+        self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
+        self.embedding_dimensions = embedding_dimensions
+        self.embedding_layers = self.create_embedding_layers()
+        self.only_output_final_timestep = only_output_final_timestep
+        self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
+        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation,
                                       hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                                       print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        self.check_input_dim_valid()
-        self.check_output_dim_valid()
-        self.check_timesteps_to_output_valid()
-        self.check_rnn_hidden_layers_valid()
+        self.check_NN_input_dim_valid()
+        self.check_RNN_layers_valid()
         self.check_activations_valid()
+        self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
+
+    def check_RNN_layers_valid(self):
+        """Checks that layers provided by user are valid"""
+        error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_RNN_hidden_layer_types)
+        error_msg_layer_form = "Layer must be of form [layer_name, hidden_units]"
+
+        all_layers = self.layers[:-1]
+        output_layer = self.layers[-1]
+        assert isinstance(output_layer, list), "layers must be a list"
+        if isinstance(output_layer[0], list):
+            for layer in output_layer:
+                all_layers.append(layer)
+
+        for layer in all_layers:
+            assert isinstance(layer, list), "Each layer must be a list"
+            assert isinstance(layer[0], str), error_msg_layer_type
+            layer_type_name = layer[0].lower()
+            assert layer_type_name in self.valid_RNN_hidden_layer_types, "Layer name {} not valid, use one of {}".format(
+                layer_type_name, self.valid_RNN_hidden_layer_types)
+
+            assert isinstance(layer[1], int), error_msg_layer_form
+            assert layer[1] > 0, "Must have hidden_units >= 1"
+            assert len(layer) == 2, error_msg_layer_form
+
+            rest_must_be_linear = False
+            if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
+            if layer_type_name == "linear": rest_must_be_linear = True
+
+    def create_hidden_layers(self):
+        """Creates the hidden layers in the network"""
+        print("HELLO")
+        RNN_hidden_layers = nn.ModuleList([])
+        input_dim = self.input_dim
+        for layer in self.layers[:-1]:
+            input_dim = self.create_and_append_layer(input_dim, layer, RNN_hidden_layers)
+        self.input_dim_into_final_layer = input_dim
+        return RNN_hidden_layers
+
+    def create_and_append_layer(self, input_dim, layer, RNN_hidden_layers):
+        layer_type_name = layer[0].lower()
+        hidden_size = layer[1]
+        if layer_type_name == "lstm":
+            RNN_hidden_layers.extend(nn.LSTM(input_size=input_dim, hidden_size=hidden_size))
+        elif layer_type_name == "gru":
+            RNN_hidden_layers.extend(
+                nn.GRU(input_size=input_dim, hidden_size=hidden_size))
+        elif layer_type_name == "linear":
+            RNN_hidden_layers.extend(nn.Linear(input_dim, hidden_size))
+        else:
+            raise ValueError("Wrong layer names")
+        input_dim = hidden_size
+        return input_dim
+
+    def create_output_layers(self):
+        """Creates the output layers in the network"""
+        output_layers = nn.ModuleList([])
+        input_dim = self.input_dim_into_final_layer
+        if not isinstance(self.layers[-1][0], list): self.layers[-1] = [self.layers[-1]]
+        for output_layer in self.layers[-1]:
+            self.create_and_append_layer(input_dim, output_layer, output_layers)
+        return output_layers
+
+
     #
     # def create_hidden_layers(self):
     #     """Creates the linear layers in the network"""

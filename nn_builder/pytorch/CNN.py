@@ -126,7 +126,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
                 rest_must_be_linear = True
 
     def create_hidden_layers(self):
-        """Creates the linear layers in the network"""
+        """Creates the hidden layers in the network"""
         print("HELLO")
         cnn_hidden_layers = nn.ModuleList([])
         input_dim = self.input_dim

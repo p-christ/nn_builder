@@ -27,31 +27,6 @@ See this [colab notebook](https://colab.research.google.com/drive/1abxTEaUrJqbTu
 of how to use this module.  
 
 
-![nn_builder](miscellaneous/material_for_readme/nn_builder_new.png)
-
-![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
-
-
-
-
-
-**nn_builder builds neural networks in 1 line**. It saves you time by removing the need for boilerplate code when making neural networks. 
-It is also well tested so you know you aren't making mistakes when creating a network this way. 
-
-### Install
-
-`pip install nn_builder`
-
-### Example
-
-On the right is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
- created in only one line of code on the left using nn_builder: 
-
-![Screenshot](miscellaneous/material_for_readme/nn_builder_use_case.png)
-
-See this [colab notebook](https://colab.research.google.com/drive/1abxTEaUrJqbTuk8e8tOa3y9DYQQVrF_N) for more examples
-of how to use this package. 
-
 ### Usage
 
 Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.

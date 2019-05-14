@@ -34,7 +34,7 @@ Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tenso
 | Network Type       | **NN**  | **CNN** | **RNN** |
 | ------- | ------- | ------- | ------- |
 | PyTorch     | :heavy_check_mark: | :heavy_check_mark:    | :heavy_check_mark:    |
-| TensorFlow  |        :x:  |  :x:                  | :x: |                             |
+| TensorFlow 2.0  |        :x:  |  :x:                  | :x: |                             |
 
 
 #### 1. PyTorch NN Module
@@ -58,12 +58,7 @@ First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arg
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |
 
 
-#### 2. PyTorch CNN Module
-
-The PyTorch CNN module lets you build convolutional PyTorch neural networks in one line. 
-
-First run `from nn_builder.pytorch.CNN import CNN` and then CNN takes the below arguments:
-
+## More Examples
 
 ## Contributing
 

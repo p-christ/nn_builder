@@ -156,7 +156,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
                 x.transpose_(1, 2)
                 x = self.batch_norm_layers[layer_ix](x)
                 x.transpose_(1, 2)
-            x = self.dropout_layer(x)
+            if self.dropout != 0.0: x = self.dropout_layer(x)
 
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
@@ -190,6 +190,3 @@ class RNN(nn.Module, PyTorch_Base_Network):
         assert len(x.shape) == 3, "x should have the shape (batch_size, sequence_length, dimension)"
         assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
         self.checked_forward_input_data_once = True #So that it doesn't check again
-
-    def print_model_summary(self):
-        pass

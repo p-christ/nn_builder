@@ -46,26 +46,6 @@ class NN(nn.Module, PyTorch_Base_Network):
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
-    def check_NN_layers_valid(self):
-        """Checks that user input for hidden_units is valid"""
-        assert isinstance(self.layers, list), "hidden_units must be a list"
-        list_error_msg = "neurons must be a list of integers"
-        integer_error_msg = "Every element of hidden_units must be 1 or higher"
-        activation_error_msg = "The number of output activations provided should match the number of output layers"
-        for neurons in self.layers[:-1]:
-            assert isinstance(neurons, int), list_error_msg
-            assert neurons > 0, integer_error_msg
-        output_layer = self.layers[-1]
-        if isinstance(output_layer, list):
-            assert len(output_layer) == len(self.output_activation), activation_error_msg
-            for output_dim in output_layer:
-                assert isinstance(output_dim, int), list_error_msg
-                assert output_dim > 0, integer_error_msg
-        else:
-            assert isinstance(self.output_activation, str) or self.output_activation is None, activation_error_msg
-            assert isinstance(output_layer, int), list_error_msg
-            assert output_layer > 0, integer_error_msg
-
     def create_hidden_layers(self):
         """Creates the linear layers in the network"""
         linear_layers = nn.ModuleList([])
@@ -104,7 +84,7 @@ class NN(nn.Module, PyTorch_Base_Network):
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-            x = self.dropout_layer(x)
+            if self.dropout != 0.0: x = self.dropout_layer(x)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             activation = self.get_activation(self.output_activation, output_layer_ix)
@@ -143,21 +123,3 @@ class NN(nn.Module, PyTorch_Base_Network):
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
         x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=1)
         return x
-
-    def print_model_summary(self):
-        if len(self.embedding_layers) > 0:
-            print("Embedding layers")
-            print("-------------")
-            print(self.embedding_layers)
-            print(" ")
-        print("-------------")
-        print("Linear layers")
-        print("-------------")
-        for layer_ix in range(len(self.hidden_layers)):
-            print(self.hidden_layers[layer_ix])
-            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
-        print("-------------")
-        print("Output Layers")
-        print("-------------")
-        for layer_ix in range(len(self.output_layers)):
-            print(self.output_layers[layer_ix])

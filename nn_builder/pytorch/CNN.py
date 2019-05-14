@@ -226,7 +226,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
                     flattened = True
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-                x = self.dropout_layer(x)
+                if self.dropout != 0.0: x = self.dropout_layer(x)
 
         if not flattened: x = self.flatten_tensor(x)
         out = None
@@ -245,17 +245,3 @@ class CNN(nn.Module, PyTorch_Base_Network):
         assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
         assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
         self.checked_forward_input_data_once = True #So that it doesn't check again
-
-    def print_model_summary(self):
-        print("-------------")
-        print("Hidden layers")
-        print("-------------")
-        for layer_ix in range(len(self.hidden_layers)):
-            print(self.hidden_layers[layer_ix])
-            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
-        print("-------------")
-        print("Output Layers")
-        print("-------------")
-        for layer_ix in range(len(self.output_layers)):
-            print(self.output_layers[layer_ix])
-

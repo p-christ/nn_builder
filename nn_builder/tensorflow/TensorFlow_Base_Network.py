@@ -12,11 +12,9 @@ class TensorFlow_Base_Network(Base_Network, ABC):
         super().__init__(input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
-
-
     @abstractmethod
-    def create_model(self, input_data):
-        """Creates and returns a tensorflow model"""
+    def call(self, x):
+        """Runs a forward pass of the tensorflow model"""
         raise NotImplementedError
 
 

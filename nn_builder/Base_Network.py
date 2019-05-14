@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 
 class Base_Network(ABC):
 
-    def __init__(self, input_dim, layers, output_activation, hidden_activations, dropout, initialiser, batch_norm,
+    def __init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm,
                  y_range, random_seed, print_model_summary):
         self.set_all_random_seeds(random_seed)
         self.input_dim = input_dim
-        self.layers = layers
+        self.layers_info = layers_info
         self.hidden_activations = hidden_activations
         self.output_activation = output_activation
         self.dropout = dropout
@@ -25,6 +25,9 @@ class Base_Network(ABC):
         self.hidden_layers = self.create_hidden_layers()
         self.output_layers = self.create_output_layers()
         self.dropout_layer = self.create_dropout_layer()
+
+        # Flag we use to run checks on the input data into forward the first time it is entered
+        self.checked_forward_input_data_once = False
 
 
     @abstractmethod
@@ -57,16 +60,22 @@ class Base_Network(ABC):
         """Sets all random seeds"""
         raise NotImplementedError
 
+    @abstractmethod
+    def check_input_data_into_forward_once(self, input_data):
+        """Checks the input data into the network is of the right form. Only runs the first time data is provided
+        otherwise would slow down training too much"""
+        raise NotImplementedError
+
     def check_NN_layers_valid(self):
         """Checks that user input for hidden_units is valid"""
-        assert isinstance(self.layers, list), "hidden_units must be a list"
+        assert isinstance(self.layers_info, list), "hidden_units must be a list"
         list_error_msg = "neurons must be a list of integers"
         integer_error_msg = "Every element of hidden_units must be 1 or higher"
         activation_error_msg = "The number of output activations provided should match the number of output layers"
-        for neurons in self.layers[:-1]:
+        for neurons in self.layers_info[:-1]:
             assert isinstance(neurons, int), list_error_msg
             assert neurons > 0, integer_error_msg
-        output_layer = self.layers[-1]
+        output_layer = self.layers_info[-1]
         if isinstance(output_layer, list):
             assert len(output_layer) == len(self.output_activation), activation_error_msg
             for output_dim in output_layer:
@@ -97,7 +106,7 @@ class Base_Network(ABC):
         if isinstance(self.hidden_activations, str):
             assert self.hidden_activations.lower() in set(valid_activations_strings), "hidden_activations must be from list {}".format(valid_activations_strings)
         elif isinstance(self.hidden_activations, list):
-            assert len(self.hidden_activations) == len(self.layers), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
+            assert len(self.hidden_activations) == len(self.layers_info), "if hidden_activations is a list then you must provide 1 activation per hidden layer"
             for activation in self.hidden_activations:
                 assert isinstance(activation, str), "hidden_activations must be a string or list of strings"
                 assert activation.lower() in set(valid_activations_strings), "each element in hidden_activations must be from list {}".format(valid_activations_strings)

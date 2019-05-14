@@ -16,8 +16,8 @@ class PyTorch_Base_Network(Base_Network, ABC):
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
         if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.initialise_all_parameters()
-        # Flag we use to run checks on the input data into forward the first time it is entered
-        self.checked_forward_input_data_once = False
+
+
 
     @abstractmethod
     def create_batch_norm_layers(self):
@@ -32,12 +32,6 @@ class PyTorch_Base_Network(Base_Network, ABC):
     @abstractmethod
     def forward(self, input_data):
         """Runs a forward pass of the network"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def check_input_data_into_forward_once(self, input_data):
-        """Checks the input data into the network is of the right form. Only runs the first time data is provided
-        otherwise would slow down training too much"""
         raise NotImplementedError
 
     def create_dropout_layer(self):

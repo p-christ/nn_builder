@@ -7,7 +7,7 @@ class NN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - layers: List of integers to indicate the width and number of linear layers you want in your network
+        - layers_info: List of integers to indicate the width and number of linear layers you want in your network
         - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
                               (not including the output layer). Default is ReLU.
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
@@ -25,7 +25,7 @@ class NN(nn.Module, PyTorch_Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, layers: list, output_activation=None,
+    def __init__(self, input_dim: int, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -50,7 +50,7 @@ class NN(nn.Module, PyTorch_Base_Network):
         """Creates the linear layers in the network"""
         linear_layers = nn.ModuleList([])
         input_dim = int(self.input_dim - len(self.embedding_dimensions) + np.sum([output_dims[1] for output_dims in self.embedding_dimensions]))
-        for hidden_unit in self.layers[:-1]:
+        for hidden_unit in self.layers_info[:-1]:
             linear_layers.extend([nn.Linear(input_dim, hidden_unit)])
             input_dim = hidden_unit
         return linear_layers
@@ -58,17 +58,17 @@ class NN(nn.Module, PyTorch_Base_Network):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
-        if len(self.layers) >= 2: input_dim = self.layers[-2]
+        if len(self.layers_info) >= 2: input_dim = self.layers_info[-2]
         else: input_dim = self.input_dim
-        if not isinstance(self.layers[-1], list): output_layer = [self.layers[-1]]
-        else: output_layer = self.layers[-1]
+        if not isinstance(self.layers_info[-1], list): output_layer = [self.layers_info[-1]]
+        else: output_layer = self.layers_info[-1]
         for output_dim in output_layer:
             output_layers.extend([nn.Linear(input_dim, output_dim)])
         return output_layers
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
-        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.layers[:-1]])
+        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=hidden_unit) for hidden_unit in self.layers_info[:-1]])
         return batch_norm_layers
 
     def initialise_all_parameters(self):

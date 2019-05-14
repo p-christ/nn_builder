@@ -7,7 +7,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
         - input_dim: Tuple of integers to indicate the (channels, height, width) dimension of the input
-        - layers: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
+        - layers_info: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
                          one of these 6 forms:
                          - ["conv", channels, kernel_size, stride, padding]
                          - ["maxpool", kernel_size, stride, padding]
@@ -27,7 +27,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim, layers, output_activation=None, hidden_activations="relu",
+    def __init__(self, input_dim, layers_info, output_activation=None, hidden_activations="relu",
                  dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
@@ -70,10 +70,10 @@ class CNN(nn.Module, PyTorch_Base_Network):
         error_msg_adaptivemaxpool_layer = """Adaptivemaxpool layer must be of form ['adaptivemaxpool', output height, output width]"""
         error_msg_adaptiveavgpool_layer = """Adaptiveavgpool layer must be of form ['adaptiveavgpool', output height, output width]"""
         error_msg_linear_layer = """Linear layer must be of form ['linear', out] where out is a non-negative integers"""
-        assert isinstance(self.layers, list), "layers must be a list"
+        assert isinstance(self.layers_info, list), "layers must be a list"
 
-        all_layers = self.layers[:-1]
-        output_layer = self.layers[-1]
+        all_layers = self.layers_info[:-1]
+        output_layer = self.layers_info[-1]
         print("OUTPUT LAYER ", output_layer)
         assert isinstance(output_layer, list), "layers must be a list"
         if isinstance(output_layer[0], list):
@@ -130,7 +130,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
         print("HELLO")
         cnn_hidden_layers = nn.ModuleList([])
         input_dim = self.input_dim
-        for layer in self.layers[:-1]:
+        for layer in self.layers_info[:-1]:
             input_dim = self.create_and_append_layer(input_dim, layer, cnn_hidden_layers)
         self.input_dim_into_final_layer = input_dim
         return cnn_hidden_layers
@@ -188,8 +188,8 @@ class CNN(nn.Module, PyTorch_Base_Network):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
         input_dim = self.input_dim_into_final_layer
-        if not isinstance(self.layers[-1][0], list)  : self.layers[-1] = [self.layers[-1]]
-        for output_layer in self.layers[-1]:
+        if not isinstance(self.layers_info[-1][0], list)  : self.layers_info[-1] = [self.layers_info[-1]]
+        for output_layer in self.layers_info[-1]:
             self.create_and_append_layer(input_dim, output_layer, output_layers)
         return output_layers
 
@@ -204,7 +204,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
         batch_norm_layers = nn.ModuleList([])
-        for layer in self.layers[:-1]:
+        for layer in self.layers_info[:-1]:
             layer_type = layer[0].lower()
             if layer_type == "conv":
                 batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])

@@ -6,7 +6,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch recurrent neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - layers: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
+        - layers_info: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
                          one of these 3 forms:
                          - ["lstm", hidden_units]
                          - ["gru", hidden_units]
@@ -29,7 +29,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, input_dim: int, layers: list, output_activation=None,
+    def __init__(self, input_dim: int, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -58,10 +58,10 @@ class RNN(nn.Module, PyTorch_Base_Network):
         error_msg_layer_form = "Layer must be of form [layer_name, hidden_units]"
         error_msg_layer_list = "Layers must be provided as a list"
 
-        assert isinstance(self.layers, list), error_msg_layer_list
+        assert isinstance(self.layers_info, list), error_msg_layer_list
 
-        all_layers = self.layers[:-1]
-        output_layer = self.layers[-1]
+        all_layers = self.layers_info[:-1]
+        output_layer = self.layers_info[-1]
         assert isinstance(output_layer, list), error_msg_layer_list
         if isinstance(output_layer[0], list):
             for layer in output_layer:
@@ -88,7 +88,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
         """Creates the hidden layers in the network"""
         RNN_hidden_layers = nn.ModuleList([])
         input_dim = self.input_dim
-        for layer in self.layers[:-1]:
+        for layer in self.layers_info[:-1]:
             input_dim = self.create_and_append_layer(input_dim, layer, RNN_hidden_layers)
         self.input_dim_into_final_layer = input_dim
         return RNN_hidden_layers
@@ -112,8 +112,8 @@ class RNN(nn.Module, PyTorch_Base_Network):
         """Creates the output layers in the network"""
         output_layers = nn.ModuleList([])
         input_dim = self.input_dim_into_final_layer
-        if not isinstance(self.layers[-1][0], list): self.layers[-1] = [self.layers[-1]]
-        for output_layer in self.layers[-1]:
+        if not isinstance(self.layers_info[-1][0], list): self.layers_info[-1] = [self.layers_info[-1]]
+        for output_layer in self.layers_info[-1]:
             self.create_and_append_layer(input_dim, output_layer, output_layers)
         return output_layers
 
@@ -125,7 +125,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
-        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=layer[1]) for layer in self.layers[:-1]])
+        batch_norm_layers = nn.ModuleList([nn.BatchNorm1d(num_features=layer[1]) for layer in self.layers_info[:-1]])
         return batch_norm_layers
 
     def get_activation(self, activations, ix=None):

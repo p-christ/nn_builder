@@ -16,7 +16,19 @@ It is also well tested so you know you aren't making mistakes when creating a ne
 
 `pip install nn_builder`
 
-### Example
+
+### Support
+
+Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.
+
+| Network Type       | **NN**  | **CNN** | **RNN** |
+| ------- | ------- | ------- | ------- |
+| PyTorch     | :heavy_check_mark: | :heavy_check_mark:    | :heavy_check_mark:    |
+| TensorFlow 2.0  |        :x:  |  :x:                  | :x: |                             |
+
+
+
+### Examples
 
 On the right is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
  created in only one line of code on the left using nn_builder: 
@@ -28,16 +40,6 @@ of how to use this module.
 
 
 ### Usage
-
-Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.
-
-| Network Type       | **NN**  | **CNN** | **RNN** |
-| ------- | ------- | ------- | ------- |
-| PyTorch     | :heavy_check_mark: | :heavy_check_mark:    | :heavy_check_mark:    |
-| TensorFlow 2.0  |        :x:  |  :x:                  | :x: |                             |
-
-
-#### 1. PyTorch NN Module
 
 The PyTorch NN module lets you build feedforward (rather than CNNs or RNNs) PyTorch neural networks in one line. 
 

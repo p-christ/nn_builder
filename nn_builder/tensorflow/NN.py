@@ -24,7 +24,6 @@ class NN(Model, TensorFlow_Base_Network):
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
-        # self.check_NN_input_dim_valid()
         self.check_NN_layers_valid()
         self.check_activations_valid()
         self.check_embedding_dimensions_valid()
@@ -68,8 +67,7 @@ class NN(Model, TensorFlow_Base_Network):
                                                         kernel_initializer=self.initialiser_function)])
         return output_layers
 
-    def call(self, x):
-        # if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
+    def call(self, x, training=True):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = linear_layer(x)
@@ -86,7 +84,7 @@ class NN(Model, TensorFlow_Base_Network):
 
     def incorporate_embeddings(self, x):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
-        to then be put through the linear layers"""
+        to then be put through the hidden layers"""
         all_embedded_data = []
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
             data = x[:, embedding_var]  #.long()

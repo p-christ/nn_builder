@@ -33,7 +33,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
-        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation, hidden_activations, dropout, initialiser,
+        PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
                                       batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):

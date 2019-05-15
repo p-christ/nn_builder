@@ -80,51 +80,18 @@ class NN(Model, TensorFlow_Base_Network):
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*activations.sigmoid(out)
         return out
 
-
-    def check_input_data_into_forward_once(self, x):
-        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
-        so that we don't keep checking as this would slow down the model too much"""
-        print(x)
-        for embedding_dim in self.columns_of_data_to_be_embedded:
-            data = x[:, embedding_dim]
-            data_long =  tf.round(data)
-
-            print(data_long)
-            assert 1 == 0
-
-            assert all(data_long >= 0), "All data to be embedded must be integers 0 and above -- {}".format(data_long)
-            assert tf.reduce_sum(abs(data - data_long)) < 0.0001, """Data columns to be embedded should be integer 
-                                                                                values 0 and above to represent the different 
-                                                                                classes"""
-        assert len(x.shape) == 2, "X should be a 2-dimensional tensor"
-        self.checked_forward_input_data_once = True #So that it doesn't check again
-
-
     def incorporate_embeddings(self, x):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
         to then be put through the linear layers"""
         all_embedded_data = []
-        print("X shape ", x.shape)
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
-            print("ONE")
             data = x[:, embedding_var]  #.long()
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
-            print("TWO")
             all_embedded_data.append(embedded_data)
-        print("HERE")
         all_embedded_data = Concatenate(axis=1)(all_embedded_data)
-
-        print(all_embedded_data.shape)
-
         non_embedded_columns = [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]
-
-        print("non_embedded_columns ", non_embedded_columns )
-
-        rest_of_data = x[:, non_embedded_columns]
-        print(rest_of_data.shape)
-        print("HERE 2 ")
+        rest_of_data = tf.gather(x, non_embedded_columns, axis=1)
         x = Concatenate(axis=1)([tf.dtypes.cast(rest_of_data, float), all_embedded_data])
-        print("HERE 3")
         return x
 
 

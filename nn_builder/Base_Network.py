@@ -26,8 +26,7 @@ class Base_Network(ABC):
         self.output_layers = self.create_output_layers()
         self.dropout_layer = self.create_dropout_layer()
 
-        # Flag we use to run checks on the input data into forward the first time it is entered
-        self.checked_forward_input_data_once = False
+
 
 
     @abstractmethod
@@ -58,12 +57,6 @@ class Base_Network(ABC):
     @abstractmethod
     def set_all_random_seeds(self, random_seed):
         """Sets all random seeds"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def check_input_data_into_forward_once(self, input_data):
-        """Checks the input data into the network is of the right form. Only runs the first time data is provided
-        otherwise would slow down training too much"""
         raise NotImplementedError
 
     def check_NN_layers_valid(self):

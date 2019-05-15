@@ -14,16 +14,10 @@ class PyTorch_Base_Network(Base_Network, ABC):
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
         super().__init__(input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
-        if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
         self.initialise_all_parameters()
 
         # Flag we use to run checks on the input data into forward the first time it is entered
         self.checked_forward_input_data_once = False
-
-    @abstractmethod
-    def create_batch_norm_layers(self):
-        """Creates the batch norm layers in the network"""
-        raise NotImplementedError
 
     @abstractmethod
     def initialise_all_parameters(self):

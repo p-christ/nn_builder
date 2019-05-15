@@ -25,6 +25,7 @@ class Base_Network(ABC):
         self.hidden_layers = self.create_hidden_layers()
         self.output_layers = self.create_output_layers()
         self.dropout_layer = self.create_dropout_layer()
+        if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
 
 
 
@@ -42,6 +43,11 @@ class Base_Network(ABC):
     @abstractmethod
     def create_output_layers(self):
         """Creates the output layers in the network"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def create_batch_norm_layers(self):
+        """Creates the batch norm layers in the network"""
         raise NotImplementedError
 
     @abstractmethod

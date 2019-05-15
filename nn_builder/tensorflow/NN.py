@@ -13,12 +13,11 @@ class NN(Model, TensorFlow_Base_Network):
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
-        super().__init__()
+        Model.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-
         TensorFlow_Base_Network.__init__(self, input_dim, layers_info, output_activation,
                                          hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                                          print_model_summary)
@@ -40,6 +39,13 @@ class NN(Model, TensorFlow_Base_Network):
             hidden_layers.extend([tf.keras.layers.Dense(hidden_unit, activation=activation,
                                                         kernel_initializer=self.initialiser_function)])
         return hidden_layers
+
+    def create_batch_norm_layers(self):
+        """Creates the batch norm layers in the network"""
+        batch_norm_layers = []
+        for _ in range(len(self.hidden_layers)):
+            batch_norm_layers.append(BatchNormalization())
+        return batch_norm_layers
 
     def create_embedding_layers(self):
         """Creates the embedding layers in the network"""
@@ -64,19 +70,17 @@ class NN(Model, TensorFlow_Base_Network):
 
     def call(self, x):
         # if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
-        if self.embedding_to_occur:
-            x = self.incorporate_embeddings(x)
+        if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = linear_layer(x)
-            if self.batch_norm: x = BatchNormalization()(x)
-            if self.dropout != 0.0: x = self.dropout_layer(x)
+            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
+            if self.dropout != 0.0:
+                x = self.dropout_layer(x)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             temp_output = output_layer(x)
-            if out is None:
-                out = temp_output
-            else:
-                out = Concatenate(axis=1)((out, temp_output))
+            if out is None: out = temp_output
+            else: out = Concatenate(axis=1)((out, temp_output))
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*activations.sigmoid(out)
         return out
 

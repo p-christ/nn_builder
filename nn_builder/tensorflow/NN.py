@@ -26,11 +26,10 @@ class NN(Model, TensorFlow_Base_Network):
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
-        - input_dim: Integer to indicate the dimension of the input into the network. Optional, not needed.
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, layers_info: list, output_activation=None, input_dim=None,
+    def __init__(self, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -39,7 +38,7 @@ class NN(Model, TensorFlow_Base_Network):
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        TensorFlow_Base_Network.__init__(self, input_dim, layers_info, output_activation,
+        TensorFlow_Base_Network.__init__(self, None, layers_info, output_activation,
                                          hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                                          print_model_summary)
 

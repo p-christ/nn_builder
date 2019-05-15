@@ -30,10 +30,9 @@ class CNN(Model, TensorFlow_Base_Network):
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
-        - input_dim: Tuple of integers to indicate the (channels, height, width) dimension of the input. Optional, not needed
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, layers_info, output_activation=None, hidden_activations="relu", input_dim=None,
+    def __init__(self, layers_info, output_activation=None, hidden_activations="relu",
                  dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
         Model.__init__(self)

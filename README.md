@@ -1,7 +1,7 @@
 
 
 
-![nn_builder](miscellaneous/material_for_readme/nn_builder_new.png)
+![nn_builder](miscellaneous/material_for_readme/nn_builder_new_copy.png)
 
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
 

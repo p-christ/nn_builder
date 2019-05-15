@@ -143,13 +143,30 @@ def test_incorporate_embeddings():
 
 def test_embedding_network_can_solve_simple_problem():
     """Tests whether network can solve simple problem using embeddings"""
-    X = np.random.random((N, 2)) * 5.0 + 20.0
+    X = np.random.random((N, 5)) * 5.0 + 20.0
     y = (X[:, 0] >= 20) * (X[:, 1] <= 20) * 1.0
+
+    print(y.shape)
     nn_instance = NN(input_dim=2, layers_info=[5, 1],
                      columns_of_data_to_be_embedded=[0, 1],
                      embedding_dimensions=[[50, 3],
                                            [55, 3]])
-    assert solves_simple_problem(X, y, nn_instance)
+
+    nn_instance.compile(optimizer='adam',
+                  loss='mse')
+
+
+    nn_instance.fit(X, y, epochs=800)
+
+    results = nn_instance.evaluate(X, y)
+
+    see here https://colab.research.google.com/drive/1-wVi_AEbvuZOTO5Lz5lgL8cg1yB5HSBi#scrollTo=n52s-lO6Qg5x
+
+
+    assert 1 == 0
+    #
+    #
+    # assert solves_simple_problem(X, y, nn_instance)
 
 def test_batch_norm_layers_info():
     """Tests whether batch_norm_layers_info method works correctly"""
@@ -189,15 +206,25 @@ def train_step(images, labels, nn_instance, loss_object, optimizer, train_loss, 
 
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
-    loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
-    optimizer = tf.keras.optimizers.Adam()
-    train_loss = tf.keras.metrics.Mean(name='train_loss')
-    train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+    # loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
+    # optimizer = tf.keras.optimizers.Adam()
+    # train_loss = tf.keras.metrics.Mean(name='train_loss')
+    # train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 
-    for ix in range(800):
-        train_step(X, y, nn_instance, loss_object, optimizer, train_loss, train_accuracy)
-    loss = train_loss.result()
-    return loss < 0.1
+    nn_instance.compile(optimizer='adam',
+                  loss='mse')
+
+
+    nn_instance.fit(X, y, epochs=800)
+
+    results = nn_instance.evaluate(X, y)
+    print(results)
+
+    #
+    # for ix in range(800):
+    #     train_step(X, y, nn_instance, loss_object, optimizer, train_loss, train_accuracy)
+    # loss = train_loss.result()
+    # return loss < 0.1
 
 
 def test_dropout():

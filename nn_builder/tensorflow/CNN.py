@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import tensorflow.keras.activations as activations
 
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, Conv2D, AveragePooling2D, \
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, Conv2D, AveragePooling2D
 
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
@@ -38,7 +38,7 @@ class CNN(Model, TensorFlow_Base_Network):
         Model.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [MaxPool2D, AveragePooling2D]
-        TensorFlow_Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
+        TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
                                       batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):

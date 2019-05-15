@@ -9,8 +9,7 @@
 
 
 
-**nn_builder builds neural networks in 1 line**. It saves you time by removing the need for boilerplate code when making neural networks. 
-It is also well tested so you know you aren't making mistakes when creating a network this way. 
+**nn_builder builds neural networks in 1 line**, saving you time.
 
 ### Install
 
@@ -41,23 +40,23 @@ of how to use this module.
 
 ### Usage
 
-The PyTorch NN module lets you build feedforward (rather than CNNs or RNNs) PyTorch neural networks in one line. 
-
-First run `from nn_builder.pytorch.NN import NN` and then NN takes the below arguments:
+Every network requires the same arguments: 
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
-| *input_dim*| Integer to indicate the dimension of the input into the network | N/A |
+| *input_dim*| Dimension of the input into the network excluding the batch size. Not needed for Tensorflow.  | N/A |
 | *layers_info* | List of integers to indicate the width and number of linear layers you want in your network | N/A |
 | *output_activation* | String to indicate the activation function you want the output to go through. Provide a list of strings if you want multiple output heads | No activation |                              
 | *hidden_activations* | String or list of string to indicate the activations you want used on the output of hidden layers (not including the output layer), default is ReLU and for example "tanh" would have tanh applied on all hidden layer activations | ReLU after every hidden layer |
 | *dropout* | Float to indicate what dropout probability you want applied after each hidden layer | 0 |
-| *initialiser* | String to indicate which initialiser you want used to initialise all the parameters. All PyTorch initialisers are supported. | PyTorch Default |
+| *initialiser* | String to indicate which initialiser you want used to initialise all the parameters | PyTorch Default |
 | *batch_norm* | Boolean to indicate whether you want batch norm applied to the output of every hidden layer | False |
-| *columns_of_data_to_be_embedded* | List to indicate the column numbers of the data that you want to be put through an embedding layer before being fed through the hidden layers of the network | No embeddings |
+| *columns of_data_to_be_embedded* | List to indicate the column numbers of the data that you want to be put through an embedding layer before being fed through the hidden layers of the network | No embeddings |
 | *embedding_dimensions* | If you have categorical variables you want embedded before flowing through the network then you specify the embedding dimensions here with a list of the form: [ [embedding_input_dim_1, embedding_output_dim_1], [embedding_input_dim_2, embedding_output_dim_2] ...] | No embeddings |
 | *y_range* | Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the output values to in regression tasks | No range |
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |
+
+e.g. 
 
 
 ## More Examples

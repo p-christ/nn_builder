@@ -108,7 +108,7 @@ class NN(nn.Module, PyTorch_Base_Network):
             assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, """Data columns to be embedded should be integer 
                                                                                 values 0 and above to represent the different 
                                                                                 classes"""
-        if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor)
+        if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor), f'Incorrect Tensor type is {x}'
         assert len(x.shape) == 2, "X should be a 2-dimensional tensor"
         self.checked_forward_input_data_once = True #So that it doesn't check again
 

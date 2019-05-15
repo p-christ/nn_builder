@@ -438,3 +438,24 @@ def test_MNIST_progress():
 
     shutil.rmtree("input/", ignore_errors=False, onerror=None)
     assert accuracies[-1] > 0.7, "Accuracy not good enough {}".format(accuracies[-1])
+
+
+def test_all_activations_work():
+    """Tests that all activations get accepted"""
+    nn_instance = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                   dropout=0.0000001,
+                                   initialiser="xavier", input_dim=(1, 5, 5))
+    for key in nn_instance.str_to_activations_converter.keys():
+        assert CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                   hidden_activations=key, output_activation=key, dropout=0.0000001,
+                                   initialiser="xavier", input_dim=(1, 5, 5))
+
+def test_all_initialisers_work():
+    """Tests that all initialisers get accepted"""
+    nn_instance = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                   dropout=0.0000001,
+                                   initialiser="xavier", input_dim=(1, 5, 5))
+    for key in nn_instance.str_to_initialiser_converter.keys():
+        assert CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                    dropout=0.0000001,
+                                   initialiser=key, input_dim=(1, 5, 5))

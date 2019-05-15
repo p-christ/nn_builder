@@ -39,7 +39,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
-        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation,
+        PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation,
                                       hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                                       print_model_summary)
 

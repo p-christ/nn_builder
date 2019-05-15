@@ -34,7 +34,7 @@ class NN(nn.Module, PyTorch_Base_Network):
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        PyTorch_Base_Network.__init__(self, input_dim, layers, output_activation,
+        PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation,
                                       hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):

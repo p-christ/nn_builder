@@ -55,17 +55,17 @@ class CNN(Model, TensorFlow_Base_Network):
         - ["conv", channels, kernel_size, stride, padding]
         - ["maxpool", kernel_size, stride, padding]
         - ["avgpool", kernel_size, stride, padding]
-        - ["adaptivemaxpool", output height, output width]
-        - ["adaptiveavgpool", output height, output width]
         - ["linear", out]
+
+        where all variables must be integers except padding which must be "valid" or "same"
         """
         error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_cnn_hidden_layer_types)
         error_msg_conv_layer = """Conv layer must be of form ['conv', channels, kernel_size, stride, padding] where the 
-                               final 4 elements are non-negative integers"""
+                               variables are all non-negative integers except padding which must be either "valid" or "same"""
         error_msg_maxpool_layer = """Maxpool layer must be of form ['maxpool', kernel_size, stride, padding] where the 
-                                       final 2 elements are non-negative integers"""
+                               variables are all non-negative integers except padding which must be either "valid" or "same"""
         error_msg_avgpool_layer = """Avgpool layer must be of form ['avgpool', kernel_size, stride, padding] where the 
-                                               final 2 elements are non-negative integers"""
+                               variables are all non-negative integers except padding which must be either "valid" or "same"""
         error_msg_linear_layer = """Linear layer must be of form ['linear', out] where out is a non-negative integers"""
         assert isinstance(self.layers_info, list), "layers must be a list"
 
@@ -89,16 +89,16 @@ class CNN(Model, TensorFlow_Base_Network):
             if layer_type_name == "conv":
                 assert len(layer) == 5, error_msg_conv_layer
                 for ix in range(3): assert isinstance(layer[ix+1], int) and layer[ix+1] > 0, error_msg_conv_layer
-                assert isinstance(layer[4], int) and layer[4] >= 0, error_msg_conv_layer
+                assert isinstance(layer[4], str) and layer[4].lower() in ["valid", "same"], error_msg_conv_layer
             elif layer_type_name == "maxpool":
                 assert len(layer) == 4, error_msg_maxpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer
                 if layer[1] != layer[2]: print("NOTE that your maxpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
-                assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
+                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_conv_layer
             elif layer_type_name == "avgpool":
                 assert len(layer) == 4, error_msg_avgpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_avgpool_layer
-                assert isinstance(layer[3], int) and layer[3] >= 0, error_msg_conv_layer
+                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_conv_layer
                 if layer[1] != layer[2]:print("NOTE that your avgpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
             elif layer_type_name == "linear":
                 assert len(layer) == 2, error_msg_linear_layer
@@ -136,32 +136,9 @@ class CNN(Model, TensorFlow_Base_Network):
             list_to_append_layer_to.extend([AveragePooling2D(pool_size=(layer[1], layer[1]),
                                                    strides=(layer[2], layer[2]), padding=layer[3])])
         elif layer_name == "linear":
-            # if isinstance(input_dim, tuple): input_dim = np.prod(np.array(input_dim))
             list_to_append_layer_to.extend([Dense(layer[1], activation=activation, kernel_initializer=self.initialiser_function)])
         else:
             raise ValueError("Wrong layer name")
-
-    # def calculate_new_dimensions(self, input_dim, layer):
-    #     """Calculates the new dimensions of the data after passing through a type of layer"""
-    #     layer_name = layer[0].lower()
-    #     if layer_name == "conv":
-    #         new_channels = layer[1]
-    #         kernel, stride, padding = layer[2], layer[3], layer[4]
-    #         new_height = int((input_dim[1] - kernel + 2*padding)/stride) + 1
-    #         new_width = int((input_dim[2] - kernel + 2 * padding) / stride) + 1
-    #         output_dim = (new_channels, new_height, new_width)
-    #     elif layer_name in ["maxpool", "avgpool"]:
-    #         new_channels = input_dim[0]
-    #         kernel, stride, padding = layer[1], layer[2], layer[3]
-    #         new_height = int((input_dim[1] - kernel + 2*padding)/stride) + 1
-    #         new_width = int((input_dim[2] - kernel + 2 * padding) / stride) + 1
-    #         output_dim = (new_channels, new_height, new_width)
-    #     elif layer_name in ["adaptivemaxpool", "adaptiveavgpool"]:
-    #         new_channels = input_dim[0]
-    #         output_dim = (new_channels, layer[1], layer[2])
-    #     elif layer_name == "linear":
-    #         output_dim = layer[1]
-    #     return output_dim
 
     def create_output_layers(self):
         """Creates the output layers in the network"""
@@ -171,25 +148,6 @@ class CNN(Model, TensorFlow_Base_Network):
             activation = self.get_activation(self.output_activation, output_layer_ix)
             self.create_and_append_layer(output_layer, output_layers, activation)
         return output_layers
-    #
-    # def initialise_all_parameters(self):
-    #     """Initialises the parameters in the linear and embedding layers"""
-    #     initialisable_layers = [layer for layer in self.hidden_layers if not type(layer) in self.valid_layer_types_with_no_parameters]
-    #     self.initialise_parameters(nn.ModuleList(initialisable_layers))
-    #     output_initialisable_layers = [layer for layer in self.output_layers if
-    #                             not type(layer) in self.valid_layer_types_with_no_parameters]
-    #     self.initialise_parameters(output_initialisable_layers)
-
-    def create_batch_norm_layers(self):
-        """Creates the batch norm layers in the network"""
-        batch_norm_layers = nn.ModuleList([])
-        for layer in self.layers_info[:-1]:
-            layer_type = layer[0].lower()
-            if layer_type == "conv":
-                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
-            elif layer_type == "linear":
-                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
-        return batch_norm_layers
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
@@ -202,34 +160,23 @@ class CNN(Model, TensorFlow_Base_Network):
 
     def call(self, x):
         """Forward pass for the network"""
-        # if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         flattened=False
-
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
             else:
-                if type(layer) == nn.Linear and not flattened:
-                    x = self.flatten_tensor(x)
+                if type(layer) == Dense and not flattened:
+                    x = Flatten()(x)
                     flattened = True
-                x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
+                x = layer(x)
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
                 if self.dropout != 0.0: x = self.dropout_layer(x)
 
-        if not flattened: x = self.flatten_tensor(x)
+        if not flattened: x = Flatten()(x)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
-            activation = self.get_activation(self.output_activation, output_layer_ix)
             temp_output = output_layer(x)
-            if activation is not None: temp_output = activation(temp_output)
             if out is None: out = temp_output
-            else: out = torch.cat((out, temp_output), dim=1)
+            else: out = Concatenate(axis=1)([out, temp_output])
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
-
-    def check_input_data_into_forward_once(self, x):
-        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
-        so that we don't keep checking as this would slow down the model too much"""
-        assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
-        assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
-        self.checked_forward_input_data_once = True #So that it doesn't check again

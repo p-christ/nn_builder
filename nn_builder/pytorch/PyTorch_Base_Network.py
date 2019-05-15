@@ -14,6 +14,7 @@ class PyTorch_Base_Network(Base_Network, ABC):
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
         super().__init__(input_dim, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
+
         self.initialise_all_parameters()
 
         # Flag we use to run checks on the input data into forward the first time it is entered
@@ -61,13 +62,12 @@ class PyTorch_Base_Network(Base_Network, ABC):
     def create_str_to_initialiser_converter(self):
         """Creates a dictionary which converts strings to initialiser"""
         str_to_initialiser_converter = {"uniform": nn.init.uniform_, "normal": nn.init.normal_,
-                                        "constant": nn.init.constant_,
-                                        "eye": nn.init.eye_, "dirac": nn.init.dirac_,
+                                        "eye": nn.init.eye_,
                                         "xavier_uniform": nn.init.xavier_uniform_, "xavier": nn.init.xavier_uniform_,
                                         "xavier_normal": nn.init.xavier_normal_,
                                         "kaiming_uniform": nn.init.kaiming_uniform_, "kaiming": nn.init.kaiming_uniform_,
                                         "kaiming_normal": nn.init.kaiming_normal_, "he": nn.init.kaiming_normal_,
-                                        "orthogonal": nn.init.orthogonal_, "sparse": nn.init.sparse_, "default": "use_default"}
+                                        "orthogonal": nn.init.orthogonal_,  "default": "use_default"}
         return str_to_initialiser_converter
 
     def set_all_random_seeds(self, random_seed):

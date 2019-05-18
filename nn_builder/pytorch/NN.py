@@ -25,7 +25,7 @@ class NN(nn.Module, PyTorch_Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, layers_info: list, output_activation=None,
+    def __init__(self, input_dim: int, layers: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):
@@ -79,7 +79,7 @@ class NN(nn.Module, PyTorch_Base_Network):
 
     def forward(self, x):
         """Forward pass for the network"""
-        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
+        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x.cpu())
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
@@ -108,7 +108,7 @@ class NN(nn.Module, PyTorch_Base_Network):
             assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, """Data columns to be embedded should be integer 
                                                                                 values 0 and above to represent the different 
                                                                                 classes"""
-        if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor)
+        if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor), f'Incorrect Tensor type x is {type(x)} is {x}'
         assert len(x.shape) == 2, "X should be a 2-dimensional tensor"
         self.checked_forward_input_data_once = True #So that it doesn't check again
 

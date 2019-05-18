@@ -7,7 +7,8 @@ class NN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
-        - layers_info: List of integers to indicate the width and number of linear layers you want in your network
+        - layers_info: List of integers to indicate the width and number of linear layers you want in your network,
+                      e.g. [5, 8, 1] would produce a network with 3 linear layers of width 5, 8 and then 1
         - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers
                               (not including the output layer). Default is ReLU.
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of

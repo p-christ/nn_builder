@@ -11,7 +11,7 @@
 #             layers = [Dense(128, activation='relu'), Dense(10, activation='softmax')]
 #
 #             return layers
-# 
+#
 #         def call(self, x):
 #             x = tf.keras.layers.Flatten(input_shape=(28, 28))(x)
 #             for layer in self.layers_custom:

@@ -4,6 +4,7 @@ import pytest
 import torch
 import random
 import numpy as np
+import tensorflow as tf
 import torch.nn as nn
 from nn_builder.tensorflow.CNN import CNN
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
@@ -131,24 +132,22 @@ def test_initialiser_user_input():
 
 def test_batch_norm_layers():
     """Tests whether batch_norm_layers method works correctly"""
-    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34], ["linear", 5]]
+    layers =[["conv", 2, 4, 3, "valid"], ["maxpool", 3, 4, "valid"], ["linear", 5]]
     cnn = CNN(layers_info=layers, hidden_activations="relu",
             output_activation="relu", initialiser="xavier", batch_norm=False)
 
-    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34], ["linear", 5]]
+    layers = [["conv", 2, 4, 3, "valid"], ["maxpool", 3, 4, "valid"], ["linear", 5]]
     cnn = CNN(layers_info=layers, hidden_activations="relu",
               output_activation="relu", initialiser="xavier", batch_norm=True)
     assert len(cnn.batch_norm_layers) == 1
-    assert cnn.batch_norm_layers[0].num_features == 2
+    assert isinstance(cnn.batch_norm_layers[0], tf.keras.layers.BatchNormalization)
 
-
-    layers = [["conv", 2, 4, 3, 2], ["maxpool", 3, 4, 2], ["conv", 12, 4, 3, 2], ["adaptivemaxpool", 3, 34], ["linear", 22], ["linear", 55]]
+    layers = [["conv", 2, 4, 3, "valid"], ["maxpool", 3, 4, "valid"], ["conv", 12, 4, 3, "valid"], ["linear", 22], ["linear", 55]]
     cnn = CNN(layers_info=layers, hidden_activations="relu",
               output_activation="relu", initialiser="xavier", batch_norm=True)
     assert len(cnn.batch_norm_layers) == 3
-    assert cnn.batch_norm_layers[0].num_features == 2
-    assert cnn.batch_norm_layers[1].num_features == 12
-    assert cnn.batch_norm_layers[2].num_features == 22
+    for layer in cnn.batch_norm_layers:
+        assert isinstance(layer, tf.keras.layers.BatchNormalization)
 
 def test_linear_layers_acceptance():
     """Tests that only accepts linear layers of correct shape"""

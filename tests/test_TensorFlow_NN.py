@@ -120,15 +120,6 @@ def test_embedding_layers():
         assert nn_instance.embedding_layers[0].output_dim == embedding_out_dim_1
         assert nn_instance.embedding_layers[1].input_dim == embedding_in_dim_2
         assert nn_instance.embedding_layers[1].output_dim == embedding_out_dim_2
-#
-# def test_non_integer_embeddings_rejected():
-#     """Tests whether an error is raised if user tries to provide non-integer data to be embedded"""
-#     with pytest.raises(AssertionError):
-#         nn_instance = NN( layers_info=[5],
-#                          columns_of_data_to_be_embedded=[2, 4],
-#                          embedding_dimensions=[[50, 3],
-#                                                [55, 4]])
-#         out = nn_instance(X)
 
 def test_incorporate_embeddings():
     """Tests the method incorporate_embeddings"""

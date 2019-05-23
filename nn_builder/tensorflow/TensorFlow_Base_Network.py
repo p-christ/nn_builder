@@ -3,6 +3,7 @@ import tensorflow.keras.activations as activations
 import tensorflow.keras.initializers as initializers
 import tensorflow as tf
 import numpy as np
+import random
 from abc import ABC, abstractmethod
 
 class TensorFlow_Base_Network(Base_Network, ABC):
@@ -46,5 +47,6 @@ class TensorFlow_Base_Network(Base_Network, ABC):
         """Sets all possible random seeds so results can be reproduced"""
         np.random.seed(random_seed)
         tf.random.set_seed(random_seed)
+        random.seed(random_seed)
 
 

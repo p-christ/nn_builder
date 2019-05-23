@@ -27,9 +27,6 @@ class Base_Network(ABC):
         self.dropout_layer = self.create_dropout_layer()
         if self.batch_norm: self.batch_norm_layers = self.create_batch_norm_layers()
 
-
-
-
     @abstractmethod
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

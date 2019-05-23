@@ -1,8 +1,9 @@
-from tensorflow.keras import Model
+from tensorflow.python.keras import Model
 import numpy as np
-import tensorflow.keras.activations as activations
+import tensorflow.python.keras.activations as activations
+import tensorflow as tf
 
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
+from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
 

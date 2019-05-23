@@ -92,7 +92,7 @@ class NN(Model, TensorFlow_Base_Network):
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = linear_layer(x)
             if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-            if self.dropout != 0.0:
+            if self.dropout != 0.0 and (training or training is None):
                 x = self.dropout_layer(x)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):

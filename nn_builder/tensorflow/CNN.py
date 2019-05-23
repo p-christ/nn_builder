@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import tensorflow.keras.activations as activations
 
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, Conv2D, AveragePooling2D
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
 
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
@@ -37,8 +37,8 @@ class CNN(Model, TensorFlow_Base_Network):
                  random_seed=0, print_model_summary: bool =False):
         Model.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'linear'}
-        self.valid_layer_types_with_no_parameters = [MaxPool2D, AveragePooling2D]
-        TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
+        self.valid_layer_types_with_no_parameters = [type(MaxPool2D), type(AveragePooling2D)]
+        TensorFlow_Base_Network.__init__(self, None, layers_info, output_activation, hidden_activations, dropout, initialiser,
                                       batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
@@ -126,7 +126,7 @@ class CNN(Model, TensorFlow_Base_Network):
             layer_name, self.valid_cnn_hidden_layer_types)
         if layer_name == "conv":
             list_to_append_layer_to.extend([Conv2D(filters=layer[1], kernel_size=layer[2],
-                                                stride=layer[3], padding=layer[4], activation=activation,
+                                                strides=layer[3], padding=layer[4], activation=activation,
                                                    kernel_initializer=self.initialiser_function)])
         elif layer_name == "maxpool":
             list_to_append_layer_to.extend([MaxPool2D(pool_size=(layer[1], layer[1]),
@@ -157,7 +157,7 @@ class CNN(Model, TensorFlow_Base_Network):
                 batch_norm_layers.extend([BatchNormalization()])
         return batch_norm_layers
 
-    def call(self, x):
+    def call(self, x, training=True):
         """Forward pass for the network"""
         flattened=False
         for layer_ix, layer in enumerate(self.hidden_layers):
@@ -169,7 +169,7 @@ class CNN(Model, TensorFlow_Base_Network):
                     flattened = True
                 x = layer(x)
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-                if self.dropout != 0.0: x = self.dropout_layer(x)
+                if self.dropout != 0.0 and (training or training is None): x = self.dropout_layer(x)
 
         if not flattened: x = Flatten()(x)
         out = None

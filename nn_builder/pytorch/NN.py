@@ -26,7 +26,7 @@ class NN(nn.Module, PyTorch_Base_Network):
                    output values to in regression tasks. Default is no range restriction
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim: int, layers: list, output_activation=None,
+    def __init__(self, input_dim: int, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  random_seed=0, print_model_summary: bool =False):

@@ -6,6 +6,7 @@ dist: xenial
 sudo: true
 
 install:
+  - pip install -q tensorflow==2.0.0-alpha0
   - pip install -r requirements.txt -q
 
 script:

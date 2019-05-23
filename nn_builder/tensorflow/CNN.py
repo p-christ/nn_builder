@@ -174,5 +174,5 @@ class CNN(Model, TensorFlow_Base_Network):
             temp_output = output_layer(x)
             if out is None: out = temp_output
             else: out = Concatenate(axis=1)([out, temp_output])
-        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
         return out

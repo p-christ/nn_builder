@@ -80,31 +80,22 @@ def test_output_layers_created_correctly():
               ["linear", 22], ["linear", 2222], ["linear", 2]]
 
     cnn = CNN(layers_info=layers, hidden_activations="relu", output_activation="relu")
-
     assert cnn.output_layers[0].units == 2
 
     layers = [["conv", 2, 4, 3,"valid"], ["maxpool", 3, 4, "same"], ["avgpool", 32, 42, "same"], ["linear", 7]]
-
     cnn = CNN(layers_info=layers, hidden_activations="relu",
               output_activation="relu")
-
     assert cnn.output_layers[0].units == 7
 
     layers = [["conv", 5, 4, 3, "valid"], ["maxpool", 3, 4, "valid"], ["avgpool", 32, 42, "valid"], ["linear", 6]]
-
-
     cnn = CNN( layers_info=layers, hidden_activations="relu",
               output_activation="relu")
-
     assert cnn.output_layers[0].units == 6
 
     layers = [["conv", 5, 4, 3, "valid"], ["maxpool", 3, 4, "valid"], ["avgpool", 32, 42, "valid"],
               [["linear", 6], ["linear", 22]]]
-
     cnn = CNN(layers_info=layers, hidden_activations="relu",
               output_activation=["softmax", None])
-
-
     assert cnn.output_layers[0].units == 6
     assert cnn.output_layers[1].units == 22
 
@@ -122,9 +113,9 @@ def test_activations_user_input():
     inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
-            CNN(layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations=input_value,
+            CNN(layers_info=[["conv", 2, 2, 3331, "valid"], ["linear", 5] ], hidden_activations=input_value,
                 output_activation="relu")
-            CNN(layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations="relu",
+            CNN(layers_info=[["conv", 2, 2, 3331, "valid"], ["linear", 3]], hidden_activations="relu",
                 output_activation=input_value)
 
 def test_initialiser_user_input():
@@ -132,10 +123,10 @@ def test_initialiser_user_input():
     inputs_that_should_fail = [-1, "aa", ["dd"], [2], 0, 2.5, {2}, "Xavier_"]
     for input_value in inputs_that_should_fail:
         with pytest.raises(AssertionError):
-            CNN(layers_info=[["conv", 2, 2, 3331, 2]], hidden_activations="relu",
+            CNN(layers_info=[["conv", 2, 2, 3331, "valid"], ["linear", 3]], hidden_activations="relu",
                 output_activation="relu", initialiser=input_value)
 
-        CNN(layers_info=[["conv", 2, 2, 3331, 2], ["linear", 3]], hidden_activations="relu",
+        CNN(layers_info=[["conv", 2, 2, 3331, "valid"], ["linear", 3]], hidden_activations="relu",
             output_activation="relu", initialiser="xavier")
 
 def test_batch_norm_layers():

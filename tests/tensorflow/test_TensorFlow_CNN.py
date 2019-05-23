@@ -165,16 +165,16 @@ def test_linear_layers_acceptance():
 def test_linear_layers_only_come_at_end():
     """Tests that it throws an error if user tries to provide list of hidden layers that include linear layers where they
     don't only come at the end"""
-    layers = [["conv", 2, 4, 3, 2], ["linear", 55], ["maxpool", 3, 4, 2], ["adaptivemaxpool", 3, 34]]
+    layers = [["conv", 2, 4, 3, "valid"], ["linear", 55], ["maxpool", 3, 4, "valid"]]
     with pytest.raises(AssertionError):
         cnn = CNN(layers_info=layers, hidden_activations="relu",
                   output_activation="relu", initialiser="xavier", batch_norm=True)
 
-    layers = [["conv", 2, 4, 3, 2], ["linear", 55]]
+    layers = [["conv", 2, 4, 3, "valid"], ["linear", 55]]
     assert CNN(layers_info=layers, hidden_activations="relu",
                       output_activation="relu", initialiser="xavier", batch_norm=True)
 
-    layers = [["conv", 2, 4, 3, 2], ["linear", 55], ["linear", 55], ["linear", 55]]
+    layers = [["conv", 2, 4, 3, "valid"], ["linear", 55], ["linear", 55], ["linear", 55]]
     assert CNN(layers_info=layers, hidden_activations="relu",
                output_activation="relu", initialiser="xavier", batch_norm=True)
 
@@ -183,48 +183,49 @@ def test_output_activation():
     RANDOM_ITERATIONS = 20
     input_dim = (5, 100, 100)
     for _ in range(RANDOM_ITERATIONS):
-        data = torch.randn((1, *input_dim))
-        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2], ["linear", 50]],
+        data = np.random.random((1, *input_dim))
+        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, "valid"],  ["linear", 50]],
                            hidden_activations="relu",
                            output_activation="relu", initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert all(out.squeeze() >= 0)
+        out = CNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
 
-        CNN_instance = CNN(layers_info=[["conv", 2, 20, 1, 0], ["linear", 5]],
+        CNN_instance = CNN(layers_info=[["conv", 2, 20, 1, "same"], ["linear", 5]],
                            hidden_activations="relu",
                            output_activation="relu", initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert all(out.squeeze() >= 0)
+        out = CNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
 
-        CNN_instance = CNN(layers_info=[["conv", 5, 20, 1, 0], ["linear", 5]],
+        CNN_instance = CNN(layers_info=[["conv", 5, 20, 1, "same"], ["linear", 5]],
                            hidden_activations="relu",
                            output_activation="relu", initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert all(out.squeeze() >= 0)
+        out = CNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
 
-        CNN_instance = CNN(layers_info=[["conv", 5, 20, 1, 0], ["linear",  22]],
+        CNN_instance = CNN(layers_info=[["conv", 5, 2, 1, "valid"], ["linear",  22]],
                            hidden_activations="relu",
                            output_activation="sigmoid", initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert all(out.squeeze() >= 0)
-        assert all(out.squeeze() <= 1)
-        assert round(torch.sum(out.squeeze()).item(), 3) != 1.0
+        out = CNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+        assert all(tf.reshape(out, [-1]) <= 1)
+        assert not np.round(tf.reduce_sum(out, axis=1), 3) == 1.0
 
-        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2], ["linear", 5]],
+        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, "same"], ["linear", 5]],
                            hidden_activations="relu",
                            output_activation="softmax", initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert all(out.squeeze() >= 0)
-        assert all(out.squeeze() <= 1)
-        assert round(torch.sum(out.squeeze()).item(), 3) == 1.0
+        out = CNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+        assert all(tf.reshape(out, [-1]) <= 1)
+        assert np.round(tf.reduce_sum(out, axis=1), 3) == 1.0
 
 
-        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2], ["linear", 5]],
+        CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, "valid"], ["linear", 5]],
                            hidden_activations="relu",
                            initialiser="xavier")
-        out = CNN_instance.forward(data)
-        assert not all(out.squeeze() >= 0)
-        assert not round(torch.sum(out.squeeze()).item(), 3) == 1.0
+        out = CNN_instance(data)
+        assert not all(tf.reshape(out, [-1]) >= 0)
+        assert not np.round(tf.reduce_sum(out, axis=1), 3) == 1.0
+
 
 def test_y_range():
     """Tests whether setting a y range works correctly"""
@@ -237,7 +238,7 @@ def test_y_range():
                            hidden_activations="relu", y_range=(lower_bound, upper_bound),
                            initialiser="xavier")
         random_data = torch.randn((10, 1, 20, 20))
-        out = CNN_instance.forward(random_data)
+        out = CNN_instance(random_data)
         assert torch.sum(out > lower_bound).item() == 10*5, "lower {} vs. {} ".format(lower_bound, out)
         assert torch.sum(out < upper_bound).item() == 10*5, "upper {} vs. {} ".format(upper_bound, out)
 
@@ -247,8 +248,8 @@ def test_deals_with_None_activation():
                            hidden_activations="relu", output_activation=None,
                            initialiser="xavier")
 
-def test_check_input_data_into_forward_once():
-    """Tests that check_input_data_into_forward_once method only runs once"""
+def test_check_input_data_into_once():
+    """Tests that check_input_data_into_once method only runs once"""
     CNN_instance = CNN(layers_info=[["conv", 2, 2, 1, 2], ["adaptivemaxpool", 2, 2], ["linear", 6]],
                        hidden_activations="relu",
                        output_activation="relu", initialiser="xavier")
@@ -257,10 +258,10 @@ def test_check_input_data_into_forward_once():
     data_to_throw_error = torch.randn((1, 2, 20, 20))
 
     with pytest.raises(AssertionError):
-        CNN_instance.forward(data_to_throw_error)
+        CNN_instance(data_to_throw_error)
     with pytest.raises(RuntimeError):
-        CNN_instance.forward(data_not_to_throw_error)
-        CNN_instance.forward(data_to_throw_error)
+        CNN_instance(data_not_to_throw_error)
+        CNN_instance(data_to_throw_error)
 
 def test_y_range_user_input():
     """Tests whether network rejects invalid y_range inputs"""
@@ -359,7 +360,7 @@ def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
     for ix in range(800):
-        out = nn_instance.forward(X)
+        out = nn_instance(X)
         loss = torch.sum((out.squeeze() - y) ** 2) / N
         optimizer.zero_grad()
         loss.backward()

@@ -58,7 +58,7 @@ class NN(Model, TensorFlow_Base_Network):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = linear_layer(x)
-            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=training)
+            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=False)
             if self.dropout != 0.0 and (training or training is None):
                 x = self.dropout_layer(x)
         out = None

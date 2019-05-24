@@ -112,34 +112,10 @@ class RNN(Model, Base_Network):
         """Forward pass for the network"""
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         training = training or training is None
-        restricted_to_final_seq = False
-        for layer_ix, layer in enumerate(self.hidden_layers):
-            if type(layer) == Dense:
-                if self.return_final_seq_only:
-                    x = x[:, -1, :]
-                    restricted_to_final_seq = True
-                x = layer(x)
-            else:
-                x = layer(x)
-            if self.batch_norm:
-                x = self.batch_norm_layers[layer_ix](x, training=False)
-            if self.dropout != 0.0 and training: x = self.dropout_layer(x)
-        out = None
-        for output_layer_ix, output_layer in enumerate(self.output_layers):
-            if type(output_layer) == Dense:
-                if self.return_final_seq_only and not restricted_to_final_seq:
-                    x = x[:, -1, :]
-                    restricted_to_final_seq = True
-                temp_output = output_layer(x)
-            else:
-                temp_output = output_layer(x)
-                activation = self.get_activation(self.output_activation, output_layer_ix)
-                temp_output = activation(temp_output)
-            if out is None: out = temp_output
-            else: out = Concatenate(axis=2)([out, temp_output])
+        x, restricted_to_final_seq = self.process_hidden_layers(x, training)
+        out = self.process_output_layers(x, restricted_to_final_seq)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
         return out
-
 
     def incorporate_embeddings(self, x):
         """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
@@ -154,3 +130,36 @@ class RNN(Model, Base_Network):
         rest_of_data = tf.gather(x, non_embedded_columns, axis=2)
         x = Concatenate(axis=2)([tf.dtypes.cast(rest_of_data, float), all_embedded_data])
         return x
+
+    def process_hidden_layers(self, x, training):
+        """Puts the data x through all the hidden layers"""
+        restricted_to_final_seq = False
+        for layer_ix, layer in enumerate(self.hidden_layers):
+            if type(layer) == Dense:
+                if self.return_final_seq_only:
+                    x = x[:, -1, :]
+                    restricted_to_final_seq = True
+                x = layer(x)
+            else:
+                x = layer(x)
+            if self.batch_norm:
+                x = self.batch_norm_layers[layer_ix](x, training=False)
+            if self.dropout != 0.0 and training: x = self.dropout_layer(x)
+        return x, restricted_to_final_seq
+
+    def process_output_layers(self, x, restricted_to_final_seq):
+        """Puts the data x through all the output layers"""
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            if type(output_layer) == Dense:
+                if self.return_final_seq_only and not restricted_to_final_seq:
+                    x = x[:, -1, :]
+                    restricted_to_final_seq = True
+                temp_output = output_layer(x)
+            else:
+                temp_output = output_layer(x)
+                activation = self.get_activation(self.output_activation, output_layer_ix)
+                temp_output = activation(temp_output)
+            if out is None: out = temp_output
+            else: out = Concatenate(axis=2)([out, temp_output])
+        return out

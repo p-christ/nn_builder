@@ -39,10 +39,10 @@ class RNN(nn.Module, Base_Network):
                  columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
                  return_final_seq_only=True, random_seed=0, print_model_summary=False):
         nn.Module.__init__(self)
-        # self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
-        # self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
-        # self.embedding_dimensions = embedding_dimensions
-        # self.embedding_layers = self.create_embedding_layers()
+        self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
+        self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
+        self.embedding_dimensions = embedding_dimensions
+        self.embedding_layers = self.create_embedding_layers()
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         Base_Network.__init__(self, input_dim, layers_info, output_activation,
@@ -143,13 +143,40 @@ class RNN(nn.Module, Base_Network):
             activation = self.str_to_activations_converter[str(activations).lower()]
         return activation
 
-
     def forward(self, x):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
-
         batch_size, seq_length, data_dimension = x.shape
+        if self.embedding_to_occur: x = self.incorporate_embeddings(x, batch_size, seq_length)
+        x = self.process_hidden_layers(x, batch_size, seq_length)
+        out = self.process_output_layers(x, batch_size, seq_length)
+        if self.return_final_seq_only: out = out[:, -1, :]
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        return out
 
+    def check_input_data_into_forward_once(self, x):
+        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
+        so that we don't keep checking as this would slow down the model too much"""
+        assert len(x.shape) == 3, "x should have the shape (batch_size, sequence_length, dimension)"
+        assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
+        self.checked_forward_input_data_once = True #So that it doesn't check again
+
+    def incorporate_embeddings(self, x, batch_size, seq_length):
+        """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
+        to then be put through the hidden layers"""
+        all_embedded_data = []
+        for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
+            data = x[:, :, embedding_var].long()
+            data = data.contiguous().view(batch_size * seq_length, -1)
+            embedded_data = self.embedding_layers[embedding_layer_ix](data)
+            embedded_data = embedded_data.view(batch_size, seq_length, -1)
+            all_embedded_data.append(embedded_data)
+        all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
+        x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=2)
+        return x
+
+    def process_hidden_layers(self, x, batch_size, seq_length):
+        """Puts the data x through all the hidden layers"""
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) == nn.Linear:
                 x = x.contiguous().view(batch_size * seq_length, -1)
@@ -164,7 +191,10 @@ class RNN(nn.Module, Base_Network):
                 x = self.batch_norm_layers[layer_ix](x)
                 x.transpose_(1, 2)
             if self.dropout != 0.0: x = self.dropout_layer(x)
+        return x
 
+    def process_output_layers(self, x, batch_size, seq_length):
+        """Puts the data x through all the output layers"""
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             activation = self.get_activation(self.output_activation, output_layer_ix)
@@ -188,13 +218,4 @@ class RNN(nn.Module, Base_Network):
                         temp_output = activation(temp_output)
             if out is None: out = temp_output
             else: out = torch.cat((out, temp_output), dim=2)
-        if self.return_final_seq_only: out = out[:, -1, :]
-        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
-
-    def check_input_data_into_forward_once(self, x):
-        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
-        so that we don't keep checking as this would slow down the model too much"""
-        assert len(x.shape) == 3, "x should have the shape (batch_size, sequence_length, dimension)"
-        assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
-        self.checked_forward_input_data_once = True #So that it doesn't check again

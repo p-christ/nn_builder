@@ -139,6 +139,13 @@ class CNN(Model, Base_Network):
 
     def call(self, x, training=True):
         """Forward pass for the network"""
+        x = self.process_hidden_layers(x, training)
+        out = self.process_output_layers(x)
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
+        return out
+
+    def process_hidden_layers(self, x, training):
+        """Puts the data x through all the hidden layers"""
         flattened=False
         training = training or training is None
         for layer_ix, layer in enumerate(self.hidden_layers):
@@ -151,12 +158,14 @@ class CNN(Model, Base_Network):
                 x = layer(x)
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=False)
                 if self.dropout != 0.0 and training: x = self.dropout_layer(x)
-
         if not flattened: x = Flatten()(x)
+        return x
+
+    def process_output_layers(self, x):
+        """Puts the data x through all the output layers"""
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             temp_output = output_layer(x)
             if out is None: out = temp_output
             else: out = Concatenate(axis=1)([out, temp_output])
-        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
         return out

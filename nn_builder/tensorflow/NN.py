@@ -55,16 +55,8 @@ class NN(Model, Base_Network):
 
     def call(self, x, training=True):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
-        for layer_ix, linear_layer in enumerate(self.hidden_layers):
-            x = linear_layer(x)
-            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=False)
-            if self.dropout != 0.0 and (training or training is None):
-                x = self.dropout_layer(x)
-        out = None
-        for output_layer_ix, output_layer in enumerate(self.output_layers):
-            temp_output = output_layer(x)
-            if out is None: out = temp_output
-            else: out = Concatenate(axis=1)((out, temp_output))
+        x = self.process_hidden_layers(x, training)
+        out = self.process_output_layers(x)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*activations.sigmoid(out)
         return out
 
@@ -82,4 +74,21 @@ class NN(Model, Base_Network):
         x = Concatenate(axis=1)([tf.dtypes.cast(rest_of_data, float), all_embedded_data])
         return x
 
+    def process_hidden_layers(self, x, training):
+        """Puts the data x through all the hidden layers"""
+        for layer_ix, linear_layer in enumerate(self.hidden_layers):
+            x = linear_layer(x)
+            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=False)
+            if self.dropout != 0.0 and (training or training is None):
+                x = self.dropout_layer(x)
+        return x
+
+    def process_output_layers(self, x):
+        """Puts the data x through all the output layers"""
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            temp_output = output_layer(x)
+            if out is None: out = temp_output
+            else: out = Concatenate(axis=1)((out, temp_output))
+        return out
 

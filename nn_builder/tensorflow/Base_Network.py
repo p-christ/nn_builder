@@ -15,7 +15,7 @@ class Base_Network(Overall_Base_Network, ABC):
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     @abstractmethod
-    def call(self, x, training):
+    def call(self, x, training=True):
         """Runs a forward pass of the tensorflow model"""
         raise NotImplementedError
 

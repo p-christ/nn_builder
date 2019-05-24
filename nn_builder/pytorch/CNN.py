@@ -86,9 +86,7 @@ class CNN(nn.Module, Base_Network):
             assert isinstance(output_layer[0], str), error_msg_layer_type
             assert output_layer[0].lower() == "linear", "Final layer must be linear"
 
-        print("ALL LAYERS ", all_layers)
         for layer in all_layers:
-            print("LAYER ", layer)
             assert isinstance(layer, list), "Each layer must be a list"
             assert isinstance(layer[0], str), error_msg_layer_type
             layer_type_name = layer[0].lower()
@@ -216,8 +214,21 @@ class CNN(nn.Module, Base_Network):
     def forward(self, x):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
-        flattened=False
+        x = self.process_hidden_layers(x)
+        out = self.process_output_layers(x)
+        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
+        return out
 
+    def check_input_data_into_forward_once(self, x):
+        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
+        so that we don't keep checking as this would slow down the model too much"""
+        assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
+        assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
+        self.checked_forward_input_data_once = True #So that it doesn't check again
+
+    def process_hidden_layers(self, x):
+        """Puts the data x through all the hidden layers"""
+        flattened=False
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
@@ -228,8 +239,11 @@ class CNN(nn.Module, Base_Network):
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
                 if self.dropout != 0.0: x = self.dropout_layer(x)
-
         if not flattened: x = self.flatten_tensor(x)
+        return x
+
+    def process_output_layers(self, x):
+        """Puts the data x through all the output layers"""
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             activation = self.get_activation(self.output_activation, output_layer_ix)
@@ -237,12 +251,4 @@ class CNN(nn.Module, Base_Network):
             if activation is not None: temp_output = activation(temp_output)
             if out is None: out = temp_output
             else: out = torch.cat((out, temp_output), dim=1)
-        if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
-
-    def check_input_data_into_forward_once(self, x):
-        """Checks the input data into forward is of the right format. Then sets a flag indicating that this has happened once
-        so that we don't keep checking as this would slow down the model too much"""
-        assert len(x.shape) == 4, "x should have the shape (batch_size, channel, height, width)"
-        assert x.shape[1:] == self.input_dim, "Input data must be of shape (channels, height, width) that you provided, not of shape {}".format(x.shape[1:])
-        self.checked_forward_input_data_once = True #So that it doesn't check again

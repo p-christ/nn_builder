@@ -83,20 +83,8 @@ class NN(nn.Module, Base_Network):
         """Forward pass for the network"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x.cpu())
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
-        for layer_ix, linear_layer in enumerate(self.hidden_layers):
-            x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
-            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
-            if self.dropout != 0.0: x = self.dropout_layer(x)
-        out = None
-        for output_layer_ix, output_layer in enumerate(self.output_layers):
-            activation = self.get_activation(self.output_activation, output_layer_ix)
-            temp_output = output_layer(x)
-            if activation is not None: temp_output = activation(temp_output)
-            if out is None:
-                out = temp_output
-            else:
-                out = torch.cat((out, temp_output), dim=1)
-
+        x = self.process_hidden_layers(x)
+        out = self.process_output_layers(x)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
 
@@ -125,3 +113,22 @@ class NN(nn.Module, Base_Network):
         all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
         x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=1)
         return x
+
+    def process_hidden_layers(self, x):
+        """Puts the data x through all the hidden layers"""
+        for layer_ix, linear_layer in enumerate(self.hidden_layers):
+            x = self.get_activation(self.hidden_activations, layer_ix)(linear_layer(x))
+            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
+            if self.dropout != 0.0: x = self.dropout_layer(x)
+        return x
+
+    def process_output_layers(self, x):
+        """Puts the data x through all the output layers"""
+        out = None
+        for output_layer_ix, output_layer in enumerate(self.output_layers):
+            activation = self.get_activation(self.output_activation, output_layer_ix)
+            temp_output = output_layer(x)
+            if activation is not None: temp_output = activation(temp_output)
+            if out is None: out = temp_output
+            else: out = torch.cat((out, temp_output), dim=1)
+        return out

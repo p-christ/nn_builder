@@ -109,7 +109,7 @@ class CNN(Model, TensorFlow_Base_Network):
             if layer[0].lower() == "linear":
                 rest_must_be_linear = True
 
-    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None):
+    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None, output_layer=False):
         """Creates and appends a layer to the list provided"""
         layer_name = layer[0].lower()
         assert layer_name in self.valid_cnn_hidden_layer_types, "Layer name {} not valid, use one of {}".format(

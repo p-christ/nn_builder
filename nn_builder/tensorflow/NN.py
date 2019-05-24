@@ -50,16 +50,9 @@ class NN(Model, TensorFlow_Base_Network):
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
-    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None):
+    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None, output_layer=False):
         """Creates and appends a layer to the list provided"""
         list_to_append_layer_to.extend([Dense(layer, activation=activation, kernel_initializer=self.initialiser_function)])
-
-    def create_batch_norm_layers(self):
-        """Creates the batch norm layers in the network"""
-        batch_norm_layers = []
-        for _ in range(len(self.hidden_layers)):
-            batch_norm_layers.append(BatchNormalization())
-        return batch_norm_layers
 
     def call(self, x, training=True):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
@@ -81,7 +74,7 @@ class NN(Model, TensorFlow_Base_Network):
         to then be put through the hidden layers"""
         all_embedded_data = []
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
-            data = x[:, embedding_var]  #.long()
+            data = x[:, embedding_var]
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
             all_embedded_data.append(embedded_data)
         all_embedded_data = Concatenate(axis=1)(all_embedded_data)

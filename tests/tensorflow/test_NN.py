@@ -1,6 +1,7 @@
 # Run from home directory with python -m pytest tests
 import pytest
 import torch
+import copy
 import random
 import numpy as np
 import tensorflow as tf
@@ -90,9 +91,11 @@ def test_linear_layers_info():
     """Tests whether create_hidden_layers_info method works correctly"""
     for input_dim, output_dim, hidden_units in zip( range(5, 8), range(9, 12), [[2, 9, 2], [3, 5, 6], [9, 12, 2]]):
         hidden_units.append(output_dim)
-        nn_instance = NN(layers_info=hidden_units,
+        print(hidden_units)
+        nn_instance = NN(layers_info=copy.copy(hidden_units),
                          hidden_activations="relu",
                          output_activation="softmax", initialiser="xavier")
+        print(hidden_units)
         assert len(nn_instance.hidden_layers) == len(hidden_units) - 1
         for layer_ix in range(len(hidden_units) - 1):
             layer = nn_instance.hidden_layers[layer_ix]

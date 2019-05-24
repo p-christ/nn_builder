@@ -109,14 +109,6 @@ class RNN(Model, TensorFlow_Base_Network):
         input_dim = hidden_size
         return input_dim
 
-    def create_batch_norm_layers(self):
-        """Creates the batch norm layers in the network"""
-        batch_norm_layers = []
-        for layer in self.layers_info[:-1]:
-            layer_type = layer[0].lower()
-            batch_norm_layers.extend([BatchNormalization()])
-        return batch_norm_layers
-
     def call(self, x, training=True):
         """Forward pass for the network"""
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)

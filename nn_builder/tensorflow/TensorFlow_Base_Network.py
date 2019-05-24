@@ -1,3 +1,5 @@
+from tensorflow.python.keras.layers import BatchNormalization
+
 from nn_builder.Base_Network import Base_Network
 import tensorflow.keras.activations as activations
 import tensorflow.keras.initializers as initializers
@@ -16,6 +18,11 @@ class TensorFlow_Base_Network(Base_Network, ABC):
     @abstractmethod
     def call(self, x, training):
         """Runs a forward pass of the tensorflow model"""
+        raise NotImplementedError
+
+    @abstractmethod
+    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None, output_layer=False):
+        """Creates a layer and appends it to the provided list"""
         raise NotImplementedError
 
     def set_all_random_seeds(self, random_seed):
@@ -59,7 +66,8 @@ class TensorFlow_Base_Network(Base_Network, ABC):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = []
-        if not isinstance(self.layers_info[-1][0], list)  : self.layers_info[-1] = [self.layers_info[-1]]
+        if isinstance(self.layers_info[-1], int) or not isinstance(self.layers_info[-1][0], list):
+            self.layers_info[-1] = [self.layers_info[-1]]
         for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
             activation = self.get_activation(self.output_activation, output_layer_ix)
             self.create_and_append_layer(output_layer, output_layers, activation, output_layer=True)
@@ -72,4 +80,11 @@ class TensorFlow_Base_Network(Base_Network, ABC):
             input_dim, output_dim = embedding_dimension
             embedding_layers.extend([tf.keras.layers.Embedding(input_dim, output_dim)])
         return embedding_layers
+
+    def create_batch_norm_layers(self):
+        """Creates the batch norm layers in the network"""
+        batch_norm_layers = []
+        for layer in self.layers_info[:-1]:
+            batch_norm_layers.extend([BatchNormalization()])
+        return batch_norm_layers
 

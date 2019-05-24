@@ -40,10 +40,10 @@ class RNN(Model, TensorFlow_Base_Network):
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
                  return_final_seq_only=True, random_seed=0, print_model_summary: bool =False):
         Model.__init__(self)
-        # self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
-        # self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
-        # self.embedding_dimensions = embedding_dimensions
-        # self.embedding_layers = self.create_embedding_layers()
+        self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
+        self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
+        self.embedding_dimensions = embedding_dimensions
+        self.embedding_layers = self.create_embedding_layers()
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
@@ -147,7 +147,7 @@ class RNN(Model, TensorFlow_Base_Network):
         to then be put through the hidden layers"""
         all_embedded_data = []
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
-            data = x[:, :, embedding_var]  #.long()
+            data = x[:, :, embedding_var]
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
             all_embedded_data.append(embedded_data)
         all_embedded_data = Concatenate(axis=1)(all_embedded_data)

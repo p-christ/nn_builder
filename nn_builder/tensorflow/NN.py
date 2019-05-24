@@ -4,9 +4,9 @@ import tensorflow.python.keras.activations as activations
 import tensorflow as tf
 
 from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
-from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
+from nn_builder.tensorflow.Base_Network import Base_Network
 
-class NN(Model, TensorFlow_Base_Network):
+class NN(Model, Base_Network):
     """Creates a PyTorch neural network
     Args:
         - layers_info: List of integers to indicate the width and number of linear layers you want in your network
@@ -29,18 +29,17 @@ class NN(Model, TensorFlow_Base_Network):
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, layers_info: list, output_activation=None,
-                 hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+    def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
+                 batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
+                 random_seed=0, print_model_summary=False):
         Model.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        TensorFlow_Base_Network.__init__(self, layers_info, output_activation,
-                                         hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
-                                         print_model_summary)
+        Base_Network.__init__(self, layers_info, output_activation,
+                              hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
+                              print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

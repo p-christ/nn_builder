@@ -4,9 +4,9 @@ from tensorflow.python.keras import Model
 import tensorflow.python.keras.activations as activations
 from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
 
-from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
+from nn_builder.tensorflow.Base_Network import Base_Network
 
-class CNN(Model, TensorFlow_Base_Network):
+class CNN(Model, Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
         - layers_info: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
@@ -30,14 +30,13 @@ class CNN(Model, TensorFlow_Base_Network):
         - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, layers_info, output_activation=None, hidden_activations="relu",
-                 dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+    def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout= 0.0, initialiser="default",
+                 batch_norm=False, y_range=(), random_seed=0, print_model_summary=False):
         Model.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [type(MaxPool2D), type(AveragePooling2D)]
-        TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                                      batch_norm, y_range, random_seed, print_model_summary)
+        Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
+                              batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
+from nn_builder.pytorch.Base_Network import Base_Network
 
-class CNN(nn.Module, PyTorch_Base_Network):
+class CNN(nn.Module, Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
         - input_dim: Tuple of integers to indicate the (channels, height, width) dimension of the input
@@ -28,14 +28,14 @@ class CNN(nn.Module, PyTorch_Base_Network):
         - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, input_dim, layers_info, output_activation=None, hidden_activations="relu",
-                 dropout: float = 0.0, initialiser: str = "default", batch_norm: bool = False, y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+    def __init__(self, input_dim, layers_info, output_activation=None,
+                 hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
+                 y_range= (), random_seed=0, print_model_summary=False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
-        PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                                      batch_norm, y_range, random_seed, print_model_summary)
+        Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
+                              batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

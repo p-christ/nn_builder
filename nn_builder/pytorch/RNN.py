@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
-from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
+from nn_builder.pytorch.Base_Network import Base_Network
 
-# TODO add embedding layers
-# TODO add option for check_return_final_seq_only_valid
+# TODO write tests for and add embedding layers
 
-class RNN(nn.Module, PyTorch_Base_Network):
+class RNN(nn.Module, Base_Network):
     """Creates a PyTorch recurrent neural network
     Args:
         - input_dim: Integer to indicate the dimension of the input into the network
@@ -35,10 +34,10 @@ class RNN(nn.Module, PyTorch_Base_Network):
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
-    def __init__(self, input_dim: int, layers_info: list, output_activation=None,
-                 hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 return_final_seq_only=True, random_seed=0, print_model_summary: bool =False):
+    def __init__(self, input_dim, layers_info, output_activation=None,
+                 hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
+                 columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
+                 return_final_seq_only=True, random_seed=0, print_model_summary=False):
         nn.Module.__init__(self)
         # self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         # self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
@@ -46,9 +45,9 @@ class RNN(nn.Module, PyTorch_Base_Network):
         # self.embedding_layers = self.create_embedding_layers()
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
-        PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation,
-                                      hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
-                                      print_model_summary)
+        Base_Network.__init__(self, input_dim, layers_info, output_activation,
+                              hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
+                              print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

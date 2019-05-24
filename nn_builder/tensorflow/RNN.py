@@ -2,12 +2,12 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras import Model
 import tensorflow.python.keras.activations as activations
-from tensorflow.python.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
-from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
+from tensorflow.python.keras.layers import Dense, Concatenate, GRU, LSTM
+from nn_builder.tensorflow.Base_Network import Base_Network
 
-# TODO add embedding layers
+# TODO write tests for and add embedding layers
 
-class RNN(Model, TensorFlow_Base_Network):
+class RNN(Model, Base_Network):
     """Creates a TensorFlow recurrent neural network
     Args:
         - layers_info: List of layer specifications to specify the hidden layers of the network. Each element of the list must be
@@ -35,10 +35,9 @@ class RNN(Model, TensorFlow_Base_Network):
         - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-    def __init__(self, layers_info: list, output_activation=None,
-                 hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
-                 columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 return_final_seq_only=True, random_seed=0, print_model_summary: bool =False):
+    def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
+                 batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
+                 return_final_seq_only=True, random_seed=0, print_model_summary=False):
         Model.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
@@ -46,14 +45,14 @@ class RNN(Model, TensorFlow_Base_Network):
         self.embedding_layers = self.create_embedding_layers()
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
-        TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                                         batch_norm, y_range, random_seed, print_model_summary)
+        Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
+                              batch_norm, y_range, random_seed, print_model_summary)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
         self.check_RNN_layers_valid()
         self.check_activations_valid()
-        # self.check_embedding_dimensions_valid()
+        self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
         self.check_return_final_seq_only_valid()

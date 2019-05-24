@@ -1,6 +1,5 @@
 from tensorflow.python.keras.layers import BatchNormalization
-
-from nn_builder.Base_Network import Base_Network
+from nn_builder.Overall_Base_Network import Overall_Base_Network
 import tensorflow.keras.activations as activations
 import tensorflow.keras.initializers as initializers
 import tensorflow as tf
@@ -8,7 +7,7 @@ import numpy as np
 import random
 from abc import ABC, abstractmethod
 
-class TensorFlow_Base_Network(Base_Network, ABC):
+class Base_Network(Overall_Base_Network, ABC):
     """Base class for TensorFlow neural network classes"""
     def __init__(self, layers, output_activation, hidden_activations, dropout, initialiser, batch_norm, y_range,
                  random_seed, print_model_summary):

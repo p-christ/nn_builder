@@ -268,7 +268,7 @@ def test_model_trains():
         assert solves_simple_problem(X, y, CNN_instance)
 
 
-def test_model_trains_second_part():
+def test_model_trains_part_2():
     """Tests whether a small range of networks can solve a simple task"""
     z = X[:, 3:4, 3:4, 0:1] > 5.0
     z = np.concatenate([z == 1, z == 0], axis=1)

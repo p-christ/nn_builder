@@ -345,3 +345,37 @@ def test_all_initialisers_work():
         assert RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            dropout=0.0000001,
                            initialiser=key, input_dim=15)
+
+def test_output_shapes():
+    """Tests whether network outputs of correct shape"""
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 3]],
+              hidden_activations="relu", initialiser="xavier")
+    output = rnn(X)
+    assert output.shape == (N, 3)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+    output = rnn(X)
+    assert output.shape == (N, 3, 7)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 3]],
+              hidden_activations="relu", initialiser="xavier")
+    output = rnn(X)
+    assert output.shape == (N, 3)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 7]],
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+    output = rnn(X)
+    assert output.shape == (N, 3, 7)
+
+def test_return_final_seq_user_input_valid():
+    """Checks whether network only accepts a valid boolean value for return_final_seq_only"""
+    for valid_case in [True, False]:
+        assert RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+                  hidden_activations="relu", initialiser="xavier", return_final_seq_only=valid_case)
+
+    for invalid_case in [[True], 22, [1, 3], (True, False), (5, False)]:
+        with pytest.raises(AssertionError):
+            print(invalid_case)
+            RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+                hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case)

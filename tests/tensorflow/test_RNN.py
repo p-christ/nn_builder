@@ -7,6 +7,12 @@ import numpy as np
 from tensorflow.python.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
 from nn_builder.tensorflow.RNN import RNN
 
+N = 250
+X = np.random.random((N, 3, 5))
+X = X.astype('float32')
+
+X[0:125, :, 3] += 10.0
+y = X[:, 2, 3] > 5.0
 
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
@@ -119,7 +125,8 @@ def test_output_activation():
     """Tests whether network outputs data that has gone through correct activation function"""
     RANDOM_ITERATIONS = 20
     for _ in range(RANDOM_ITERATIONS):
-        data = np.random.random((25, 10, 100))
+        data = np.random.random((25, 10, 30))
+        data = data.astype('float32')
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
                            hidden_activations="relu",
                            output_activation="relu", initialiser="xavier", batch_norm=True)
@@ -144,83 +151,67 @@ def test_output_activation():
         out = RNN_instance(data)
         assert all(tf.reshape(out, [-1]) >= 0)
         assert all(tf.reshape(out, [-1]) <= 1)
-        summed_result = tf.reduce_sum(out, axis=2)
 
-        assert all(tf.reshape(summed_result, [-1]) != 1.0)
-
+        summed_result = tf.reduce_sum(out, axis=1)
+        summed_result = tf.reshape(summed_result, [-1, 1])
+        assert summed_result != 1.0
 
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
                            hidden_activations="relu",
                            output_activation="softmax", initialiser="xavier")
-        out = RNN_instance.forward(data)
+        out = RNN_instance(data)
         assert all(tf.reshape(out, [-1]) >= 0)
         assert all(tf.reshape(out, [-1]) <= 1)
-        summed_result = tf.reduce_sum(out, axis=2)
-        assert all(np.round(summed_result, 3) == 1.0)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert (np.round(summed_result, 3) == 1.0).all()
 
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
                            hidden_activations="relu",
                            output_activation="softmax", initialiser="xavier")
-        out = RNN_instance.forward(data)
+        out = RNN_instance(data)
         assert all(tf.reshape(out, [-1]) >= 0)
         assert all(tf.reshape(out, [-1]) <= 1)
-        summed_result = tf.reduce_sum(out, axis=2)
-        assert all(np.round(summed_result, 3) == 1.0)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert (np.round(summed_result, 3) == 1.0).all()
 
-        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
-                           hidden_activations="relu",
-                           initialiser="xavier")
-        out = RNN_instance.forward(data)
+        RNN_instance = RNN(layers_info=[["linear", 20], ["linear", 50]],
+                           hidden_activations="relu")
+
+        out = RNN_instance(data)
         assert not all(tf.reshape(out, [-1]) >= 0)
         assert not all(tf.reshape(out, [-1]) <= 1)
-        summed_result = tf.reduce_sum(out, axis=2)
-        assert not all(np.round(summed_result, 3) == 1.0)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert not (np.round(summed_result, 3) == 1.0).all()
 
-        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25], ["linear", 8]],
-                           hidden_activations="relu",
-                           initialiser="xavier")
-        out = RNN_instance.forward(data)
+        RNN_instance = RNN(layers_info=[ ["lstm", 25], ["linear", 10]],
+                           hidden_activations="relu")
+
+        out = RNN_instance(data)
         assert not all(tf.reshape(out, [-1]) >= 0)
-        assert not all(tf.reshape(out, [-1]) <= 1)
-        summed_result = tf.reduce_sum(out, axis=2)
-        assert not all(np.round(summed_result, 3) == 1.0)
+        assert not all(tf.reshape(out, [-1]) <= 0)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert not (np.round(summed_result, 3) == 1.0).all()
 
 def test_y_range():
     """Tests whether setting a y range works correctly"""
-    for _ in range(100):
+    for _ in range(20):
         val1 = random.random() - 3.0*random.random()
         val2 = random.random() + 2.0*random.random()
         lower_bound = min(val1, val2)
         upper_bound = max(val1, val2)
         rnn = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
-                           hidden_activations="relu", y_range=(lower_bound, upper_bound),
-                           initialiser="xavier", input_dim=22)
-        random_data = torch.randn((10, 11, 22))
-        out = rnn.forward(random_data)
-        out = out.reshape(1, -1).squeeze()
-        assert torch.sum(out > lower_bound).item() == 11*25*10, "lower {} vs. {} ".format(lower_bound, out)
-        assert torch.sum(out < upper_bound).item() == 11*25*10, "upper {} vs. {} ".format(upper_bound, out)
+                  hidden_activations="relu", y_range=(lower_bound, upper_bound), initialiser="xavier")
+        random_data = np.random.random((10, 11, 22))
+        random_data = random_data.astype('float32')
+        out = rnn(random_data)
+        assert all(tf.reshape(out, [-1]) > lower_bound)
+        assert all(tf.reshape(out, [-1]) < upper_bound)
 
 def test_deals_with_None_activation():
     """Tests whether is able to handle user inputting None as output activation"""
     assert RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
                            hidden_activations="relu", output_activation=None,
-                           initialiser="xavier", input_dim=5)
-
-def test_check_input_data_into_forward_once():
-    """Tests that check_input_data_into_forward_once method only runs once"""
-    rnn = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
-                       hidden_activations="relu", input_dim=5,
-                       output_activation="relu", initialiser="xavier")
-
-    data_not_to_throw_error = torch.randn((1, 4, 5))
-    data_to_throw_error = torch.randn((1, 2, 20))
-
-    with pytest.raises(AssertionError):
-        rnn.forward(data_to_throw_error)
-    with pytest.raises(RuntimeError):
-        rnn.forward(data_not_to_throw_error)
-        rnn.forward(data_to_throw_error)
+                           initialiser="xavier")
 
 def test_y_range_user_input():
     """Tests whether network rejects invalid y_range inputs"""
@@ -229,71 +220,69 @@ def test_y_range_user_input():
         with pytest.raises(AssertionError):
             print(y_range_value)
             rnn = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
-                           hidden_activations="relu", y_range=y_range_value, input_dim=5,
+                           hidden_activations="relu", y_range=y_range_value,
                            initialiser="xavier")
 
 
-N = 250
-X = torch.randn((N, 5, 15))
-X[0:125, 0, 3] += 20.0
-y = X[:, 0, 3] > 5.0
-y = y.float()
-
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
-    optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
-    for ix in range(800):
-        out = nn_instance.forward(X)
-        out = out[:, -1, :]
-        loss = torch.sum((out.squeeze() - y) ** 2) / N
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-    print("LOSS ", loss)
-    return loss < 0.1
+    print("X shape ", X.shape)
+    print("y shape ", y.shape)
+    nn_instance.compile(optimizer='adam',
+                  loss='mse')
+    nn_instance.fit(X, y, epochs=25)
+    results = nn_instance.evaluate(X, y)
+    print("FINAL RESULT ", results)
+    return results < 0.1
 
 def test_model_trains():
     """Tests whether a small range of networks can solve a simple task"""
     for output_activation in ["sigmoid", "None"]:
-        rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+        rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]],
                            hidden_activations="relu", output_activation=output_activation,
                            initialiser="xavier")
+
         assert solves_simple_problem(X, y, rnn)
 
-    z = X[:, 0:1, 3:4] > 5.0
-    z =  torch.cat([z ==1, z==0], dim=1).float()
-    z = z.squeeze(-1).squeeze(-1)
-    rnn = RNN(layers_info=[["gru", 20], ["lstm", 2]], input_dim=15,
+def test_model_trains_part_2():
+    """Tests whether a small range of networks can solve a simple task"""
+    z = X[:, 2:3, 3:4] > 5.0
+    z = np.concatenate([z == 1, z == 0], axis=1)
+    z = z.reshape((-1, 2))
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 2]],
                            hidden_activations="relu", output_activation="softmax", dropout=0.01,
                            initialiser="xavier")
     assert solves_simple_problem(X, z, rnn)
 
-    rnn = RNN(layers_info=[["lstm", 20], ["linear", 1]], input_dim=15,
+    rnn = RNN(layers_info=[["lstm", 20], ["linear", 1]],
                        hidden_activations="relu", output_activation=None,
                        initialiser="xavier")
     assert solves_simple_problem(X, y, rnn)
 
-    rnn = RNN(layers_info=[["lstm", 20], ["linear", 20], ["linear", 1]], input_dim=15,
+    rnn = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
+                       hidden_activations="relu", output_activation=None,
+                       initialiser="xavier")
+    assert solves_simple_problem(X, y, rnn)
+
+def test_model_trains_with_batch_norm():
+    """Tests whether a model with batch norm on can solve a simple task"""
+    rnn = RNN(layers_info=[["lstm", 20], ["linear", 20], ["linear", 1]],
                        hidden_activations="relu", output_activation=None,
                        initialiser="xavier", batch_norm=True)
-    assert solves_simple_problem(X, y, rnn)
-
-    rnn = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]], input_dim=15,
-                       hidden_activations="relu", output_activation=None,
-                       initialiser="xavier")
     assert solves_simple_problem(X, y, rnn)
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""
     rnn = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            hidden_activations="relu", output_activation="sigmoid", dropout=0.9999,
-                           initialiser="xavier", input_dim=15)
-    assert rnn.dropout_layer.p == 0.9999
+                           initialiser="xavier")
+    assert rnn.dropout_layer.rate == 0.9999
     assert not solves_simple_problem(X, y, rnn)
     rnn = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            hidden_activations="relu", output_activation=None, dropout=0.0000001,
-                           initialiser="xavier", input_dim=15)
-    assert rnn.dropout_layer.p == 0.0000001
+                           initialiser="xavier")
+    assert rnn.dropout_layer.rate == 0.0000001
     assert solves_simple_problem(X, y, rnn)
 
 
@@ -301,18 +290,52 @@ def test_all_activations_work():
     """Tests that all activations get accepted"""
     nn_instance = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            hidden_activations="relu", output_activation=None, dropout=0.0000001,
-                           initialiser="xavier", input_dim=15)
+                           initialiser="xavier")
     for key in nn_instance.str_to_activations_converter.keys():
         assert RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            hidden_activations=key, output_activation=key, dropout=0.0000001,
-                           initialiser="xavier", input_dim=15)
+                           initialiser="xavier")
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
     nn_instance = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            hidden_activations="relu", output_activation=None, dropout=0.0000001,
-                           initialiser="xavier", input_dim=15)
+                           initialiser="xavier")
     for key in nn_instance.str_to_initialiser_converter.keys():
         assert RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            dropout=0.0000001,
-                           initialiser=key, input_dim=15)
+                           initialiser=key)
+
+def test_output_shapes():
+    """Tests whether network outputs of correct shape"""
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 3]],
+              hidden_activations="relu", initialiser="xavier")
+    output = rnn(X)
+    assert output.shape == (N, 3)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+    output = rnn(X)
+    assert output.shape == (N, 3, 7)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 3]],
+              hidden_activations="relu", initialiser="xavier")
+    output = rnn(X)
+    assert output.shape == (N, 3)
+
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 7]],
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+    output = rnn(X)
+    assert output.shape == (N, 3, 7)
+
+def test_return_final_seq_user_input_valid():
+    """Checks whether network only accepts a valid boolean value for return_final_seq_only"""
+    for valid_case in [True, False]:
+        assert RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+                  hidden_activations="relu", initialiser="xavier", return_final_seq_only=valid_case)
+
+    for invalid_case in [[True], 22, [1, 3], (True, False), (5, False)]:
+        with pytest.raises(AssertionError):
+            print(invalid_case)
+            RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+                hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case)

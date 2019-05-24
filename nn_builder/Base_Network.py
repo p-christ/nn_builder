@@ -82,7 +82,6 @@ class Base_Network(ABC):
             assert isinstance(output_layer, int), list_error_msg
             assert output_layer > 0, integer_error_msg
 
-
     def check_NN_input_dim_valid(self):
         """Checks that user input for input_dim is valid"""
         assert isinstance(self.input_dim, int), "input_dim must be an integer"
@@ -114,7 +113,6 @@ class Base_Network(ABC):
             assert len(embedding_dim) == 2 and isinstance(embedding_dim, list), \
                 "Each element of embedding_dimensions must be of form (input_dim, output_dim)"
 
-
     def check_y_range_values_valid(self):
         """Checks that user input for y_range is valid"""
         if self.y_range:
@@ -132,6 +130,10 @@ class Base_Network(ABC):
         valid_initialisers = set(self.str_to_initialiser_converter.keys())
         assert isinstance(self.initialiser, str), "initialiser must be a string from list {}".format(valid_initialisers)
         assert self.initialiser.lower() in valid_initialisers, "initialiser must be from list {}".format(valid_initialisers)
+
+    def check_return_final_seq_only_valid(self):
+        """Checks whether user input for return_final_seq_only is a boolean and therefore valid. Only relevant for RNNs"""
+        assert isinstance(self.return_final_seq_only, bool)
 
     def get_activation(self, activations, ix=None):
         """Gets the activation function"""

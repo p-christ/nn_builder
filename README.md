@@ -53,6 +53,8 @@ Every network requires the same arguments:
 | *y_range* | Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the output values to in regression tasks | No range |
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |
 
+- random_seed: Integer to indicate the random seed you want to use
+
 e.g. 
 
 

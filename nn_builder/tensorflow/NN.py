@@ -6,9 +6,6 @@ import tensorflow as tf
 from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
-
-#TODO add weight decay
-
 class NN(Model, TensorFlow_Base_Network):
     """Creates a PyTorch neural network
     Args:
@@ -28,6 +25,7 @@ class NN(Model, TensorFlow_Base_Network):
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 

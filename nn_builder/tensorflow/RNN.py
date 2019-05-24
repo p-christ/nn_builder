@@ -30,17 +30,21 @@ class RNN(Model, TensorFlow_Base_Network):
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - return_final_seq_only: Boolean to indicate whether you only want to return the output for the final timestep (True)
+                                 or if you want to return the output for all timesteps (False)
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+                 return_final_seq_only=True, random_seed=0, print_model_summary: bool =False):
         Model.__init__(self)
         # self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         # self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         # self.embedding_dimensions = embedding_dimensions
         # self.embedding_layers = self.create_embedding_layers()
+        self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         TensorFlow_Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
                                          batch_norm, y_range, random_seed, print_model_summary)
@@ -52,6 +56,7 @@ class RNN(Model, TensorFlow_Base_Network):
         # self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
+        self.check_return_final_seq_only_valid()
 
     def check_RNN_layers_valid(self):
         """Checks that layers provided by user are valid"""
@@ -93,13 +98,17 @@ class RNN(Model, TensorFlow_Base_Network):
             self.create_and_append_layer(layer, rnn_hidden_layers, activation)
         return rnn_hidden_layers
 
-    def create_and_append_layer(self, layer, rnn_hidden_layers, activation):
+    def create_and_append_layer(self, layer, rnn_hidden_layers, activation, output_layer=False):
         layer_type_name = layer[0].lower()
         hidden_size = layer[1]
+        if output_layer and self.return_final_seq_only: return_sequences = False
+        else: return_sequences = True
         if layer_type_name == "lstm":
-            rnn_hidden_layers.extend([LSTM(units=hidden_size, kernel_initializer=self.initialiser_function)])
+            rnn_hidden_layers.extend([LSTM(units=hidden_size, kernel_initializer=self.initialiser_function,
+                                           return_sequences=return_sequences)])
         elif layer_type_name == "gru":
-            rnn_hidden_layers.extend([GRU(units=hidden_size, kernel_initializer=self.initialiser_function)])
+            rnn_hidden_layers.extend([GRU(units=hidden_size, kernel_initializer=self.initialiser_function,
+                                          return_sequences=return_sequences)])
         elif layer_type_name == "linear":
             rnn_hidden_layers.extend(
                 [Dense(units=hidden_size, activation=activation, kernel_initializer=self.initialiser_function)])
@@ -114,7 +123,8 @@ class RNN(Model, TensorFlow_Base_Network):
         if not isinstance(self.layers_info[-1][0], list): self.layers_info[-1] = [self.layers_info[-1]]
         for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
             activation = self.get_activation(self.output_activation, output_layer_ix)
-            self.create_and_append_layer(output_layer, output_layers, activation)
+            self.create_and_append_layer(output_layer, output_layers, activation, output_layer=True)
+            print("Creating output layer ", output_layer)
         return output_layers
 
     def create_batch_norm_layers(self):
@@ -127,32 +137,38 @@ class RNN(Model, TensorFlow_Base_Network):
 
     def call(self, x, training=True):
         """Forward pass for the network"""
-        batch_size, seq_length, data_dimension = x.shape
+        training = training or training is None
+        restricted_to_final_seq = False
+
+        print("1: ", x.shape)
 
         for layer_ix, layer in enumerate(self.hidden_layers):
-            if type(layer) == type(Dense):
-                x = tf.reshape(x, [batch_size*seq_length, -1])
+            if type(layer) == Dense:
+                if self.return_final_seq_only:
+                    x = x[:, -1, :]
+                    restricted_to_final_seq = True
                 x = layer(x)
-                x = tf.reshape(x, [batch_size, seq_length, -1])
             else:
                 x = layer(x)
-                print(x.shape)
-                assert 1 == 0
-                x = x[0]
             if self.batch_norm:
-                x = tf.transpose(x, perm=[0, 2, 1])
-                # x.transpose_(1, 2)
-                x = self.batch_norm_layers[layer_ix](x, training=training)
-                x = tf.transpose(x, perm=[0, 2, 1])
-                # x.transpose_(1, 2)
-            if self.dropout != 0.0 and (training or training is None): x = self.dropout_layer(x)
+                x = self.batch_norm_layers[layer_ix](x, training=False)
+            if self.dropout != 0.0 and training: x = self.dropout_layer(x)
+
+        print("2: ", x.shape)
 
         out = None
-        x = tf.reshape(x, [batch_size * seq_length, -1])
         for output_layer_ix, output_layer in enumerate(self.output_layers):
-            temp_output = output_layer(x)
-            temp_output = tf.reshape(temp_output, [batch_size, seq_length, -1])
+            if type(output_layer) == Dense:
+                if self.return_final_seq_only and not restricted_to_final_seq:
+                    x = x[:, -1, :]
+                    restricted_to_final_seq = True
+                temp_output = output_layer(x)
+            else:
+                temp_output = output_layer(x)
+                activation = self.get_activation(self.output_activation, output_layer_ix)
+                temp_output = activation(temp_output)
             if out is None: out = temp_output
             else: out = Concatenate(axis=2)([out, temp_output])  # out = torch.cat((out, temp_output), dim=2)
+        print("3: ", out.shape)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
         return out

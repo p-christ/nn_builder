@@ -24,6 +24,7 @@ class NN(nn.Module, PyTorch_Base_Network):
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, input_dim: int, layers_info: list, output_activation=None,

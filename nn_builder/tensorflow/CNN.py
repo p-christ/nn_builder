@@ -27,6 +27,7 @@ class CNN(Model, TensorFlow_Base_Network):
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu",
@@ -157,6 +158,7 @@ class CNN(Model, TensorFlow_Base_Network):
     def call(self, x, training=True):
         """Forward pass for the network"""
         flattened=False
+        training = training or training is None
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
@@ -166,7 +168,7 @@ class CNN(Model, TensorFlow_Base_Network):
                     flattened = True
                 x = layer(x)
                 if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=training)
-                if self.dropout != 0.0 and (training or training is None): x = self.dropout_layer(x)
+                if self.dropout != 0.0 and training: x = self.dropout_layer(x)
 
         if not flattened: x = Flatten()(x)
         out = None

@@ -3,6 +3,7 @@ import torch.nn as nn
 from nn_builder.pytorch.PyTorch_Base_Network import PyTorch_Base_Network
 
 # TODO add embedding layers
+# TODO add option for check_return_final_seq_only_valid
 
 class RNN(nn.Module, PyTorch_Base_Network):
     """Creates a PyTorch recurrent neural network
@@ -28,18 +29,22 @@ class RNN(nn.Module, PyTorch_Base_Network):
                                 [embedding_input_dim_2, embedding_output_dim_2] ...]. Default is no embeddings
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - return_final_seq_only: Boolean to indicate whether you only want to return the output for the final timestep (True)
+                                 or if you want to return the output for all timesteps (False)
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
 
     def __init__(self, input_dim: int, layers_info: list, output_activation=None,
                  hidden_activations="relu", dropout: float =0.0, initialiser: str ="default", batch_norm: bool =False,
                  columns_of_data_to_be_embedded: list =[], embedding_dimensions: list =[], y_range: tuple = (),
-                 random_seed=0, print_model_summary: bool =False):
+                 return_final_seq_only=True, random_seed=0, print_model_summary: bool =False):
         nn.Module.__init__(self)
         # self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         # self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         # self.embedding_dimensions = embedding_dimensions
         # self.embedding_layers = self.create_embedding_layers()
+        self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         PyTorch_Base_Network.__init__(self, input_dim, layers_info, output_activation,
                                       hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
@@ -53,6 +58,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
         # self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
+        self.check_return_final_seq_only_valid()
 
     def check_RNN_layers_valid(self):
         """Checks that layers provided by user are valid"""

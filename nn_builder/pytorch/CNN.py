@@ -25,6 +25,7 @@ class CNN(nn.Module, PyTorch_Base_Network):
         - batch_norm: Boolean to indicate whether you want batch norm applied to the output of every hidden layer. Default is False
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
+        - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, input_dim, layers_info, output_activation=None, hidden_activations="relu",

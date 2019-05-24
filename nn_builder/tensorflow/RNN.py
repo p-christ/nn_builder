@@ -2,8 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras import Model
 import tensorflow.python.keras.activations as activations
-from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D,\
-                                            AveragePooling2D, GRU, LSTM
+from tensorflow.python.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
 # TODO add embedding layers

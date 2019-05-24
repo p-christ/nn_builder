@@ -109,14 +109,6 @@ class CNN(Model, TensorFlow_Base_Network):
             if layer[0].lower() == "linear":
                 rest_must_be_linear = True
 
-    def create_hidden_layers(self):
-        """Creates the hidden layers in the network"""
-        cnn_hidden_layers = []
-        for layer_ix, layer in enumerate(self.layers_info[:-1]):
-            activation = self.get_activation(self.hidden_activations, layer_ix)
-            self.create_and_append_layer(layer, cnn_hidden_layers, activation)
-        return cnn_hidden_layers
-
     def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None):
         """Creates and appends a layer to the list provided"""
         layer_name = layer[0].lower()
@@ -136,15 +128,6 @@ class CNN(Model, TensorFlow_Base_Network):
             list_to_append_layer_to.extend([Dense(layer[1], activation=activation, kernel_initializer=self.initialiser_function)])
         else:
             raise ValueError("Wrong layer name")
-
-    def create_output_layers(self):
-        """Creates the output layers in the network"""
-        output_layers = []
-        if not isinstance(self.layers_info[-1][0], list)  : self.layers_info[-1] = [self.layers_info[-1]]
-        for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
-            activation = self.get_activation(self.output_activation, output_layer_ix)
-            self.create_and_append_layer(output_layer, output_layers, activation)
-        return output_layers
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""

@@ -411,3 +411,38 @@ def test_return_final_seq_user_input_valid():
             print(invalid_case)
             RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
                 hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case)
+
+
+def test_embedding_layers():
+    """Tests whether create_embedding_layers_info method works correctly"""
+    for embedding_in_dim_1, embedding_out_dim_1, embedding_in_dim_2, embedding_out_dim_2 in zip(range(5, 8), range(3, 6), range(1, 4), range(24, 27)):
+        nn_instance = RNN( layers_info=[5], columns_of_data_to_be_embedded=[0, 1],
+                         embedding_dimensions =[[embedding_in_dim_1, embedding_out_dim_1], [embedding_in_dim_2, embedding_out_dim_2]])
+        for layer in nn_instance.embedding_layers:
+            assert isinstance(layer, tf.keras.layers.Embedding)
+        assert len(nn_instance.embedding_layers) == 2
+        assert nn_instance.embedding_layers[0].input_dim == embedding_in_dim_1
+        assert nn_instance.embedding_layers[0].output_dim == embedding_out_dim_1
+        assert nn_instance.embedding_layers[1].input_dim == embedding_in_dim_2
+        assert nn_instance.embedding_layers[1].output_dim == embedding_out_dim_2
+
+def test_incorporate_embeddings():
+    """Tests the method incorporate_embeddings"""
+    X_new = X
+    X_new[:, [2, 4]] = tf.round(X_new[:, [2, 4]])
+    nn_instance = NN( layers_info=[10],
+                     columns_of_data_to_be_embedded=[2, 4],
+                     embedding_dimensions=[[50, 3],
+                                                       [55, 4]])
+    out = nn_instance.incorporate_embeddings(X)
+    assert out.shape == (N, X.shape[1]+3+4-2)
+
+def test_embedding_network_can_solve_simple_problem():
+    """Tests whether network can solve simple problem using embeddings"""
+    X = (np.random.random((N, 5)) - 0.5) * 5.0 + 20.0
+    y = (X[:, 0] >= 20) * (X[:, 1] <= 20) * 1.0
+    nn_instance = NN( layers_info=[5, 1],
+                     columns_of_data_to_be_embedded=[0, 1],
+                     embedding_dimensions=[[50, 3],
+                                           [55, 3]])
+    assert solves_simple_problem(X, y, nn_instance)

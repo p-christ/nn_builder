@@ -50,13 +50,9 @@ class NN(Model, TensorFlow_Base_Network):
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
 
-    def create_hidden_layers(self):
-        """Creates the linear layers in the network"""
-        hidden_layers = []
-        for layer_ix, hidden_unit in enumerate(self.layers_info[:-1]):
-            activation = self.get_activation(self.hidden_activations, layer_ix)
-            hidden_layers.extend([Dense(hidden_unit, activation=activation, kernel_initializer=self.initialiser_function)])
-        return hidden_layers
+    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None):
+        """Creates and appends a layer to the list provided"""
+        list_to_append_layer_to.extend([Dense(layer, activation=activation, kernel_initializer=self.initialiser_function)])
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
@@ -64,27 +60,6 @@ class NN(Model, TensorFlow_Base_Network):
         for _ in range(len(self.hidden_layers)):
             batch_norm_layers.append(BatchNormalization())
         return batch_norm_layers
-
-    def create_embedding_layers(self):
-        """Creates the embedding layers in the network"""
-        embedding_layers = []
-        for embedding_dimension in self.embedding_dimensions:
-            input_dim, output_dim = embedding_dimension
-            embedding_layers.extend([tf.keras.layers.Embedding(input_dim, output_dim)])
-        return embedding_layers
-
-    def create_output_layers(self):
-        """Creates the output layers in the network"""
-        output_layers = []
-        # if len(self.layers) >= 2: input_dim = self.layers[-2]
-        # else: input_dim = self.input_dim
-        if not isinstance(self.layers_info[-1], list): output_layer = [self.layers_info[-1]]
-        else: output_layer = self.layers_info[-1]
-        for output_layer_ix, output_dim in enumerate(output_layer):
-            activation = self.get_activation(self.output_activation, output_layer_ix)
-            output_layers.extend([tf.keras.layers.Dense(output_dim, activation=activation,
-                                                        kernel_initializer=self.initialiser_function)])
-        return output_layers
 
     def call(self, x, training=True):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)

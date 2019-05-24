@@ -90,14 +90,6 @@ class RNN(Model, TensorFlow_Base_Network):
             if rest_must_be_linear: assert layer[0].lower() == "linear", "If have linear layers then they must come at end"
             if layer_type_name == "linear": rest_must_be_linear = True
 
-    def create_hidden_layers(self):
-        """Creates the hidden layers in the network"""
-        rnn_hidden_layers = []
-        for layer_ix, layer in enumerate(self.layers_info[:-1]):
-            activation = self.get_activation(self.hidden_activations, layer_ix)
-            self.create_and_append_layer(layer, rnn_hidden_layers, activation)
-        return rnn_hidden_layers
-
     def create_and_append_layer(self, layer, rnn_hidden_layers, activation, output_layer=False):
         layer_type_name = layer[0].lower()
         hidden_size = layer[1]
@@ -117,16 +109,6 @@ class RNN(Model, TensorFlow_Base_Network):
         input_dim = hidden_size
         return input_dim
 
-    def create_output_layers(self):
-        """Creates the output layers in the network"""
-        output_layers = []
-        if not isinstance(self.layers_info[-1][0], list): self.layers_info[-1] = [self.layers_info[-1]]
-        for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
-            activation = self.get_activation(self.output_activation, output_layer_ix)
-            self.create_and_append_layer(output_layer, output_layers, activation, output_layer=True)
-            print("Creating output layer ", output_layer)
-        return output_layers
-
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
         batch_norm_layers = []
@@ -137,11 +119,9 @@ class RNN(Model, TensorFlow_Base_Network):
 
     def call(self, x, training=True):
         """Forward pass for the network"""
+        if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         training = training or training is None
         restricted_to_final_seq = False
-
-        print("1: ", x.shape)
-
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) == Dense:
                 if self.return_final_seq_only:
@@ -153,9 +133,6 @@ class RNN(Model, TensorFlow_Base_Network):
             if self.batch_norm:
                 x = self.batch_norm_layers[layer_ix](x, training=False)
             if self.dropout != 0.0 and training: x = self.dropout_layer(x)
-
-        print("2: ", x.shape)
-
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             if type(output_layer) == Dense:
@@ -168,7 +145,21 @@ class RNN(Model, TensorFlow_Base_Network):
                 activation = self.get_activation(self.output_activation, output_layer_ix)
                 temp_output = activation(temp_output)
             if out is None: out = temp_output
-            else: out = Concatenate(axis=2)([out, temp_output])  # out = torch.cat((out, temp_output), dim=2)
-        print("3: ", out.shape)
+            else: out = Concatenate(axis=2)([out, temp_output])
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)
         return out
+
+
+    def incorporate_embeddings(self, x):
+        """Puts relevant data through embedding layers and then concatenates the result with the rest of the data ready
+        to then be put through the hidden layers"""
+        all_embedded_data = []
+        for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
+            data = x[:, :, embedding_var]  #.long()
+            embedded_data = self.embedding_layers[embedding_layer_ix](data)
+            all_embedded_data.append(embedded_data)
+        all_embedded_data = Concatenate(axis=1)(all_embedded_data)
+        non_embedded_columns = [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]
+        rest_of_data = tf.gather(x, non_embedded_columns, axis=2)
+        x = Concatenate(axis=2)([tf.dtypes.cast(rest_of_data, float), all_embedded_data])
+        return x

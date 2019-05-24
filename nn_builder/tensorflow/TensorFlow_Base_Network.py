@@ -18,6 +18,11 @@ class TensorFlow_Base_Network(Base_Network, ABC):
         """Runs a forward pass of the tensorflow model"""
         raise NotImplementedError
 
+    def set_all_random_seeds(self, random_seed):
+        """Sets all possible random seeds so results can be reproduced"""
+        np.random.seed(random_seed)
+        tf.random.set_seed(random_seed)
+        random.seed(random_seed)
 
     def create_str_to_activations_converter(self):
         """Creates a dictionary which converts strings to activations"""
@@ -43,10 +48,28 @@ class TensorFlow_Base_Network(Base_Network, ABC):
         """Creates a dropout layer"""
         return tf.keras.layers.Dropout(rate=self.dropout)
 
-    def set_all_random_seeds(self, random_seed):
-        """Sets all possible random seeds so results can be reproduced"""
-        np.random.seed(random_seed)
-        tf.random.set_seed(random_seed)
-        random.seed(random_seed)
+    def create_hidden_layers(self):
+        """Creates the hidden layers in the network"""
+        hidden_layers = []
+        for layer_ix, layer in enumerate(self.layers_info[:-1]):
+            activation = self.get_activation(self.hidden_activations, layer_ix)
+            self.create_and_append_layer(layer, hidden_layers, activation, output_layer=False)
+        return hidden_layers
 
+    def create_output_layers(self):
+        """Creates the output layers in the network"""
+        output_layers = []
+        if not isinstance(self.layers_info[-1][0], list)  : self.layers_info[-1] = [self.layers_info[-1]]
+        for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
+            activation = self.get_activation(self.output_activation, output_layer_ix)
+            self.create_and_append_layer(output_layer, output_layers, activation, output_layer=True)
+        return output_layers
+
+    def create_embedding_layers(self):
+        """Creates the embedding layers in the network"""
+        embedding_layers = []
+        for embedding_dimension in self.embedding_dimensions:
+            input_dim, output_dim = embedding_dimension
+            embedding_layers.extend([tf.keras.layers.Embedding(input_dim, output_dim)])
+        return embedding_layers
 

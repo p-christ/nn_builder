@@ -189,6 +189,7 @@ class RNN(nn.Module, PyTorch_Base_Network):
                         temp_output = activation(temp_output)
             if out is None: out = temp_output
             else: out = torch.cat((out, temp_output), dim=2)
+        if self.return_final_seq_only: out = out[:, -1, :]
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*nn.Sigmoid()(out)
         return out
 

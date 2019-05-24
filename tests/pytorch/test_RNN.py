@@ -10,6 +10,11 @@ from nn_builder.pytorch.RNN import RNN
 import torch.optim as optim
 from torchvision import datasets, transforms
 
+N = 250
+X = torch.randn((N, 5, 15))
+X[0:125, 0, 3] += 20.0
+y = X[:, 0, 3] > 5.0
+y = y.float()
 
 def test_user_hidden_layers_input_rejections():
     """Tests whether network rejects invalid hidden_layers inputted from user"""
@@ -162,7 +167,7 @@ def test_output_activation():
         out = RNN_instance.forward(data)
         assert all(out.reshape(1, -1).squeeze() >= 0)
         assert all(out.reshape(1, -1).squeeze() <= 1)
-        summed_result = torch.sum(out, dim=2)
+        summed_result = torch.sum(out, dim=1)
         assert all(summed_result.reshape(1, -1).squeeze() != 1.0)
 
 
@@ -172,13 +177,93 @@ def test_output_activation():
         out = RNN_instance.forward(data)
         assert all(out.reshape(1, -1).squeeze() >= 0)
         assert all(out.reshape(1, -1).squeeze() <= 1)
-        summed_result = torch.sum(out, dim=2)
+        summed_result = torch.sum(out, dim=1)
         summed_result = summed_result.reshape(1, -1).squeeze()
         summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
         assert all( summed_result == 1.0)
 
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
                            hidden_activations="relu", input_dim=input_dim,
+                           output_activation="softmax", initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+        assert all(out.reshape(1, -1).squeeze() <= 1)
+        summed_result = torch.sum(out, dim=1)
+        summed_result = summed_result.reshape(1, -1).squeeze()
+        summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
+        assert all( summed_result == 1.0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu", input_dim=input_dim,
+                           initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert not all(out.reshape(1, -1).squeeze() >= 0)
+
+        assert not all(out.reshape(1, -1).squeeze() <= 0)
+        summed_result = torch.sum(out, dim=1)
+        summed_result = summed_result.reshape(1, -1).squeeze()
+        summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
+        assert not all(summed_result == 1.0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25], ["linear", 8]],
+                           hidden_activations="relu", input_dim=input_dim,
+                           initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert not all(out.reshape(1, -1).squeeze() >= 0)
+        assert not all(out.reshape(1, -1).squeeze() <= 0)
+        summed_result = torch.sum(out, dim=1)
+        summed_result = summed_result.reshape(1, -1).squeeze()
+        summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
+        assert not all( summed_result == 1.0)
+
+
+def test_output_activation_return_return_final_seq_only_off():
+    """Tests whether network outputs data that has gone through correct activation function"""
+    RANDOM_ITERATIONS = 20
+    input_dim = 100
+    for _ in range(RANDOM_ITERATIONS):
+        data = torch.randn((25, 10, 100))
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
+                           output_activation="relu", initialiser="xavier", batch_norm=True)
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5]],
+                           hidden_activations="relu",  input_dim=input_dim, return_final_seq_only=False,
+                           output_activation="relu", initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
+                           output_activation="relu", initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
+                           output_activation="sigmoid", initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+        assert all(out.reshape(1, -1).squeeze() <= 1)
+        summed_result = torch.sum(out, dim=2)
+        assert all(summed_result.reshape(1, -1).squeeze() != 1.0)
+
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
+                           output_activation="softmax", initialiser="xavier")
+        out = RNN_instance.forward(data)
+        assert all(out.reshape(1, -1).squeeze() >= 0)
+        assert all(out.reshape(1, -1).squeeze() <= 1)
+        summed_result = torch.sum(out, dim=2)
+        summed_result = summed_result.reshape(1, -1).squeeze()
+        summed_result = torch.round( (summed_result * 10 ** 5) / (10 ** 5))
+        assert all( summed_result == 1.0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
                            output_activation="softmax", initialiser="xavier")
         out = RNN_instance.forward(data)
         assert all(out.reshape(1, -1).squeeze() >= 0)
@@ -192,7 +277,7 @@ def test_output_activation():
         assert all( summed_result == 1.0)
 
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
-                           hidden_activations="relu", input_dim=input_dim,
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
                            initialiser="xavier")
         out = RNN_instance.forward(data)
         assert not all(out.reshape(1, -1).squeeze() >= 0)
@@ -204,7 +289,7 @@ def test_output_activation():
         assert not all( summed_result == 1.0)
 
         RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25], ["linear", 8]],
-                           hidden_activations="relu", input_dim=input_dim,
+                           hidden_activations="relu", input_dim=input_dim, return_final_seq_only=False,
                            initialiser="xavier")
         out = RNN_instance.forward(data)
         assert not all(out.reshape(1, -1).squeeze() >= 0)
@@ -227,8 +312,8 @@ def test_y_range():
         random_data = torch.randn((10, 11, 22))
         out = rnn.forward(random_data)
         out = out.reshape(1, -1).squeeze()
-        assert torch.sum(out > lower_bound).item() == 11*25*10, "lower {} vs. {} ".format(lower_bound, out)
-        assert torch.sum(out < upper_bound).item() == 11*25*10, "upper {} vs. {} ".format(upper_bound, out)
+        assert torch.sum(out > lower_bound).item() == 25*10, "lower {} vs. {} ".format(lower_bound, out)
+        assert torch.sum(out < upper_bound).item() == 25*10, "upper {} vs. {} ".format(upper_bound, out)
 
 def test_deals_with_None_activation():
     """Tests whether is able to handle user inputting None as output activation"""
@@ -261,19 +346,11 @@ def test_y_range_user_input():
                            hidden_activations="relu", y_range=y_range_value, input_dim=5,
                            initialiser="xavier")
 
-
-N = 250
-X = torch.randn((N, 5, 15))
-X[0:125, 0, 3] += 20.0
-y = X[:, 0, 3] > 5.0
-y = y.float()
-
 def solves_simple_problem(X, y, nn_instance):
     """Checks if a given network is able to solve a simple problem"""
     optimizer = optim.Adam(nn_instance.parameters(), lr=0.15)
     for ix in range(800):
         out = nn_instance.forward(X)
-        out = out[:, -1, :]
         loss = torch.sum((out.squeeze() - y) ** 2) / N
         optimizer.zero_grad()
         loss.backward()
@@ -349,33 +426,33 @@ def test_all_initialisers_work():
 def test_output_shapes():
     """Tests whether network outputs of correct shape"""
     rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 3]],
-              hidden_activations="relu", initialiser="xavier")
+              hidden_activations="relu", initialiser="xavier", input_dim=15)
     output = rnn(X)
     assert output.shape == (N, 3)
 
     rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
-              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False, input_dim=15)
     output = rnn(X)
-    assert output.shape == (N, 3, 7)
+    assert output.shape == (N, 5, 7)
 
     rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 3]],
-              hidden_activations="relu", initialiser="xavier")
+              hidden_activations="relu", initialiser="xavier", input_dim=15)
     output = rnn(X)
     assert output.shape == (N, 3)
 
     rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 7]],
-              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False)
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False, input_dim=15)
     output = rnn(X)
-    assert output.shape == (N, 3, 7)
+    assert output.shape == (N, 5, 7)
 
 def test_return_final_seq_user_input_valid():
     """Checks whether network only accepts a valid boolean value for return_final_seq_only"""
     for valid_case in [True, False]:
         assert RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
-                  hidden_activations="relu", initialiser="xavier", return_final_seq_only=valid_case)
+                  hidden_activations="relu", initialiser="xavier", return_final_seq_only=valid_case, input_dim=15)
 
     for invalid_case in [[True], 22, [1, 3], (True, False), (5, False)]:
         with pytest.raises(AssertionError):
             print(invalid_case)
             RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
-                hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case)
+                hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case, input_dim=15)

@@ -192,6 +192,78 @@ def test_output_activation():
         summed_result = tf.reduce_sum(out, axis=1)
         assert not (np.round(summed_result, 3) == 1.0).all()
 
+
+def test_output_activation():
+    """Tests whether network outputs data that has gone through correct activation function"""
+    RANDOM_ITERATIONS = 20
+    for _ in range(RANDOM_ITERATIONS):
+        data = np.random.random((25, 10, 30))
+        data = data.astype('float32')
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu",
+                           output_activation="relu", initialiser="xavier", batch_norm=True)
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5]],
+                           hidden_activations="relu",
+                           output_activation="relu", initialiser="xavier")
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu",
+                           output_activation="relu", initialiser="xavier")
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu",
+                           output_activation="sigmoid", initialiser="xavier")
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+        assert all(tf.reshape(out, [-1]) <= 1)
+
+        summed_result = tf.reduce_sum(out, axis=1)
+        summed_result = tf.reshape(summed_result, [-1, 1])
+        assert summed_result != 1.0
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["linear", 10], ["linear", 3]],
+                           hidden_activations="relu",
+                           output_activation="softmax", initialiser="xavier")
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+        assert all(tf.reshape(out, [-1]) <= 1)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert (np.round(summed_result, 3) == 1.0).all()
+
+        RNN_instance = RNN(layers_info=[["lstm", 20], ["gru", 5], ["lstm", 25]],
+                           hidden_activations="relu",
+                           output_activation="softmax", initialiser="xavier")
+        out = RNN_instance(data)
+        assert all(tf.reshape(out, [-1]) >= 0)
+        assert all(tf.reshape(out, [-1]) <= 1)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert (np.round(summed_result, 3) == 1.0).all()
+
+        RNN_instance = RNN(layers_info=[["linear", 20], ["linear", 50]],
+                           hidden_activations="relu")
+
+        out = RNN_instance(data)
+        assert not all(tf.reshape(out, [-1]) >= 0)
+        assert not all(tf.reshape(out, [-1]) <= 1)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert not (np.round(summed_result, 3) == 1.0).all()
+
+        RNN_instance = RNN(layers_info=[ ["lstm", 25], ["linear", 10]],
+                           hidden_activations="relu")
+
+        out = RNN_instance(data)
+        assert not all(tf.reshape(out, [-1]) >= 0)
+        assert not all(tf.reshape(out, [-1]) <= 0)
+        summed_result = tf.reduce_sum(out, axis=1)
+        assert not (np.round(summed_result, 3) == 1.0).all()
+
 def test_y_range():
     """Tests whether setting a y range works correctly"""
     for _ in range(20):

@@ -8,9 +8,9 @@ from abc import ABC, abstractmethod
 
 class TensorFlow_Base_Network(Base_Network, ABC):
     """Base class for TensorFlow neural network classes"""
-    def __init__(self, input_dim, layers, output_activation,
-                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary):
-        super().__init__(input_dim, layers, output_activation,
+    def __init__(self, layers, output_activation, hidden_activations, dropout, initialiser, batch_norm, y_range,
+                 random_seed, print_model_summary):
+        super().__init__(None, layers, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     @abstractmethod

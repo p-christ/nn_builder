@@ -7,6 +7,8 @@ from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, 
 from nn_builder.tensorflow.TensorFlow_Base_Network import TensorFlow_Base_Network
 
 
+#TODO add weight decay
+
 class NN(Model, TensorFlow_Base_Network):
     """Creates a PyTorch neural network
     Args:
@@ -38,7 +40,7 @@ class NN(Model, TensorFlow_Base_Network):
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
-        TensorFlow_Base_Network.__init__(self, None, layers_info, output_activation,
+        TensorFlow_Base_Network.__init__(self, layers_info, output_activation,
                                          hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
                                          print_model_summary)
 
@@ -56,7 +58,6 @@ class NN(Model, TensorFlow_Base_Network):
         for layer_ix, hidden_unit in enumerate(self.layers_info[:-1]):
             activation = self.get_activation(self.hidden_activations, layer_ix)
             hidden_layers.extend([Dense(hidden_unit, activation=activation, kernel_initializer=self.initialiser_function)])
-
         return hidden_layers
 
     def create_batch_norm_layers(self):
@@ -91,7 +92,7 @@ class NN(Model, TensorFlow_Base_Network):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         for layer_ix, linear_layer in enumerate(self.hidden_layers):
             x = linear_layer(x)
-            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
+            if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=training)
             if self.dropout != 0.0 and (training or training is None):
                 x = self.dropout_layer(x)
         out = None

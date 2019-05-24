@@ -20,7 +20,7 @@ class Base_Network(Overall_Base_Network, ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_and_append_layer(self, layer, list_to_append_layer_to, activation=None, output_layer=False):
+    def create_and_append_layer(self, layer, list_to_append_layer_to, activation, output_layer=False):
         """Creates a layer and appends it to the provided list"""
         raise NotImplementedError
 

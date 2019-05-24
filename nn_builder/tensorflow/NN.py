@@ -68,10 +68,13 @@ class NN(Model, Base_Network):
             data = x[:, embedding_var]
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
             all_embedded_data.append(embedded_data)
-        all_embedded_data = Concatenate(axis=1)(all_embedded_data)
+        if len(all_embedded_data) > 1: all_embedded_data = Concatenate(axis=1)(all_embedded_data)
+        else: all_embedded_data = all_embedded_data[0]
         non_embedded_columns = [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]
-        rest_of_data = tf.gather(x, non_embedded_columns, axis=1)
-        x = Concatenate(axis=1)([tf.dtypes.cast(rest_of_data, float), all_embedded_data])
+        if len(non_embedded_columns) > 0:
+            x = tf.gather(x, non_embedded_columns, axis=1)
+            x = Concatenate(axis=1)([tf.dtypes.cast(x, float), all_embedded_data])
+        else: x = all_embedded_data
         return x
 
     def process_hidden_layers(self, x, training):

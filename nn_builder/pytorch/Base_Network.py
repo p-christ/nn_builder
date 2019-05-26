@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import torch
+from torchsummary import summary
 import torch.nn as nn
 from nn_builder.Overall_Base_Network import Overall_Base_Network
 from abc import ABC, abstractmethod
@@ -89,3 +90,7 @@ class Base_Network(Overall_Base_Network, ABC):
     def flatten_tensor(self, tensor):
         """Flattens a tensor of shape (a, b, c, d, ...) into (a, b * c * d * .. )"""
         return tensor.reshape(tensor.shape[0], -1)
+
+    def print_model_summary(self):
+        print(self)
+

@@ -6,8 +6,7 @@
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
 
 
-**nn_builder builds neural networks in 1 line**, saving you time :clock1: and from making bugs :bug:
-.
+**nn_builder builds neural networks in 1 line** to save you time :clock1:.
 
 ### Install
 
@@ -15,8 +14,6 @@
 
 
 ### Support
-
-Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tensorflow networks.
 
 | Network Type       | **NN**  | **CNN** | **RNN** |
 | ------- | ------- | ------- | ------- |
@@ -27,7 +24,7 @@ Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tenso
 
 ### Examples
 
-On the right is the large amount of code you would need to write to create a PyTorch neural network equivalent to the network
+On the right is the code needed to create a PyTorch neural network equivalent to the network
  created in only one line of code on the left using nn_builder: 
 
 ![Screenshot](miscellaneous/material_for_readme/nn_builder_use_case.png)
@@ -52,11 +49,9 @@ Every network requires the same arguments:
 | *columns of_data_to_be_embedded* | List to indicate the column numbers of the data that you want to be put through an embedding layer before being fed through the hidden layers of the network | No embeddings |
 | *embedding_dimensions* | If you have categorical variables you want embedded before flowing through the network then you specify the embedding dimensions here with a list of the form: [ [embedding_input_dim_1, embedding_output_dim_1], [embedding_input_dim_2, embedding_output_dim_2] ...] | No embeddings |
 | *y_range* | Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the output values to in regression tasks | No range |
+| *random_seed* | Integer to indicate the random seed you want to use | 0 |
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |
 
-- random_seed: Integer to indicate the random seed you want to use
-
-e.g. 
 
 
 ## More Examples

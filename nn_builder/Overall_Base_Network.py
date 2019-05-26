@@ -62,6 +62,11 @@ class Overall_Base_Network(ABC):
         """Sets all random seeds"""
         raise NotImplementedError
 
+    @abstractmethod
+    def print_model_summary(self):
+        """Prints a summary of the model"""
+        raise NotImplementedError
+
     def check_NN_layers_valid(self):
         """Checks that user input for hidden_units is valid"""
         assert isinstance(self.layers_info, list), "hidden_units must be a list"
@@ -140,21 +145,21 @@ class Overall_Base_Network(ABC):
         if isinstance(activations, list):
             return self.str_to_activations_converter[str(activations[ix]).lower()]
         return self.str_to_activations_converter[str(activations).lower()]
-
-    def print_model_summary(self):
-        if len(self.embedding_layers) > 0:
-            print("Embedding layers")
-            print("-------------")
-            print(self.embedding_layers)
-            print(" ")
-        print("-------------")
-        print("Linear layers")
-        print("-------------")
-        for layer_ix in range(len(self.hidden_layers)):
-            print(self.hidden_layers[layer_ix])
-            if self.batch_norm: print(self.batch_norm_layers[layer_ix])
-        print("-------------")
-        print("Output Layers")
-        print("-------------")
-        for layer_ix in range(len(self.output_layers)):
-            print(self.output_layers[layer_ix])
+    #
+    # def print_model_summary(self):
+    #     if len(self.embedding_layers) > 0:
+    #         print("Embedding layers")
+    #         print("-------------")
+    #         print(self.embedding_layers)
+    #         print(" ")
+    #     print("-------------")
+    #     print("Linear layers")
+    #     print("-------------")
+    #     for layer_ix in range(len(self.hidden_layers)):
+    #         print(self.hidden_layers[layer_ix])
+    #         if self.batch_norm: print(self.batch_norm_layers[layer_ix])
+    #     print("-------------")
+    #     print("Output Layers")
+    #     print("-------------")
+    #     for layer_ix in range(len(self.output_layers)):
+    #         print(self.output_layers[layer_ix])

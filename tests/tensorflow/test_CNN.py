@@ -413,3 +413,10 @@ def test_all_initialisers_work():
         assert CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 1]],
                                     dropout=0.0000001,
                                    initialiser=key)
+
+def test_print_model_summary():
+    nn_instance = CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["conv", 25, 5, 1, "valid"], ["linear", 1]],
+                      dropout=0.0000001, batch_norm=True,
+                      initialiser="xavier")
+    nn_instance.print_model_summary((64, 11, 11, 3))
+

@@ -456,3 +456,8 @@ def test_return_final_seq_user_input_valid():
             print(invalid_case)
             RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
                 hidden_activations="relu", initialiser="xavier", return_final_seq_only=invalid_case, input_dim=15)
+
+def test_print_model_summary():
+    nn_instance = RNN(layers_info=[["gru", 20], ["lstm", 8], ["lstm", 7]],
+              hidden_activations="relu", initialiser="xavier", return_final_seq_only=False, input_dim=15)
+    nn_instance.print_model_summary()

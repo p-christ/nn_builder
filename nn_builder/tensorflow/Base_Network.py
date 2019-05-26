@@ -87,3 +87,8 @@ class Base_Network(Overall_Base_Network, ABC):
             batch_norm_layers.extend([BatchNormalization()])
         return batch_norm_layers
 
+    def print_model_summary(self, input_shape=None):
+        assert input_shape is not None, "Must provide the input_shape parameter as a tuple"
+        self.build(input_shape=input_shape)
+        self.dropout_layer.build(input_shape)
+        self.summary()

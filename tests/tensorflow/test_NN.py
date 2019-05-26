@@ -223,3 +223,7 @@ def test_all_initialisers_work():
     nn_instance = NN(layers_info=[10, 10, 1], dropout=0.9999)
     for key in nn_instance.str_to_initialiser_converter.keys():
         assert NN(layers_info=[10, 10, 1], dropout=0.9999, initialiser=key)
+
+def test_print_model_summary():
+    nn_instance = NN(layers_info=[10, 10, 1])
+    nn_instance.print_model_summary((64, 11))

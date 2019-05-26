@@ -456,3 +456,10 @@ def test_embedding_network_can_solve_simple_problem():
                      embedding_dimensions=[[50, 3],
                                            [55, 3]])
     assert solves_simple_problem(X, y, nn_instance)
+
+
+def test_print_model_summary():
+    nn_instance = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 7]],
+                     columns_of_data_to_be_embedded=[2],
+                     embedding_dimensions=[[150, 30]])
+    nn_instance.print_model_summary((64, 11, 11))

@@ -6,8 +6,12 @@ dist: xenial
 sudo: true
 
 install:
-  - pip install -q tensorflow==2.0.0-alpha0
-  - pip install -r requirements.txt -q
+  - pip install -q tensorflow==2.0.0a0
+  - pip install torchvision==0.2.2.post3
+  - pip install numpy==1.16.2
+  - pip install setuptools==40.8.0
+  - pip install pytest==4.4.0
+  - pip install torch==1.0.1.post2
 
 script:
   - export PYTHONPATH="$PYTHONPATH:$PWD"

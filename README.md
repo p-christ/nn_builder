@@ -1,6 +1,3 @@
-
-
-
 ![nn_builder](miscellaneous/material_for_readme/nn_builder_new.png)
 
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
@@ -53,6 +50,7 @@ Every network requires the same arguments:
 | *print_model_summary* | Boolean to indicate whether you want a model summary printed after model is created | False |
 
 
+After creating a model, the function print_model_summary() can be used to summarise the layers.  
 
 ## More Examples
 

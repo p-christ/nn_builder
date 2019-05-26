@@ -6,7 +6,8 @@
 ![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
 
 
-**nn_builder builds neural networks in 1 line**, saving you time.
+**nn_builder builds neural networks in 1 line**, saving you time :clock1: and from making bugs :bug:
+.
 
 ### Install
 
@@ -20,7 +21,7 @@ Types of network supported so far: PyTorch NN, CNN & RNN. Soon we will add Tenso
 | Network Type       | **NN**  | **CNN** | **RNN** |
 | ------- | ------- | ------- | ------- |
 | PyTorch     | :heavy_check_mark: | :heavy_check_mark:    | :heavy_check_mark:    |
-| TensorFlow 2.0  |        :heavy_check_mark:  |  :x:                  | :x: |                             |
+| TensorFlow 2.0  |        :heavy_check_mark:  |  :heavy_check_mark: | :heavy_check_mark: |                             |
 
 
 

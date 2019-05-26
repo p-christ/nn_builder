@@ -5,7 +5,7 @@ import random
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
-from nn_builder.pytorch.NN import NN
+from nn_builder.pytorch_networks.NN import NN
 
 N = 250
 X = torch.randn((N, 5))

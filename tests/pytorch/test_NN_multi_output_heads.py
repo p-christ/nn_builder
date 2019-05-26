@@ -2,7 +2,7 @@ import random
 
 import torch
 import pytest
-from nn_builder.pytorch.NN import NN
+from nn_builder.pytorch_networks.NN import NN
 
 def test_output_heads_error_catching():
     """Tests that having multiple output heads catches errors from user inputs"""

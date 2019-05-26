@@ -6,7 +6,7 @@ import random
 import numpy as np
 import tensorflow as tf
 import torch.nn as nn
-from nn_builder.tensorflow.CNN import CNN
+from nn_builder.tensorflow_networks.CNN import CNN
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
 
 

@@ -75,7 +75,6 @@ class CNN(nn.Module, Base_Network):
 
         all_layers = self.layers_info[:-1]
         output_layer = self.layers_info[-1]
-        print("OUTPUT LAYER ", output_layer)
         assert isinstance(output_layer, list), "layers must be a list"
         if isinstance(output_layer[0], list):
             for layer in output_layer:
@@ -126,7 +125,6 @@ class CNN(nn.Module, Base_Network):
 
     def create_hidden_layers(self):
         """Creates the hidden layers in the network"""
-        print("HELLO")
         cnn_hidden_layers = nn.ModuleList([])
         input_dim = self.input_dim
         for layer in self.layers_info[:-1]:
@@ -137,7 +135,6 @@ class CNN(nn.Module, Base_Network):
     def create_and_append_layer(self, input_dim, layer, list_to_append_layer_to):
         """Creates and appends a layer to the list provided"""
         layer_name = layer[0].lower()
-        print(layer_name)
         assert layer_name in self.valid_cnn_hidden_layer_types, "Layer name {} not valid, use one of {}".format(
             layer_name, self.valid_cnn_hidden_layer_types)
         if layer_name == "conv":

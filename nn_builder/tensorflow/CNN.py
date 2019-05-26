@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from tensorflow.python.keras import Model, activations
-from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
+from tensorflow.keras import Model, activations
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
 
 from nn_builder.tensorflow.Base_Network import Base_Network
 

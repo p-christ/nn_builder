@@ -1,8 +1,8 @@
 import tensorflow as tf
-from tensorflow.keras.layers import BatchNormalization
+from tensorflow.python.keras.layers import BatchNormalization
 from nn_builder.Overall_Base_Network import Overall_Base_Network
-import tensorflow.keras.activations as activations
-import tensorflow.keras.initializers as initializers
+import tensorflow.python.keras.activations as activations
+import tensorflow.python.keras.initializers as initializers
 
 import numpy as np
 import random

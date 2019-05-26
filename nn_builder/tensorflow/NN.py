@@ -2,7 +2,7 @@ from tensorflow.keras import Model, activations
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
+from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization
 from nn_builder.tensorflow.Base_Network import Base_Network
 
 class NN(Model, Base_Network):

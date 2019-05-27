@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow.python.keras.layers import BatchNormalization
-from tensorflow.python.training.tracking.data_structures import _ListWrapper
 
 from nn_builder.Overall_Base_Network import Overall_Base_Network
 import tensorflow.python.keras.activations as activations

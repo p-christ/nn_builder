@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import torch.nn as nn
-from nn_builder.pytorch_nn.Base_Network import Base_Network
+from nn_builder.pytorch.Base_Network import Base_Network
 
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network

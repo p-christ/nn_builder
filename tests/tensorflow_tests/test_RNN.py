@@ -5,7 +5,7 @@ import random
 import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
-from nn_builder.tensorflow_nn.RNN import RNN
+from nn_builder.tensorflow.RNN import RNN
 
 N = 250
 X = np.random.random((N, 3, 5))

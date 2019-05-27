@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from nn_builder.pytorch_nn.Base_Network import Base_Network
+from nn_builder.pytorch.Base_Network import Base_Network
 
 # TODO write tests for and add embedding layers
 

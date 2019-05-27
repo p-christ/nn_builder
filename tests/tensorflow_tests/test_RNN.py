@@ -463,3 +463,73 @@ def test_print_model_summary():
                      columns_of_data_to_be_embedded=[2],
                      embedding_dimensions=[[150, 30]])
     nn_instance.print_model_summary((64, 11, 11))
+
+def test_output_heads_error_catching():
+    """Tests that having multiple output heads catches errors from user inputs"""
+    output_dims_that_should_break = [["linear", 2, 2, "SAME", "conv", 3, 4, "SAME"], [[["lstm", 3], ["gru", 4]]],
+                                     [[2, 8]], [-33, 33, 33, 33, 33]]
+    for output_dim in output_dims_that_should_break:
+        with pytest.raises(AssertionError):
+            RNN(layers_info=[["gru", 20], ["lstm", 8], output_dim],
+                hidden_activations="relu", output_activation="relu")
+    output_activations_that_should_break = ["relu", ["relu"], ["relu", "softmax"]]
+    for output_activation in output_activations_that_should_break:
+        with pytest.raises(AssertionError):
+            RNN(layers_info=[["gru", 20], ["lstm", 8], [["linear", 5], ["linear", 2], ["linear", 5]]],
+               hidden_activations="relu", output_activation=output_activation)
+
+
+def test_output_head_layers():
+    """Tests whether the output head layers get created properly"""
+    for output_dim in [[["linear", 3],["linear", 9]], [["linear", 4], ["linear", 20]], [["linear", 1], ["linear", 1]]]:
+        nn_instance = RNN(layers_info=[["gru", 20], ["lstm", 8], output_dim],
+                          hidden_activations="relu", output_activation=["softmax", None])
+        assert nn_instance.output_layers[0].units == output_dim[0][1]
+        assert nn_instance.output_layers[1].units == output_dim[1][1]
+
+def test_output_head_activations_work():
+    """Tests that output head activations work properly"""
+
+    output_dim = [["linear", 5], ["linear", 10], ["linear", 3]]
+    nn_instance = RNN(layers_info=[["gru", 20], ["lstm", 8], output_dim],
+                          hidden_activations="relu", output_activation=["softmax", None, "relu"])
+    x = np.random.random((20, 10, 4)) * -20.0
+    x = x.astype('float32')
+    out = nn_instance(x)
+
+    assert out.shape == (20, 18)
+
+    sums = tf.reduce_sum(out[:, :5], axis=1)
+    sums_others = tf.reduce_sum(out[:, 5:], axis=1)
+    sums_others_2 = tf.reduce_sum(out[:, 5:15], axis=1)
+    sums_others_3 = tf.reduce_sum(out[:, 15:18], axis=1)
+
+
+    for row in range(out.shape[0]):
+        assert tf.math.equal(np.round(sums[row], 4), 1.0), sums[row]
+        assert not tf.math.equal(np.round(sums_others[row], 4), 1.0), np.round(sums_others[row], 4)
+        assert not tf.math.equal(np.round(sums_others_2[row], 4), 1.0), np.round(sums_others_2[row], 4)
+        assert not tf.math.equal(np.round(sums_others_3[row], 4), 1.0), np.round(sums_others_3[row], 4)
+        for col in range(3):
+            assert out[row, 15 + col] >= 0.0, out[row, 15 + col]
+
+def test_output_head_shapes_correct():
+    """Tests that the output shape of network is correct when using multiple outpout heads"""
+    N = 20
+    X = np.random.random((N, 10, 4)) * -20.0
+    X = X.astype('float32')
+    for _ in range(25):
+        nn_instance = RNN(
+            layers_info=[["gru", 20], ["lstm", 8], ["linear", 1], ["linear", 12]],
+            hidden_activations="relu")
+        out = nn_instance(X)
+        assert out.shape[0] == N
+        assert out.shape[1] == 12
+
+    for output_dim in [[ ["linear", 10], ["linear", 4], ["linear", 6]], [["linear", 3], ["linear", 8], ["linear", 9]]]:
+        nn_instance = RNN(
+            layers_info=[["gru", 20], ["lstm", 8], ["linear", 1], ["linear", 12], output_dim],
+            hidden_activations="relu", output_activation=["softmax", None, "relu"])
+        out = nn_instance(X)
+        assert out.shape[0] == N
+        assert out.shape[1] == 20

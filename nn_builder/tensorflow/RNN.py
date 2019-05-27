@@ -61,6 +61,7 @@ class RNN(Model, Base_Network):
         error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_RNN_hidden_layer_types)
         error_msg_layer_form = "Layer must be of form [layer_name, hidden_units]"
         error_msg_layer_list = "Layers must be provided as a list"
+        error_msg_output_heads = "Number of output activations must equal number of output heads"
 
         assert isinstance(self.layers_info, list), error_msg_layer_list
 
@@ -68,9 +69,12 @@ class RNN(Model, Base_Network):
         output_layer = self.layers_info[-1]
         assert isinstance(output_layer, list), error_msg_layer_list
         if isinstance(output_layer[0], list):
+            assert len(output_layer) == len(
+                self.output_activation), error_msg_output_heads
             for layer in output_layer:
                 all_layers.append(layer)
         else:
+            assert not isinstance(self.output_activation, list) or len(self.output_activation) == 1, error_msg_output_heads
             all_layers.append(output_layer)
 
         rest_must_be_linear = False
@@ -137,8 +141,9 @@ class RNN(Model, Base_Network):
         """Puts the data x through all the hidden layers"""
         restricted_to_final_seq = False
         for layer_ix, layer in enumerate(self.hidden_layers):
+            print(x.shape)
             if type(layer) == Dense:
-                if self.return_final_seq_only:
+                if self.return_final_seq_only and not restricted_to_final_seq:
                     x = x[:, -1, :]
                     restricted_to_final_seq = True
                 x = layer(x)
@@ -151,6 +156,7 @@ class RNN(Model, Base_Network):
 
     def process_output_layers(self, x, restricted_to_final_seq):
         """Puts the data x through all the output layers"""
+        print(x.shape)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             if type(output_layer) == Dense:
@@ -163,5 +169,8 @@ class RNN(Model, Base_Network):
                 activation = self.get_activation(self.output_activation, output_layer_ix)
                 temp_output = activation(temp_output)
             if out is None: out = temp_output
-            else: out = Concatenate(axis=2)([out, temp_output])
+            else:
+                if restricted_to_final_seq: dim = 1
+                else: dim = 2
+                out = Concatenate(axis=dim)([out, temp_output])
         return out

@@ -77,6 +77,8 @@ class CNN(nn.Module, Base_Network):
         output_layer = self.layers_info[-1]
         assert isinstance(output_layer, list), "layers must be a list"
         if isinstance(output_layer[0], list):
+            assert len(output_layer) == len(
+                self.output_activation), "Number of output activations must equal number of output heads"
             for layer in output_layer:
                 all_layers.append(layer)
                 assert layer[0].lower() == "linear", "Final layer must be linear"

@@ -465,3 +465,74 @@ def test_print_model_summary():
                                    dropout=0.0000001,
                                    initialiser="xavier", input_dim=(1, 5, 5))
     nn_instance.print_model_summary()
+
+def test_output_heads_error_catching():
+    """Tests that having multiple output heads catches errors from user inputs"""
+    output_dims_that_should_break = [["linear", 2, 2, "SAME", "conv", 3, 4, "SAME"], [[["conv", 3, 2, "same"], ["linear", 4]]],
+                                     [[2, 8]], [-33, 33, 33, 33, 33]]
+    for output_dim in output_dims_that_should_break:
+        with pytest.raises(AssertionError):
+            CNN(input_dim=(12, 12, 3), layers_info=[["conv", 25, 5, 1, "valid"], ["conv", 25, 5, 1, "valid"], ["linear", 1], output_dim],
+                hidden_activations="relu", output_activation="relu")
+    output_activations_that_should_break = ["relu", ["relu"], ["relu", "softmax"]]
+    for output_activation in output_activations_that_should_break:
+        with pytest.raises(AssertionError):
+            CNN(input_dim=(12, 12, 3), layers_info=[["conv", 25, 5, 1, "valid"], ["conv", 25, 5, 1, "valid"], ["linear", 1],
+                                                    [["linear", 4], ["linear", 10], ["linear", 4]]],
+               hidden_activations="relu", output_activation=output_activation)
+
+
+def test_output_head_layers():
+    """Tests whether the output head layers get created properly"""
+    for output_dim in [[["linear", 3],["linear", 9]], [["linear", 4], ["linear", 20]], [["linear", 1], ["linear", 1]]]:
+        nn_instance = CNN(input_dim=(12, 12, 3), layers_info=[["conv", 25, 5, 1, 2], ["conv", 25, 5, 1, 3], ["linear", 5], output_dim],
+                          hidden_activations="relu", output_activation=["softmax", None])
+        assert nn_instance.output_layers[0].out_features == output_dim[0][1]
+        assert nn_instance.output_layers[0].in_features == 5
+        assert nn_instance.output_layers[1].out_features == output_dim[1][1]
+        assert nn_instance.output_layers[1].in_features == 5
+
+def test_output_head_activations_work():
+    """Tests that output head activations work properly"""
+
+    output_dim = [["linear", 5], ["linear", 10], ["linear", 3]]
+    nn_instance = CNN(input_dim=(12, 12, 3), layers_info=[["conv", 3, 2, 1, 1], ["conv", 3, 1, 1, 1], ["linear", 1], output_dim],
+                          hidden_activations="relu", output_activation=["softmax", None, "relu"])
+    x = torch.randn((20, 12, 12, 3)) * -20.0
+    out = nn_instance(x)
+
+    assert out.shape == (20, 18)
+
+    sums = torch.sum(out[:, :5], dim=1).detach().numpy()
+    sums_others = torch.sum(out[:, 5:], dim=1).detach().numpy()
+    sums_others_2 = torch.sum(out[:, 5:15], dim=1).detach().numpy()
+    sums_others_3 = torch.sum(out[:, 15:18], dim=1).detach().numpy()
+
+
+    for row in range(out.shape[0]):
+        assert np.round(sums[row], 4) == 1.0, sums[row]
+        assert not np.round(sums_others[row], 4) == 1.0, sums_others[row]
+        assert not np.round(sums_others_2[row], 4) == 1.0, sums_others_2[row]
+        assert not np.round(sums_others_3[row], 4) == 1.0, sums_others_3[row]
+        for col in range(3):
+            assert out[row, 15 + col] >= 0.0, out[row, 15 + col]
+
+def test_output_head_shapes_correct():
+    """Tests that the output shape of network is correct when using multiple outpout heads"""
+    N = 20
+    X = torch.randn((N, 25, 25, 2))
+    for _ in range(25):
+        nn_instance = CNN(input_dim=(25, 25, 2),
+            layers_info=[["conv", 25, 2, 1, 1], ["conv", 2, 5, 1, 1], ["linear", 1], ["linear", 12]],
+            hidden_activations="relu")
+        out = nn_instance(X)
+        assert out.shape[0] == N
+        assert out.shape[1] == 12
+
+    for output_dim in [[ ["linear", 10], ["linear", 4], ["linear", 6]], [["linear", 3], ["linear", 8], ["linear", 9]]]:
+        nn_instance = CNN(input_dim=(25, 25, 2),
+            layers_info=[["conv", 25, 1, 1, 2], ["conv", 25, 5, 1, 1], ["linear", 1], output_dim],
+            hidden_activations="relu", output_activation=["softmax", None, "relu"])
+        out = nn_instance(X)
+        assert out.shape[0] == N
+        assert out.shape[1] == 20

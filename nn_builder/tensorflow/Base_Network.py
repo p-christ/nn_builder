@@ -1,5 +1,7 @@
 import tensorflow as tf
 from tensorflow.python.keras.layers import BatchNormalization
+from tensorflow.python.training.tracking.data_structures import _ListWrapper
+
 from nn_builder.Overall_Base_Network import Overall_Base_Network
 import tensorflow.python.keras.activations as activations
 import tensorflow.python.keras.initializers as initializers
@@ -10,9 +12,9 @@ from abc import ABC, abstractmethod
 
 class Base_Network(Overall_Base_Network, ABC):
     """Base class for TensorFlow neural network classes"""
-    def __init__(self, layers, output_activation, hidden_activations, dropout, initialiser, batch_norm, y_range,
+    def __init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm, y_range,
                  random_seed, print_model_summary):
-        super().__init__(None, layers, output_activation,
+        super().__init__(None, layers_info, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
 
     @abstractmethod
@@ -66,8 +68,13 @@ class Base_Network(Overall_Base_Network, ABC):
     def create_output_layers(self):
         """Creates the output layers in the network"""
         output_layers = []
-        if isinstance(self.layers_info[-1], int) or not isinstance(self.layers_info[-1][0], list):
-            self.layers_info[-1] = [self.layers_info[-1]]
+        network_type = type(self).__name__
+        if network_type in ["CNN", "RNN"]:
+            if not isinstance(self.layers_info[-1][0], list): self.layers_info[-1] = [self.layers_info[-1]]
+        elif network_type == "NN":
+            if isinstance(self.layers_info[-1], int): self.layers_info[-1] = [self.layers_info[-1]]
+        else:
+            raise ValueError("Network type not recognised")
         for output_layer_ix, output_layer in enumerate(self.layers_info[-1]):
             activation = self.get_activation(self.output_activation, output_layer_ix)
             self.create_and_append_layer(output_layer, output_layers, activation, output_layer=True)

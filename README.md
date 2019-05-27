@@ -21,10 +21,11 @@
 
 ### Examples
 
-On the right is the code needed to create a PyTorch neural network equivalent to the network
- created in only one line of code on the left using nn_builder: 
+On the left is how you can create the neural network on the right in only 1 line of code using nn_builder:
 
 ![Screenshot](miscellaneous/material_for_readme/nn_builder_use_case.png)
+
+Tensorflow example... 
 
 See this [colab notebook](https://colab.research.google.com/drive/1abxTEaUrJqbTuk8e8tOa3y9DYQQVrF_N) for demonstrations 
 of how to use this module.  

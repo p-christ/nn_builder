@@ -27,7 +27,6 @@ class NN(Model, Base_Network):
         - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
-
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
                  batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
                  random_seed=0, print_model_summary=False):
@@ -91,6 +90,9 @@ class NN(Model, Base_Network):
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             temp_output = output_layer(x)
             if out is None: out = temp_output
-            else: out = Concatenate(axis=1)((out, temp_output))
+            else:
+                print(out.shape)
+                print(temp_output.shape)
+                out = Concatenate(axis=1)(inputs=[out, temp_output])
         return out
 

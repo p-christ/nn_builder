@@ -4,9 +4,12 @@ class Overall_Base_Network(ABC):
 
     def __init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm,
                  y_range, random_seed, print_model_summary):
+
+        print("layer info ", layers_info)
         self.set_all_random_seeds(random_seed)
         self.input_dim = input_dim
         self.layers_info = layers_info
+
         self.hidden_activations = hidden_activations
         self.output_activation = output_activation
         self.dropout = dropout
@@ -21,6 +24,8 @@ class Overall_Base_Network(ABC):
         self.check_all_user_inputs_valid()
 
         self.initialiser_function = self.str_to_initialiser_converter[initialiser.lower()]
+
+        print("layer info ", self.layers_info)
 
         self.hidden_layers = self.create_hidden_layers()
         self.output_layers = self.create_output_layers()
@@ -145,21 +150,3 @@ class Overall_Base_Network(ABC):
         if isinstance(activations, list):
             return self.str_to_activations_converter[str(activations[ix]).lower()]
         return self.str_to_activations_converter[str(activations).lower()]
-    #
-    # def print_model_summary(self):
-    #     if len(self.embedding_layers) > 0:
-    #         print("Embedding layers")
-    #         print("-------------")
-    #         print(self.embedding_layers)
-    #         print(" ")
-    #     print("-------------")
-    #     print("Linear layers")
-    #     print("-------------")
-    #     for layer_ix in range(len(self.hidden_layers)):
-    #         print(self.hidden_layers[layer_ix])
-    #         if self.batch_norm: print(self.batch_norm_layers[layer_ix])
-    #     print("-------------")
-    #     print("Output Layers")
-    #     print("-------------")
-    #     for layer_ix in range(len(self.output_layers)):
-    #         print(self.output_layers[layer_ix])

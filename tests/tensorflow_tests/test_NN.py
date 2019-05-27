@@ -6,8 +6,8 @@ import random
 import numpy as np
 import tensorflow as tf
 from nn_builder.tensorflow.NN import NN
-import tensorflow.keras.initializers as initializers
-import tensorflow.keras.activations as activations
+import tensorflow.python.keras.initializers as initializers
+import tensorflow.python.keras.activations as activations
 
 N = 250
 X = (np.random.random((N, 5)) - 0.5) * 2.0
@@ -102,7 +102,7 @@ def test_linear_layers_info():
             print(nn_instance.hidden_layers[layer_ix])
             assert type(layer) == tf.keras.layers.Dense
             assert layer.units == hidden_units[layer_ix]
-            assert layer.kernel_initializer == initializers.glorot_uniform
+            assert layer.kernel_initializer == initializers.glorot_uniform, layer.kernel_initializer
             assert layer.activation == activations.relu
 
         output_layer = nn_instance.output_layers[0]

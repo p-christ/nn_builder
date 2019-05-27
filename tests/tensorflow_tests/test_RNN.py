@@ -66,7 +66,7 @@ def test_output_layers_created_correctly():
 
     layers = [["gru", 25], ["lstm", 23], [["lstm", 10], ["linear", 15]]]
     rnn = RNN(layers_info=layers, hidden_activations="relu",
-              output_activation="relu")
+              output_activation=["relu", "softmax"])
     assert rnn.output_layers[0].units == 10
     assert rnn.output_layers[1].units == 15
 

@@ -64,6 +64,7 @@ class RNN(nn.Module, Base_Network):
         error_msg_layer_type = "First element in a layer specification must be one of {}".format(self.valid_RNN_hidden_layer_types)
         error_msg_layer_form = "Layer must be of form [layer_name, hidden_units]"
         error_msg_layer_list = "Layers must be provided as a list"
+        error_msg_output_heads = "Number of output activations must equal number of output heads"
 
         assert isinstance(self.layers_info, list), error_msg_layer_list
 
@@ -71,9 +72,13 @@ class RNN(nn.Module, Base_Network):
         output_layer = self.layers_info[-1]
         assert isinstance(output_layer, list), error_msg_layer_list
         if isinstance(output_layer[0], list):
+            assert len(output_layer) == len(
+                self.output_activation), error_msg_output_heads
             for layer in output_layer:
                 all_layers.append(layer)
         else:
+            assert not isinstance(self.output_activation, list) or len(
+                self.output_activation) == 1, error_msg_output_heads
             all_layers.append(output_layer)
 
         rest_must_be_linear = False

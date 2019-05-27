@@ -25,8 +25,6 @@ class Overall_Base_Network(ABC):
 
         self.initialiser_function = self.str_to_initialiser_converter[initialiser.lower()]
 
-        print("layer info ", self.layers_info)
-
         self.hidden_layers = self.create_hidden_layers()
         self.output_layers = self.create_output_layers()
         self.dropout_layer = self.create_dropout_layer()

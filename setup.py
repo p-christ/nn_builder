@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="nn_builder",
-    version="0.0.12",
+    version="0.0.13",
     author="Petros Christodoulou",
     author_email="p.christodoulou2@gmail.com",
     description="Build neural networks in 1 line",
@@ -18,4 +18,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        "tensorflow==2.0.0a0"
+    ]
 )

@@ -6,7 +6,7 @@ import random
 import numpy as np
 import torch.nn as nn
 
-from nn_builder.pytorch.RNN import RNN
+from nn_builder.pytorch_nn.RNN import RNN
 import torch.optim as optim
 from torchvision import datasets, transforms
 

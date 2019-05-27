@@ -5,7 +5,7 @@ import torch
 import random
 import numpy as np
 import torch.nn as nn
-from nn_builder.pytorch.CNN import CNN
+from nn_builder.pytorch_nn.CNN import CNN
 import torch.optim as optim
 from torchvision import datasets, transforms
 

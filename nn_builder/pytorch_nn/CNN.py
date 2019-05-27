@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from nn_builder.pytorch.Base_Network import Base_Network
+from nn_builder.pytorch_nn.Base_Network import Base_Network
 
 class CNN(nn.Module, Base_Network):
     """Creates a PyTorch convolutional neural network

@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras import Model, activations
 from tensorflow.python.keras.layers import Dense, Concatenate, GRU, LSTM
-from nn_builder.tensorflow.Base_Network import Base_Network
+from nn_builder.tensorflow_nn.Base_Network import Base_Network
 
 # TODO write tests for and add embedding layers
 

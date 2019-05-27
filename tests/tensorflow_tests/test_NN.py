@@ -5,7 +5,7 @@ import copy
 import random
 import numpy as np
 import tensorflow as tf
-from nn_builder.tensorflow.NN import NN
+from nn_builder.tensorflow_nn.NN import NN
 import tensorflow.python.keras.initializers as initializers
 import tensorflow.python.keras.activations as activations
 

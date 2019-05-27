@@ -1,12 +1,11 @@
-import tensorflow as tf
+import tensorflow.python
 from tensorflow.python.keras.layers import BatchNormalization
-
 from nn_builder.Overall_Base_Network import Overall_Base_Network
 import tensorflow.python.keras.activations as activations
 import tensorflow.python.keras.initializers as initializers
-
 import numpy as np
 import random
+import tensorflow as tf
 from abc import ABC, abstractmethod
 
 class Base_Network(Overall_Base_Network, ABC):

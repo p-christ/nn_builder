@@ -238,7 +238,6 @@ class CNN(nn.Module, Base_Network):
                     flattened = True
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
                 if self.batch_norm:
-                    print(x.shape)
                     x = self.batch_norm_layers[valid_batch_norm_layer_ix](x)
                     valid_batch_norm_layer_ix += 1
                 if self.dropout != 0.0: x = self.dropout_layer(x)

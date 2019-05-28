@@ -290,3 +290,45 @@ def test_output_head_shapes_correct():
         out = nn_instance(X)
         assert out.shape[0] == N
         assert out.shape[1] == 20
+
+
+def test_boston_housing_progress():
+    """Tests that network made using CNN module can make progress on MNIST"""
+    boston_housing = tf.keras.datasets.boston_housing
+    (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
+
+    model = NN(layers_info=[30, 10, 1],
+                hidden_activations="relu", output_activation=None, dropout=0.0,
+                initialiser="xavier", batch_norm=True, y_range=(4.5, 55.0))
+
+    model.compile(optimizer='adam',loss='mse')
+    model.fit(x_train, y_train, epochs=200, batch_size=64)
+    results = model.evaluate(x_test, y_test)
+    assert results < 35
+
+    model = NN(layers_info=[30, 10, 1],
+                hidden_activations="relu", output_activation=None, dropout=0.0,
+                initialiser="xavier", batch_norm=False)
+
+    model.compile(optimizer='adam',loss='mse')
+    model.fit(x_train, y_train, epochs=200, batch_size=64)
+    results = model.evaluate(x_test, y_test)
+    assert results < 30
+
+    model = NN(layers_info=[30, 10, 1],
+                hidden_activations="relu", output_activation=None, dropout=0.0,
+                initialiser="xavier", batch_norm=True)
+
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(x_train, y_train, epochs=200, batch_size=64)
+    results = model.evaluate(x_test, y_test)
+    assert results < 30
+
+    model = NN(layers_info=[150, 50, 1],
+                hidden_activations="relu", output_activation=None, dropout=0.05,
+                initialiser="xavier", batch_norm=False)
+
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(x_train, y_train, epochs=200, batch_size=64)
+    results = model.evaluate(x_test, y_test)
+    assert results < 30

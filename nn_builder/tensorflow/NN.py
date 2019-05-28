@@ -55,7 +55,9 @@ class NN(Model, Base_Network):
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         x = self.process_hidden_layers(x, training)
         out = self.process_output_layers(x)
+        print("BEFORE ", out)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0])*activations.sigmoid(out)
+        print("AFTER ", out)
         return out
 
     def incorporate_embeddings(self, x):
@@ -91,8 +93,6 @@ class NN(Model, Base_Network):
             temp_output = output_layer(x)
             if out is None: out = temp_output
             else:
-                print(out.shape)
-                print(temp_output.shape)
                 out = Concatenate(axis=1)(inputs=[out, temp_output])
         return out
 

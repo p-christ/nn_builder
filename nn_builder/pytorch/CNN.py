@@ -207,7 +207,7 @@ class CNN(nn.Module, Base_Network):
             if layer_type == "conv":
                 batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
             elif layer_type == "linear":
-                batch_norm_layers.extend([nn.BatchNorm2d(num_features=layer[1])])
+                batch_norm_layers.extend([nn.BatchNorm1d(num_features=layer[1])])
         return batch_norm_layers
 
     def forward(self, x):
@@ -228,6 +228,7 @@ class CNN(nn.Module, Base_Network):
     def process_hidden_layers(self, x):
         """Puts the data x through all the hidden layers"""
         flattened=False
+        valid_batch_norm_layer_ix = 0
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
@@ -236,7 +237,10 @@ class CNN(nn.Module, Base_Network):
                     x = self.flatten_tensor(x)
                     flattened = True
                 x = self.get_activation(self.hidden_activations, layer_ix)(layer(x))
-                if self.batch_norm: x = self.batch_norm_layers[layer_ix](x)
+                if self.batch_norm:
+                    print(x.shape)
+                    x = self.batch_norm_layers[valid_batch_norm_layer_ix](x)
+                    valid_batch_norm_layer_ix += 1
                 if self.dropout != 0.0: x = self.dropout_layer(x)
         if not flattened: x = self.flatten_tensor(x)
         return x

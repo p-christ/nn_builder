@@ -1,9 +1,8 @@
-import tensorflow.python
 import numpy as np
-from tensorflow.python.keras import Model, activations
-from tensorflow.python.keras.layers import Dense, Concatenate, GRU, LSTM
+from tensorflow.keras import Model, activations
+from tensorflow.keras.layers import Dense, Concatenate, GRU, LSTM
 from nn_builder.tensorflow.Base_Network import Base_Network
-import tensorflow as tf
+
 
 # TODO write tests for and add embedding layers
 

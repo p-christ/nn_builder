@@ -1,9 +1,10 @@
-import tensorflow.python
 import numpy as np
-from tensorflow.python.keras import Model, activations
-from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
+from tensorflow.keras import Model, activations
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNormalization, MaxPool2D, AveragePooling2D
 from nn_builder.tensorflow.Base_Network import Base_Network
 import tensorflow as tf
+
+#TODO add transposed convolution... and make output size variable
 
 class CNN(Model, Base_Network):
     """Creates a PyTorch convolutional neural network
@@ -33,7 +34,7 @@ class CNN(Model, Base_Network):
                  batch_norm=False, y_range=(), random_seed=0, print_model_summary=False):
         Model.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'linear'}
-        self.valid_layer_types_with_no_parameters = [type(MaxPool2D), type(AveragePooling2D)]
+        self.valid_layer_types_with_no_parameters = (MaxPool2D, AveragePooling2D)
         Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
                               batch_norm, y_range, random_seed, print_model_summary)
 
@@ -149,6 +150,7 @@ class CNN(Model, Base_Network):
         """Puts the data x through all the hidden layers"""
         flattened=False
         training = training or training is None
+        valid_batch_norm_layer_ix = 0
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) in self.valid_layer_types_with_no_parameters:
                 x = layer(x)
@@ -157,7 +159,11 @@ class CNN(Model, Base_Network):
                     x = Flatten()(x)
                     flattened = True
                 x = layer(x)
-                if self.batch_norm: x = self.batch_norm_layers[layer_ix](x, training=False)
+                print(len(self.batch_norm_layers))
+                print(valid_batch_norm_layer_ix)
+                if self.batch_norm:
+                    x = self.batch_norm_layers[valid_batch_norm_layer_ix](x, training=False)
+                    valid_batch_norm_layer_ix += 1
                 if self.dropout != 0.0 and training: x = self.dropout_layer(x)
         if not flattened: x = Flatten()(x)
         return x

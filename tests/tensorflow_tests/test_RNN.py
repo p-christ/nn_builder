@@ -4,7 +4,7 @@ import torch
 import random
 import tensorflow as tf
 import numpy as np
-from tensorflow.python.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
+from tensorflow.keras.layers import Dense, Concatenate, BatchNormalization, GRU, LSTM
 from nn_builder.tensorflow.RNN import RNN
 
 N = 250

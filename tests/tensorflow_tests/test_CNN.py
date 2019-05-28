@@ -366,6 +366,23 @@ def test_MNIST_progress():
     x_train = x_train[..., tf.newaxis]
     x_test = x_test[..., tf.newaxis]
 
+    # Create model using nn_builder
+    model = CNN(layers_info=[["conv", 32, 3, 1, "valid"], ["maxpool", 2, 2, "valid"], ["conv", 64, 3, 1, "valid"],
+                             ["linear", 10]],
+                hidden_activations="relu", output_activation="softmax", dropout=0.0,
+                initialiser="xavier", batch_norm=True)
+
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    model.fit(x_train, y_train, epochs=2, batch_size=64)
+
+
+    model.evaluate(x_test, y_test)
+
+    results = model.evaluate(x_test, y_test)
+    assert results[1] > 0.9
+
     model = CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 10]],
                            hidden_activations="relu", output_activation="softmax", dropout=0.9999,
                            initialiser="xavier")

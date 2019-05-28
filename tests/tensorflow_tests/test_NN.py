@@ -6,8 +6,8 @@ import random
 import numpy as np
 import tensorflow as tf
 from nn_builder.tensorflow.NN import NN
-import tensorflow.python.keras.initializers as initializers
-import tensorflow.python.keras.activations as activations
+import tensorflow.keras.initializers as initializers
+import tensorflow.keras.activations as activations
 
 N = 250
 X = (np.random.random((N, 5)) - 0.5) * 2.0

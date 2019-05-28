@@ -407,37 +407,40 @@ def test_MNIST_progress():
                        ])),
         batch_size=batch_size, shuffle=True)
 
-    cnn = CNN(layers_info=[["conv", 20, 5, 1, 0],
-                                  ["maxpool", 2, 2, 0],
-                                  ["conv", 50, 5, 1, 0],
-                                  ["maxpool", 2, 2, 0],
-                                  ["linear", 500], ["linear", 10]], hidden_activations="relu",
-              output_activation="softmax", initialiser="xavier", input_dim=(1, 28, 28))
+    for batch_norm in [True, False]:
 
-    loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(cnn.parameters(), lr=0.001)
+        cnn = CNN(layers_info=[["conv", 20, 5, 1, 0],
+                                      ["maxpool", 2, 2, 0],
+                                      ["conv", 50, 5, 1, 0],
+                                      ["maxpool", 2, 2, 0],
+                                      ["linear", 500], ["linear", 10]], hidden_activations="relu",
+                  output_activation="softmax", initialiser="xavier", input_dim=(1, 28, 28), batch_norm=batch_norm)
 
-    ix = 0
-    accuracies = []
-    for data, target in train_loader:
-        ix += 1
+        loss_fn = nn.CrossEntropyLoss()
+        optimizer = optim.Adam(cnn.parameters(), lr=0.001)
 
-        output = cnn(data)
-        loss = loss_fn(output, target)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        ix = 0
+        accuracies = []
+        for data, target in train_loader:
+            ix += 1
 
-        pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-        correct = pred.eq(target.view_as(pred)).sum().item()
-        print("Accuracy {}".format(correct / batch_size))
-        accuracies.append(correct / batch_size)
+            output = cnn(data)
+            loss = loss_fn(output, target)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        if ix > 200:
-            break
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct = pred.eq(target.view_as(pred)).sum().item()
+            print("Accuracy {}".format(correct / batch_size))
+            accuracies.append(correct / batch_size)
 
+            if ix > 200:
+                break
+
+
+        assert accuracies[-1] > 0.7, "Accuracy not good enough {}".format(accuracies[-1])
     shutil.rmtree("input/", ignore_errors=False, onerror=None)
-    assert accuracies[-1] > 0.7, "Accuracy not good enough {}".format(accuracies[-1])
 
 
 def test_all_activations_work():

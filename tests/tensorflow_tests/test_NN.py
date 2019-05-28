@@ -291,7 +291,6 @@ def test_output_head_shapes_correct():
         assert out.shape[0] == N
         assert out.shape[1] == 20
 
-
 def test_boston_housing_progress():
     """Tests that network made using CNN module can make progress on MNIST"""
     boston_housing = tf.keras.datasets.boston_housing

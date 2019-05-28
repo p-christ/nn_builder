@@ -1,4 +1,8 @@
 # Run from home directory with python -m pytest tests
+import copy
+import shutil
+from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
 import pytest
 import torch
 import random
@@ -6,6 +10,7 @@ import numpy as np
 import torch.nn as nn
 import torch.optim as optim
 from nn_builder.pytorch.NN import NN
+from sklearn.utils import shuffle
 
 N = 250
 X = torch.randn((N, 5))
@@ -311,5 +316,51 @@ def test_output_head_shapes_correct():
         out = nn_instance(X)
         assert out.shape[0] == N
         assert out.shape[1] == 20
+
+def train_on_boston_housing(model, X, y):
+    # Compile the model
+    loss_fn = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.1)
+    X = torch.Tensor(X)
+    y = torch.Tensor(y)
+
+    for _ in range(475):
+        output = model(X)
+        loss = loss_fn(output.squeeze(-1), y)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        print(loss)
+    return loss
+
+
+def test_boston_housing_progress():
+    """Tests that network made using NN module can make progress on boston housing dataset"""
+    boston = load_boston()
+    X, y = (boston.data, boston.target)
+
+    model = NN(layers_info=[30, 10, 1], input_dim=13,
+               hidden_activations="relu", output_activation=None, dropout=0.0,
+               initialiser="xavier", batch_norm=True, y_range=(4.5, 55.0))
+    result = train_on_boston_housing(model, X, y)
+    assert result < 35
+    model = NN(layers_info=[15, 15, 15, 15, 1], input_dim=13, random_seed=52,
+                hidden_activations="relu", output_activation=None, dropout=0.0,
+                initialiser="xavier", batch_norm=False)
+    result = train_on_boston_housing(model, X, y)
+    assert result < 30
+
+    model = NN(layers_info=[30, 10, 1], input_dim=13,
+                hidden_activations="relu", output_activation=None, dropout=0.0,
+                initialiser="xavier", batch_norm=True)
+    result = train_on_boston_housing(model, X, y)
+    assert result < 30
+
+    model = NN(layers_info=[15, 15, 15, 1], input_dim=13,
+                hidden_activations="relu", output_activation=None, dropout=0.05,
+                initialiser="xavier", batch_norm=False)
+    result = train_on_boston_housing(model, X, y)
+    assert result < 30
+
 
 

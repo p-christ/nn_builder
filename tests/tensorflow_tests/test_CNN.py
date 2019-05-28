@@ -1,7 +1,6 @@
 # Run from home directory with python -m pytest tests
 import shutil
 import pytest
-import torch
 import random
 import numpy as np
 import tensorflow as tf

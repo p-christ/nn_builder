@@ -159,8 +159,6 @@ class CNN(Model, Base_Network):
                     x = Flatten()(x)
                     flattened = True
                 x = layer(x)
-                print(len(self.batch_norm_layers))
-                print(valid_batch_norm_layer_ix)
                 if self.batch_norm:
                     x = self.batch_norm_layers[valid_batch_norm_layer_ix](x, training=False)
                     valid_batch_norm_layer_ix += 1

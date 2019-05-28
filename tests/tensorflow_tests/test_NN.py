@@ -1,6 +1,5 @@
 # Run from home directory with python -m pytest tests
 import pytest
-import torch
 import copy
 import random
 import numpy as np

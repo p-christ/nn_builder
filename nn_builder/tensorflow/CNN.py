@@ -27,6 +27,8 @@ class CNN(Model, Base_Network):
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
         - random_seed: Integer to indicate the random seed you want to use
+
+    NOTE that this class' call method expects input data in the form: (batch, channels, height, width)
     """
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout= 0.0, initialiser="default",
                  batch_norm=False, y_range=(), random_seed=0):
@@ -138,7 +140,7 @@ class CNN(Model, Base_Network):
         return batch_norm_layers
 
     def call(self, x, training=True):
-        """Forward pass for the network"""
+        """Forward pass for the network. Note that it expects input data in the form (Batch, Height, Width, Channels)"""
         x = self.process_hidden_layers(x, training)
         out = self.process_output_layers(x)
         if self.y_range: out = self.y_range[0] + (self.y_range[1] - self.y_range[0]) * activations.sigmoid(out)

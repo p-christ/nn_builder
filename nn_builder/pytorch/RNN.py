@@ -151,8 +151,7 @@ class RNN(nn.Module, Base_Network):
         return activation
 
     def forward(self, x):
-        """Forward pass for the network.
-        NOTE that it expects data in the form: (batch, sequence length, features)"""
+        """Forward pass for the network. Note that it expects input data in the form (batch, seq length, features)"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         batch_size, seq_length, data_dimension = x.shape
         if self.embedding_to_occur: x = self.incorporate_embeddings(x, batch_size, seq_length)

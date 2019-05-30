@@ -26,6 +26,8 @@ class CNN(nn.Module, Base_Network):
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
         - random_seed: Integer to indicate the random seed you want to use
+
+    NOTE that this class' forward method expects input data in the form: (batch, channels, height, width)
     """
     def __init__(self, input_dim, layers_info, output_activation=None,
                  hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
@@ -210,7 +212,7 @@ class CNN(nn.Module, Base_Network):
         return batch_norm_layers
 
     def forward(self, x):
-        """Forward pass for the network"""
+        """Forward pass for the network. Note that it expects input data in the form (Batch, Channels, Height, Width)"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         x = self.process_hidden_layers(x)
         out = self.process_output_layers(x)

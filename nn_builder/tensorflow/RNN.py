@@ -30,6 +30,8 @@ class RNN(Model, Base_Network):
         - return_final_seq_only: Boolean to indicate whether you only want to return the output for the final timestep (True)
                                  or if you want to return the output for all timesteps (False)
         - random_seed: Integer to indicate the random seed you want to use
+
+    NOTE that this class' call method expects input data in the form: (batch, sequence length, features)
     """
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
                  batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
@@ -109,7 +111,7 @@ class RNN(Model, Base_Network):
         return input_dim
 
     def call(self, x, training=True):
-        """Forward pass for the network"""
+        """Forward pass for the network. Note that it expects input data in the form (batch, seq length, features)"""
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         training = training or training is None
         x, restricted_to_final_seq = self.process_hidden_layers(x, training)

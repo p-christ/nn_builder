@@ -5,7 +5,6 @@ class Overall_Base_Network(ABC):
     def __init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm,
                  y_range, random_seed, print_model_summary):
 
-        print("layer info ", layers_info)
         self.set_all_random_seeds(random_seed)
         self.input_dim = input_dim
         self.layers_info = layers_info

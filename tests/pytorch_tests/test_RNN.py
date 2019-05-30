@@ -1,4 +1,5 @@
 # Run from home directory with python -m pytest tests
+import copy
 import shutil
 import pytest
 import torch
@@ -388,6 +389,57 @@ def test_model_trains():
                        hidden_activations="relu", output_activation=None,
                        initialiser="xavier")
     assert solves_simple_problem(X, y, rnn)
+
+def test_error_when_provide_negative_data_for_embedding():
+    """Tests that it raises an error if we try to do an embedding on negative data"""
+    N = 250
+    X = torch.randn((N, 5, 15))
+    X[0:125, 0, 3] += 20.0
+    y = X[:, 0, 3] > 5.0
+    y = y.float()
+    with pytest.raises(AssertionError):
+        rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+                  hidden_activations="relu", output_activation="sigmoid", columns_of_data_to_be_embedded=[0],
+                  embedding_dimensions=[[200, 5]], initialiser="xavier")
+        assert solves_simple_problem(X, y, rnn)
+
+    X[:, :, 0] = abs(X[:, :, 0]).long()
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+              hidden_activations="relu", output_activation="sigmoid", columns_of_data_to_be_embedded=[0],
+              embedding_dimensions=[[200, 5]], initialiser="xavier")
+    assert solves_simple_problem(X, y, rnn)
+
+
+def test_model_trains_with_embeddings():
+    """Tests that model trains when using embeddings"""
+    N = 250
+    X = torch.randn((N, 5, 15))
+    X[0:125, 0, 3] += 20.0
+    y = X[:, 0, 3] > 5.0
+    y = y.float()
+
+    Z = copy.deepcopy(X)
+    Z[:, :, 0] = abs(Z[:, :, 0]).long()
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+              hidden_activations="relu", output_activation="sigmoid", columns_of_data_to_be_embedded=[0],
+              embedding_dimensions=[[200, 5]], initialiser="xavier")
+    assert solves_simple_problem(Z, y, rnn)
+
+    Z = copy.deepcopy(X)
+    Z[:, :, 0:2] = abs(Z[:, :, 0:2]).long()
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+              hidden_activations="relu", output_activation="sigmoid", columns_of_data_to_be_embedded=[0, 1],
+              embedding_dimensions=[[200, 5], [50, 3]], initialiser="xavier")
+    assert solves_simple_problem(Z, y, rnn)
+
+    Z = copy.deepcopy(X)
+    Z[:, :, 3] = abs(Z[:, :, 3]).long()
+    Z[:, :, 6] = abs(Z[:, :, 6]).long()
+    Z[:, :, 4] = abs(Z[:, :, 4]).long()
+    rnn = RNN(layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]], input_dim=15,
+              hidden_activations="relu", output_activation="sigmoid", columns_of_data_to_be_embedded=[3, 6, 4],
+              embedding_dimensions=[[200, 5], [50, 3], [50, 12]], initialiser="xavier")
+    assert solves_simple_problem(Z, y, rnn)
 
 def test_dropout():
     """Tests whether dropout layer reads in probability correctly"""

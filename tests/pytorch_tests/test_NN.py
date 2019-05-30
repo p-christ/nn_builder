@@ -262,7 +262,6 @@ def test_print_model_summary():
     nn_instance = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999)
     nn_instance.print_model_summary()
 
-
 def test_output_heads_error_catching():
     """Tests that having multiple output heads catches errors from user inputs"""
     output_dims_that_should_break = [[[2, 8]], [-33, 33, 33, 33, 33]]
@@ -320,11 +319,11 @@ def test_output_head_shapes_correct():
 def train_on_boston_housing(model, X, y):
     # Compile the model
     loss_fn = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.1)
+    optimizer = optim.Adam(model.parameters(), lr=0.08)
     X = torch.Tensor(X)
     y = torch.Tensor(y)
 
-    for _ in range(475):
+    for _ in range(1000):
         output = model(X)
         loss = loss_fn(output.squeeze(-1), y)
         optimizer.zero_grad()
@@ -339,28 +338,34 @@ def test_boston_housing_progress():
     boston = load_boston()
     X, y = (boston.data, boston.target)
 
+    # Normalise the data
+    mean = np.mean(X, axis=0)
+    std = np.std(X, axis=0)
+    X = (X - mean) / std
+
     model = NN(layers_info=[30, 10, 1], input_dim=13,
                hidden_activations="relu", output_activation=None, dropout=0.0,
                initialiser="xavier", batch_norm=True, y_range=(4.5, 55.0))
     result = train_on_boston_housing(model, X, y)
-    assert result < 35
+    assert result < 15
+
     model = NN(layers_info=[15, 15, 15, 15, 1], input_dim=13, random_seed=52,
                 hidden_activations="relu", output_activation=None, dropout=0.0,
                 initialiser="xavier", batch_norm=False)
     result = train_on_boston_housing(model, X, y)
-    assert result < 30
+    assert result < 15
 
     model = NN(layers_info=[30, 10, 1], input_dim=13,
                 hidden_activations="relu", output_activation=None, dropout=0.0,
                 initialiser="xavier", batch_norm=True)
     result = train_on_boston_housing(model, X, y)
-    assert result < 30
+    assert result < 15
 
     model = NN(layers_info=[15, 15, 15, 1], input_dim=13,
                 hidden_activations="relu", output_activation=None, dropout=0.05,
                 initialiser="xavier", batch_norm=False)
     result = train_on_boston_housing(model, X, y)
-    assert result < 30
+    assert result < 15
 
 
 

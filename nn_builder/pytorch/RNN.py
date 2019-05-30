@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 from nn_builder.pytorch.Base_Network import Base_Network
 
 # TODO write tests for and add embedding layers
@@ -32,6 +33,8 @@ class RNN(nn.Module, Base_Network):
                                  or if you want to return the output for all timesteps (False)
         - random_seed: Integer to indicate the random seed you want to use
         - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
+
+    NOTE that this class' forward method expects input data in the form: (batch, sequence length, features)
     """
 
     def __init__(self, input_dim, layers_info, output_activation=None,
@@ -54,7 +57,7 @@ class RNN(nn.Module, Base_Network):
         self.check_NN_input_dim_valid()
         self.check_RNN_layers_valid()
         self.check_activations_valid()
-        # self.check_embedding_dimensions_valid()
+        self.check_embedding_dimensions_valid()
         self.check_initialiser_valid()
         self.check_y_range_values_valid()
         self.check_return_final_seq_only_valid()
@@ -99,7 +102,8 @@ class RNN(nn.Module, Base_Network):
     def create_hidden_layers(self):
         """Creates the hidden layers in the network"""
         RNN_hidden_layers = nn.ModuleList([])
-        input_dim = self.input_dim
+        input_dim = int(self.input_dim - len(self.embedding_dimensions) + np.sum(
+            [output_dims[1] for output_dims in self.embedding_dimensions]))
         for layer in self.layers_info[:-1]:
             input_dim = self.create_and_append_layer(input_dim, layer, RNN_hidden_layers)
         self.input_dim_into_final_layer = input_dim
@@ -133,7 +137,7 @@ class RNN(nn.Module, Base_Network):
         """Initialises the parameters in the linear and embedding layers"""
         self.initialise_parameters(self.hidden_layers)
         self.initialise_parameters(self.output_layers)
-        # self.initialise_parameters(self.embedding_layers)
+        self.initialise_parameters(self.embedding_layers)
 
     def create_batch_norm_layers(self):
         """Creates the batch norm layers in the network"""
@@ -149,7 +153,8 @@ class RNN(nn.Module, Base_Network):
         return activation
 
     def forward(self, x):
-        """Forward pass for the network"""
+        """Forward pass for the network.
+        NOTE that it expects data in the form: (batch, sequence length, features)"""
         if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         batch_size, seq_length, data_dimension = x.shape
         if self.embedding_to_occur: x = self.incorporate_embeddings(x, batch_size, seq_length)
@@ -164,6 +169,15 @@ class RNN(nn.Module, Base_Network):
         so that we don't keep checking as this would slow down the model too much"""
         assert len(x.shape) == 3, "x should have the shape (batch_size, sequence_length, dimension)"
         assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
+        for embedding_dim in self.columns_of_data_to_be_embedded:
+            data = x[:, :, embedding_dim]
+            data = data.view(-1, 1)
+            data_long = data.long()
+            assert all(data_long >= 0), "All data to be embedded must be integers 0 and above -- {}".format(data_long)
+            assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, """Data columns to be embedded should be integer 
+                                                                                values 0 and above to represent the different 
+                                                                                classes"""
+        if self.input_dim > len(self.columns_of_data_to_be_embedded): assert isinstance(x, torch.FloatTensor), f'Incorrect Tensor type x is {type(x)} is {x}'
         self.checked_forward_input_data_once = True #So that it doesn't check again
 
     def incorporate_embeddings(self, x, batch_size, seq_length):
@@ -172,25 +186,26 @@ class RNN(nn.Module, Base_Network):
         all_embedded_data = []
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
             data = x[:, :, embedding_var].long()
-            data = data.contiguous().view(batch_size * seq_length, -1)
+            data = data.view(batch_size * seq_length, -1)
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
             embedded_data = embedded_data.view(batch_size, seq_length, -1)
             all_embedded_data.append(embedded_data)
-        all_embedded_data = torch.cat(tuple(all_embedded_data), dim=1)
-        x = torch.cat((x[:, [col for col in range(x.shape[1]) if col not in self.columns_of_data_to_be_embedded]].float(), all_embedded_data), dim=2)
+        all_embedded_data = torch.cat(tuple(all_embedded_data), dim=2)
+        non_embedded_data = x[:, :, [col for col in range(x.shape[2]) if col not in self.columns_of_data_to_be_embedded]].float()
+        x = torch.cat((non_embedded_data, all_embedded_data), dim=2)
         return x
 
     def process_hidden_layers(self, x, batch_size, seq_length):
         """Puts the data x through all the hidden layers"""
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) == nn.Linear:
-                x = x.contiguous().view(batch_size * seq_length, -1)
+                x = x.view(batch_size * seq_length, -1)
                 activation = self.get_activation(self.hidden_activations, layer_ix)
                 x = activation(layer(x))
                 x = x.view(batch_size, seq_length, layer.out_features)
             else:
                 x = layer(x)
-                x = x[0]
+                x = x[0] #because we only want to keep the output and not the hidden states
             if self.batch_norm:
                 x.transpose_(1, 2)
                 x = self.batch_norm_layers[layer_ix](x)
@@ -216,7 +231,7 @@ class RNN(nn.Module, Base_Network):
                 temp_output = temp_output[0]
                 if activation is not None:
                     if type(activation) == nn.Softmax:
-                        temp_output = temp_output.contiguous().view(batch_size * seq_length, -1)
+                        temp_output = temp_output.view(batch_size * seq_length, -1)
                         temp_output = activation(temp_output)
                         temp_output = temp_output.view(batch_size, seq_length, -1)
                     else:

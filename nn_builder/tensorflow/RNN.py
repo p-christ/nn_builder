@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras import Model, activations
 from tensorflow.keras.layers import Dense, Concatenate, GRU, LSTM
 from nn_builder.tensorflow.Base_Network import Base_Network
@@ -141,7 +142,6 @@ class RNN(Model, Base_Network):
         """Puts the data x through all the hidden layers"""
         restricted_to_final_seq = False
         for layer_ix, layer in enumerate(self.hidden_layers):
-            print(x.shape)
             if type(layer) == Dense:
                 if self.return_final_seq_only and not restricted_to_final_seq:
                     x = x[:, -1, :]
@@ -156,7 +156,6 @@ class RNN(Model, Base_Network):
 
     def process_output_layers(self, x, restricted_to_final_seq):
         """Puts the data x through all the output layers"""
-        print(x.shape)
         out = None
         for output_layer_ix, output_layer in enumerate(self.output_layers):
             if type(output_layer) == Dense:

@@ -32,7 +32,6 @@ class RNN(nn.Module, Base_Network):
         - return_final_seq_only: Boolean to indicate whether you only want to return the output for the final timestep (True)
                                  or if you want to return the output for all timesteps (False)
         - random_seed: Integer to indicate the random seed you want to use
-        - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
 
     NOTE that this class' forward method expects input data in the form: (batch, sequence length, features)
     """
@@ -40,7 +39,7 @@ class RNN(nn.Module, Base_Network):
     def __init__(self, input_dim, layers_info, output_activation=None,
                  hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
                  columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
-                 return_final_seq_only=True, random_seed=0, print_model_summary=False):
+                 return_final_seq_only=True, random_seed=0):
         nn.Module.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
@@ -49,8 +48,7 @@ class RNN(nn.Module, Base_Network):
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         Base_Network.__init__(self, input_dim, layers_info, output_activation,
-                              hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed,
-                              print_model_summary)
+                              hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""
@@ -171,7 +169,7 @@ class RNN(nn.Module, Base_Network):
         assert x.shape[2] == self.input_dim, "x must have the same dimension as the input_dim you provided"
         for embedding_dim in self.columns_of_data_to_be_embedded:
             data = x[:, :, embedding_dim]
-            data = data.view(-1, 1)
+            data = data.contiguous().view(-1, 1)
             data_long = data.long()
             assert all(data_long >= 0), "All data to be embedded must be integers 0 and above -- {}".format(data_long)
             assert torch.sum(abs(data.float() - data_long.float())) < 0.0001, """Data columns to be embedded should be integer 
@@ -186,7 +184,7 @@ class RNN(nn.Module, Base_Network):
         all_embedded_data = []
         for embedding_layer_ix, embedding_var in enumerate(self.columns_of_data_to_be_embedded):
             data = x[:, :, embedding_var].long()
-            data = data.view(batch_size * seq_length, -1)
+            data = data.contiguous().view(batch_size * seq_length, -1)
             embedded_data = self.embedding_layers[embedding_layer_ix](data)
             embedded_data = embedded_data.view(batch_size, seq_length, -1)
             all_embedded_data.append(embedded_data)
@@ -199,7 +197,7 @@ class RNN(nn.Module, Base_Network):
         """Puts the data x through all the hidden layers"""
         for layer_ix, layer in enumerate(self.hidden_layers):
             if type(layer) == nn.Linear:
-                x = x.view(batch_size * seq_length, -1)
+                x = x.contiguous().view(batch_size * seq_length, -1)
                 activation = self.get_activation(self.hidden_activations, layer_ix)
                 x = activation(layer(x))
                 x = x.view(batch_size, seq_length, layer.out_features)
@@ -231,7 +229,7 @@ class RNN(nn.Module, Base_Network):
                 temp_output = temp_output[0]
                 if activation is not None:
                     if type(activation) == nn.Softmax:
-                        temp_output = temp_output.view(batch_size * seq_length, -1)
+                        temp_output = temp_output.contiguous().view(batch_size * seq_length, -1)
                         temp_output = activation(temp_output)
                         temp_output = temp_output.view(batch_size, seq_length, -1)
                     else:

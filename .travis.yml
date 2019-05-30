@@ -7,6 +7,8 @@ sudo: true
 
 install:
   - pip install -r requirements.txt -q
+  - pip install sklearn
+  - pip install torchvision
 
 script:
   - export PYTHONPATH="$PYTHONPATH:$PWD"

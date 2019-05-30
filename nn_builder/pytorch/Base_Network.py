@@ -8,11 +8,11 @@ from abc import ABC, abstractmethod
 class Base_Network(Overall_Base_Network, ABC):
     """Base class for PyTorch neural network classes"""
     def __init__(self, input_dim, layers_info, output_activation,
-                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary):
+                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed):
         self.str_to_activations_converter = self.create_str_to_activations_converter()
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
         super().__init__(input_dim, layers_info, output_activation,
-                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed, print_model_summary)
+                 hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed)
         self.initialise_all_parameters()
         # Flag we use to run checks on the input data into forward the first time it is entered
         self.checked_forward_input_data_once = False

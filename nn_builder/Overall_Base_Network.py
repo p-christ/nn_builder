@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class Overall_Base_Network(ABC):
 
     def __init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm,
-                 y_range, random_seed, print_model_summary):
+                 y_range, random_seed):
 
         self.set_all_random_seeds(random_seed)
         self.input_dim = input_dim
@@ -15,7 +15,6 @@ class Overall_Base_Network(ABC):
         self.initialiser = initialiser
         self.batch_norm = batch_norm
         self.y_range = y_range
-        if print_model_summary: self.print_model_summary()
 
         self.str_to_activations_converter = self.create_str_to_activations_converter()
         self.str_to_initialiser_converter = self.create_str_to_initialiser_converter()
@@ -62,11 +61,6 @@ class Overall_Base_Network(ABC):
     @abstractmethod
     def set_all_random_seeds(self, random_seed):
         """Sets all random seeds"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def print_model_summary(self):
-        """Prints a summary of the model"""
         raise NotImplementedError
 
     def check_NN_layers_valid(self):

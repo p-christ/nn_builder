@@ -6,10 +6,11 @@ import torch
 import random
 import numpy as np
 import torch.nn as nn
-
+import torch
+import spacy
+from torchtext import data, datasets
 from nn_builder.pytorch.RNN import RNN
 import torch.optim as optim
-from torchvision import datasets, transforms
 
 N = 250
 X = torch.randn((N, 5, 15))
@@ -409,6 +410,18 @@ def test_error_when_provide_negative_data_for_embedding():
               embedding_dimensions=[[200, 5]], initialiser="xavier")
     assert solves_simple_problem(X, y, rnn)
 
+def test_embedding_layers():
+    """Tests whether create_embedding_layers method works correctly"""
+    for embedding_in_dim_1, embedding_out_dim_1, embedding_in_dim_2, embedding_out_dim_2 in zip(range(5, 8), range(3, 6), range(1, 4), range(24, 27)):
+        nn_instance = RNN(input_dim=15, layers_info=[["gru", 20], ["lstm", 8], ["linear", 1]],
+                         embedding_dimensions =[[embedding_in_dim_1, embedding_out_dim_1], [embedding_in_dim_2, embedding_out_dim_2]])
+        for layer in nn_instance.embedding_layers:
+            assert isinstance(layer, nn.Embedding)
+        assert len(nn_instance.embedding_layers) == 2
+        assert nn_instance.embedding_layers[0].num_embeddings == embedding_in_dim_1
+        assert nn_instance.embedding_layers[0].embedding_dim == embedding_out_dim_1
+        assert nn_instance.embedding_layers[1].num_embeddings == embedding_in_dim_2
+        assert nn_instance.embedding_layers[1].embedding_dim == embedding_out_dim_2
 
 def test_model_trains_with_embeddings():
     """Tests that model trains when using embeddings"""

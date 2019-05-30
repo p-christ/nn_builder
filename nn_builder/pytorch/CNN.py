@@ -26,16 +26,15 @@ class CNN(nn.Module, Base_Network):
         - y_range: Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the
                    output values to in regression tasks. Default is no range restriction
         - random_seed: Integer to indicate the random seed you want to use
-        - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, input_dim, layers_info, output_activation=None,
                  hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
-                 y_range= (), random_seed=0, print_model_summary=False):
+                 y_range= (), random_seed=0):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
         Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                              batch_norm, y_range, random_seed, print_model_summary)
+                              batch_norm, y_range, random_seed)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

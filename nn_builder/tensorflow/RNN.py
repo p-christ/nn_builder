@@ -4,9 +4,6 @@ from tensorflow.keras import Model, activations
 from tensorflow.keras.layers import Dense, Concatenate, GRU, LSTM
 from nn_builder.tensorflow.Base_Network import Base_Network
 
-
-# TODO write tests for and add embedding layers
-
 class RNN(Model, Base_Network):
     """Creates a TensorFlow recurrent neural network
     Args:
@@ -33,11 +30,10 @@ class RNN(Model, Base_Network):
         - return_final_seq_only: Boolean to indicate whether you only want to return the output for the final timestep (True)
                                  or if you want to return the output for all timesteps (False)
         - random_seed: Integer to indicate the random seed you want to use
-        - print_model_summary: Boolean to indicate whether you want a model summary printed after model is created. Default is False.
     """
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
                  batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (),
-                 return_final_seq_only=True, random_seed=0, print_model_summary=False):
+                 return_final_seq_only=True, random_seed=0):
         Model.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
@@ -46,7 +42,7 @@ class RNN(Model, Base_Network):
         self.return_final_seq_only = return_final_seq_only
         self.valid_RNN_hidden_layer_types = {"linear", "gru", "lstm"}
         Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                              batch_norm, y_range, random_seed, print_model_summary)
+                              batch_norm, y_range, random_seed)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

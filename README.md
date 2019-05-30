@@ -25,7 +25,9 @@ On the left is how you can create the PyTorch neural network on the right in onl
 
 ![Screenshot](miscellaneous/material_for_readme/nn_builder_use_case.png)
 
-Similarly for a TensorFlow network: 
+Similarly for TensorFlow on the left is how you can create the CNN on the right in only 1 line of code using nn_builder: 
+
+![Screenshot](miscellaneous/material_for_readme/tf_nn_builder_example.png)
 
 ### Usage
 

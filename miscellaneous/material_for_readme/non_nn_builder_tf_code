@@ -1,0 +1,43 @@
+#Without nn_builder
+import tensorflow as tf
+from tensorflow.keras import Model, activations
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, \
+                                    MaxPool2D, AveragePooling2D
+class CNN(Model):
+    def __init__(self):
+        Model.__init__(self)
+
+        self.conv1 = Conv2D(filters=32, kernel_size=3, strides=1,
+                            padding="valid", activation="relu",
+                            kernel_initializer="glorot_normal")
+        self.conv2 = Conv2D(filters=64, kernel_size=3, strides=1,
+                            padding="valid", activation="relu",
+                            kernel_initializer="glorot_normal")
+        self.conv3 = Conv2D(filters=128, kernel_size=3, strides=1,
+                            padding="valid", activation="relu",
+                            kernel_initializer="glorot_normal")
+        self.conv4 = Conv2D(filters=256, kernel_size=3, strides=1,
+                            padding="valid", activation="relu",
+                            kernel_initializer="glorot_normal")
+
+        self.maxpool1 = MaxPool2D(pool_size=3, strides=3, padding="valid")
+        self.maxpool2 = MaxPool2D(pool_size=3, strides=2, padding="valid")
+        self.maxpool3 = MaxPool2D(pool_size=3, strides=1, padding="valid")
+        self.avgpool = AveragePooling2D(pool_size=3, strides=1, padding="valid")
+
+        self.linear1 = Dense(64, activation="relu")
+        self.linear2 = Dense(10, activation="softmax")
+
+        self.dropout = tf.keras.layers.Dropout(rate=0.2)
+
+    def call(self, x):
+        x = self.dropout(self.maxpool1(self.conv1(x)))
+        x = self.dropout(self.maxpool2(self.conv2(x)))
+        x = self.dropout(self.maxpool3(self.conv3(x)))
+        x = self.dropout(self.avgpool(self.conv4(x)))
+        x = Flatten()(x)
+        x = self.dropout(self.linear1(x))
+        x = self.linear2(x)
+        return x
+
+model = CNN()

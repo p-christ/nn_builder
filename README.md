@@ -30,9 +30,9 @@ Similarly for a TensorFlow network:
 ### Usage
 
 See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5Rq11nyLHxMSVtTVZryhW) for demonstrations 
-of how to use this module.  
+of how to use this module on famous datasets Boston Housing, MNIST and IMDB.  
 
-Three types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Each network takes the following arguments:
+3 types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Each network takes the following arguments:
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
@@ -49,11 +49,9 @@ Three types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Ea
 | *random_seed* | Integer to indicate the random seed you want to use | 0 |
 | *return_final_seq_only* | Only needed for RNN. Boolean to indicate whether you only want to return the output for the final timestep (True) or if you want to return the output for all timesteps (False) | True |
 
-The field *input_dim* is not required for TensorFlow. For PyTorch we expect it     
+Details on the slightly different specification requirements per network type:
 
-Details:
-
-#### 1. NN
+##### 1. NN
 
 For a PyTorch NN we expect *input_dim = # Features*. For TensorFlow you don't
 need to specify the field *input_dim*.
@@ -63,7 +61,7 @@ e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10,
 
 Otherwise everything is as described in the table above.  
 
-#### 2. CNN
+##### 2. CNN
 
 For a PyTorch CNN we expect *input_dim = (# Channels, Height, Width)*. For TensorFlow you don't
 need to specify the field *input_dim*.
@@ -83,7 +81,7 @@ would create a 3 layer CNN with the first layer being a convolutional layer with
 stride 3 and padding of 2. The next layer would be a maxpool layer with kernel size 3, stride 3 and 0 padding. The final layer
 would be a linear layer with 10 hidden units. 
 
-#### 3. RNN
+##### 3. RNN
 
 For a PyTorch RNN we expect *input_dim = # Features*. For TensorFlow you don't
 need to specify the field *input_dim*.

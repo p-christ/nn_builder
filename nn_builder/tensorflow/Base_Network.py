@@ -43,10 +43,9 @@ class Base_Network(Overall_Base_Network, ABC):
         """Creates a dictionary which converts strings to initialiser"""
         str_to_initialiser_converter = {"glorot_normal": initializers.glorot_normal, "glorot_uniform": initializers.glorot_uniform,
                                         "xavier_normal": initializers.glorot_normal, "xavier_uniform": initializers.glorot_uniform,
-                                        "xavier": initializers.glorot_uniform,
-                                        "he_normal": initializers.he_normal, "he_uniform": initializers.he_uniform,
-                                        "identity": initializers.identity, "lecun_normal": initializers.lecun_normal,
-                                        "lecun_uniform": initializers.lecun_uniform, "truncated_normal": initializers.TruncatedNormal,
+                                        "xavier": initializers.glorot_uniform, "he_normal": initializers.he_normal(),
+                                        "he_uniform": initializers.he_uniform(), "lecun_normal": initializers.lecun_normal(),
+                                        "lecun_uniform": initializers.lecun_uniform(), "truncated_normal": initializers.TruncatedNormal,
                                         "variance_scaling": initializers.VarianceScaling, "default": initializers.glorot_uniform}
         return str_to_initialiser_converter
 

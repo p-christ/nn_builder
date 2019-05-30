@@ -449,9 +449,12 @@ def test_all_activations_work():
                                    dropout=0.0000001,
                                    initialiser="xavier", input_dim=(1, 5, 5))
     for key in nn_instance.str_to_activations_converter.keys():
-        assert CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
-                                   hidden_activations=key, output_activation=key, dropout=0.0000001,
+        if key == "none": hidden_key = "relu"
+        else: hidden_key = key
+        model = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                   hidden_activations=hidden_key, output_activation=key, dropout=0.0000001,
                                    initialiser="xavier", input_dim=(1, 5, 5))
+        model(X)
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
@@ -459,9 +462,10 @@ def test_all_initialisers_work():
                                    dropout=0.0000001,
                                    initialiser="xavier", input_dim=(1, 5, 5))
     for key in nn_instance.str_to_initialiser_converter.keys():
-        assert CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+        model = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
                                     dropout=0.0000001,
                                    initialiser=key, input_dim=(1, 5, 5))
+        model(X)
 
 def test_print_model_summary():
     nn_instance = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],

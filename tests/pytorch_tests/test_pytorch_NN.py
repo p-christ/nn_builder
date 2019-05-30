@@ -250,13 +250,17 @@ def test_all_activations_work():
     """Tests that all activations get accepted"""
     nn_instance = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999)
     for key in nn_instance.str_to_activations_converter.keys():
-        assert NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999, hidden_activations=key, output_activation=key)
+        if key == "none": hidden_key = "relu"
+        else: hidden_key = key
+        model = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999, hidden_activations=hidden_key, output_activation=key)
+        model(X)
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
     nn_instance = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999)
     for key in nn_instance.str_to_initialiser_converter.keys():
-        assert NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999, initialiser=key)
+        model = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999, initialiser=key)
+        model(X)
 
 def test_print_model_summary():
     nn_instance = NN(input_dim=X.shape[1], layers_info=[10, 10, 1], dropout=0.9999)

@@ -416,9 +416,10 @@ def test_all_activations_work():
                                    dropout=0.0000001,
                                    initialiser="xavier")
     for key in nn_instance.str_to_activations_converter.keys():
-        assert CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 1]],
+        model = CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 1]],
                                    hidden_activations=key, output_activation=key, dropout=0.0000001,
                                    initialiser="xavier")
+        model(X)
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
@@ -426,9 +427,11 @@ def test_all_initialisers_work():
                                    dropout=0.0000001,
                                    initialiser="xavier")
     for key in nn_instance.str_to_initialiser_converter.keys():
-        assert CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 1]],
+        print(key)
+        model = CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["linear", 1]],
                                     dropout=0.0000001,
                                    initialiser=key)
+        model(X)
 
 def test_print_model_summary():
     nn_instance = CNN(layers_info=[["conv", 25, 5, 1, "valid"], ["conv", 25, 5, 1, "valid"], ["linear", 1]],

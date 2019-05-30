@@ -16,7 +16,6 @@ class CNN(Model, Base_Network):
                          - ["avgpool", kernel_size, stride, padding]
                          - ["linear", out]
                         where all variables are integers except for padding which must be either "same" or "valid"
-
         - output_activation: String to indicate the activation function you want the output to go through. Provide a list of
                              strings if you want multiple output heads
         - hidden_activations: String or list of string to indicate the activations you want used on the output of hidden layers

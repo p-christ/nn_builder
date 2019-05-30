@@ -150,7 +150,7 @@ def test_batch_norm_layers_info():
         hidden_units.append(output_dim)
         nn_instance = NN( layers_info=hidden_units,
                          hidden_activations="relu", batch_norm=True,
-                         output_activation="relu", initialiser="xavier", print_model_summary=False)
+                         output_activation="relu", initialiser="xavier")
         for layer in nn_instance.batch_norm_layers:
             assert isinstance(layer, tf.keras.layers.BatchNormalization)
         assert len(nn_instance.batch_norm_layers) == len(hidden_units) - 1
@@ -215,13 +215,15 @@ def test_all_activations_work():
     """Tests that all activations get accepted"""
     nn_instance = NN( layers_info=[10, 10, 1], dropout=0.9999)
     for key in nn_instance.str_to_activations_converter.keys():
-        assert NN(layers_info=[10, 10, 1], dropout=0.9999, hidden_activations=key, output_activation=key)
+        model = NN(layers_info=[10, 10, 1], dropout=0.9999, hidden_activations=key, output_activation=key)
+        model(X)
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
     nn_instance = NN(layers_info=[10, 10, 1], dropout=0.9999)
     for key in nn_instance.str_to_initialiser_converter.keys():
-        assert NN(layers_info=[10, 10, 1], dropout=0.9999, initialiser=key)
+        model = NN(layers_info=[10, 10, 1], dropout=0.9999, initialiser=key)
+        model(X)
 
 def test_print_model_summary():
     nn_instance = NN(layers_info=[10, 10, 1])

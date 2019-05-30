@@ -470,9 +470,12 @@ def test_all_activations_work():
                            hidden_activations="relu", output_activation=None, dropout=0.0000001,
                            initialiser="xavier", input_dim=15)
     for key in nn_instance.str_to_activations_converter.keys():
-        assert RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
-                           hidden_activations=key, output_activation=key, dropout=0.0000001,
+        if key == "none": hidden_key = "relu"
+        else: hidden_key = key
+        model = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
+                           hidden_activations=hidden_key, output_activation=key, dropout=0.0000001,
                            initialiser="xavier", input_dim=15)
+        model(X)
 
 def test_all_initialisers_work():
     """Tests that all initialisers get accepted"""
@@ -480,9 +483,10 @@ def test_all_initialisers_work():
                            hidden_activations="relu", output_activation=None, dropout=0.0000001,
                            initialiser="xavier", input_dim=15)
     for key in nn_instance.str_to_initialiser_converter.keys():
-        assert RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
+        model = RNN(layers_info=[["lstm", 20], ["gru", 10], ["linear", 20], ["linear", 1]],
                            dropout=0.0000001,
                            initialiser=key, input_dim=15)
+        model(X)
 
 def test_output_shapes():
     """Tests whether network outputs of correct shape"""

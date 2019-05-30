@@ -49,7 +49,7 @@ class Base_Network(Overall_Base_Network, ABC):
                                         "sigmoid": nn.Sigmoid(), "softplus": nn.Softplus(), "logsoftmax": nn.LogSoftmax(),
                                         "softshrink": nn.Softshrink(), "softsign": nn.Softsign(), "tanh": nn.Tanh(),
                                         "tanhshrink": nn.Tanhshrink(), "softmin": nn.Softmin(), "softmax": nn.Softmax(dim=1),
-                                        "softmax2d": nn.Softmax2d(), "none": None}
+                                         "none": None}
         return str_to_activations_converter
 
     def create_str_to_initialiser_converter(self):

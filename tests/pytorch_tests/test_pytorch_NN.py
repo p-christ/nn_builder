@@ -104,7 +104,7 @@ def test_linear_layers():
         hidden_units.append(output_dim)
         nn_instance = NN(input_dim=input_dim, layers_info=hidden_units,
                          hidden_activations="relu",
-                         output_activation="relu", initialiser="xavier", print_model_summary=False)
+                         output_activation="relu", initialiser="xavier")
         for layer in nn_instance.hidden_layers:
             assert isinstance(layer, nn.Linear)
         assert nn_instance.hidden_layers[0].in_features == input_dim
@@ -165,7 +165,7 @@ def test_batch_norm_layers():
         hidden_units.append(output_dim)
         nn_instance = NN(input_dim=input_dim, layers_info=hidden_units,
                          hidden_activations="relu", batch_norm=True,
-                         output_activation="relu", initialiser="xavier", print_model_summary=False)
+                         output_activation="relu", initialiser="xavier")
         for layer in nn_instance.batch_norm_layers:
             assert isinstance(layer, nn.BatchNorm1d)
         assert len(nn_instance.batch_norm_layers) == len(hidden_units) - 1

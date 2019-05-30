@@ -34,7 +34,7 @@ of how to use this module.
 
 ### Usage
 
-Every network takes the same arguments: 
+Network arguments: 
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
@@ -49,17 +49,16 @@ Every network takes the same arguments:
 | *embedding_dimensions* | If you have categorical variables you want embedded before flowing through the network then you specify the embedding dimensions here with a list of the form: [ [embedding_input_dim_1, embedding_output_dim_1], [embedding_input_dim_2, embedding_output_dim_2] ...] | No embeddings |
 | *y_range* | Tuple of float or integers of the form (y_lower, y_upper) indicating the range you want to restrict the output values to in regression tasks | No range |
 | *random_seed* | Integer to indicate the random seed you want to use | 0 |
+| *return_final_seq_only* | Only needed for RNN. Boolean to indicate whether you only want to return the output for the final timestep (True) or if you want to return the output for all timesteps (False) | True |
 
 
-After creating a model, the function print_model_summary() can be used to summarise the layers.  
 
-## More Examples
+After creating a model, the function print_model_summary() can be used to summarise the model.  
+
 
 ## Contributing
 
-Together we can make something that is useful for millions of people. 
-
-Anyone is very welcome to contribute via a pull request. Please see the [Issues](https://github.com/p-christ/nn_builder/issues) 
+Together we can make something that is useful for millions of people. Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 
 page for ideas on the best areas to contribute to and try to:
 1. Add tests to the tests folder that cover any code you write
 1. Write comments for every function

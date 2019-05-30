@@ -1,14 +1,10 @@
 # Run from home directory with python -m pytest tests
 import copy
-import shutil
 import pytest
-import torch
 import random
 import numpy as np
 import torch.nn as nn
 import torch
-import spacy
-from torchtext import data, datasets
 from nn_builder.pytorch.RNN import RNN
 import torch.optim as optim
 

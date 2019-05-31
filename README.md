@@ -56,7 +56,8 @@ Each network type has slightly different requirements for *input_dim* and *layer
 ##### 1. NN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
-* **layers_info**: List of integers to indicate number of hidden units you want per linear layer. e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10, 10 and 1.
+* **layers_info**: List of integers to indicate number of hidden units you want per linear layer. 
+* e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10, 10 and 1.
 
 ##### 2. CNN
 

@@ -43,7 +43,7 @@ of how to use this module on famous datasets Boston Housing, MNIST and IMDB.
 | *output_activation* | String to indicate the activation function you want the output to go through. Provide a list of strings if you want multiple output heads | No activation |                              
 | *hidden_activations* | String or list of string to indicate the activations you want used on the output of hidden layers (not including the output layer), default is ReLU and for example "tanh" would have tanh applied on all hidden layer activations | ReLU after every hidden layer |
 | *dropout* | Float to indicate what dropout probability you want applied after each hidden layer | 0 |
-| *initialiser* | String to indicate which initialiser you want used to initialise all the parameters | PyTorch Default |
+| *initialiser* | String to indicate which initialiser you want used to initialise all the parameters | PyTorch & TF Default |
 | *batch_norm* | Boolean to indicate whether you want batch norm applied to the output of every hidden layer | False |
 | *columns of_data_to_be_embedded* | List to indicate the column numbers of the data that you want to be put through an embedding layer before being fed through the hidden layers of the network | No embeddings |
 | *embedding_dimensions* | If you have categorical variables you want embedded before flowing through the network then you specify the embedding dimensions here with a list of the form: [ [embedding_input_dim_1, embedding_output_dim_1], [embedding_input_dim_2, embedding_output_dim_2] ...] | No embeddings |
@@ -51,33 +51,23 @@ of how to use this module on famous datasets Boston Housing, MNIST and IMDB.
 | *random_seed* | Integer to indicate the random seed you want to use | 0 |
 | *return_final_seq_only* | Only needed for RNN. Boolean to indicate whether you only want to return the output for the final timestep (True) or if you want to return the output for all timesteps (False) | True |
 
-Details on the slightly different specification requirements per network type:
+Each network type has slightly different requirements for *input_dim* and *layers_info* as explained below:
 
 ##### 1. NN
 
-For a PyTorch NN we expect *input_dim = # Features*. For TensorFlow you don't
-need to specify the field *input_dim*.
-
-We expect the field *layers_info* to be a list of integers to indicate the number of hidden units you want per layer, 
-e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10, 10 and 1.
-
-Otherwise everything is as described in the table above.  
+* **input_dim**: # Features in PyTorch, not needed for TensorFlow
+* **layers_info**: List of integers to indicate number of hidden units you want per linear layer. e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10, 10 and 1.
 
 ##### 2. CNN
 
-For a PyTorch CNN we expect *input_dim = (# Channels, Height, Width)*. For TensorFlow you don't
-need to specify the field *input_dim*.
-
-We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a 
-CNN can be one of these 4 forms:
-* ["conv", channels, kernel size, stride, padding]
-* ["maxpool", kernel size, stride, padding]
-* ["avgpool", kernel size, stride, padding]
-* ["linear", units]
-
-For a PyTorch network kernel size, stride, padding and units must be integers. For TensorFlow they must all be integers except for padding which must be one of {“valid”, “same”}
-
-e.g. with PyTorch
+* **input_dim**: (# Channels, Height, Width) in PyTorch, not needed for TensorFlow
+* **layers_info**: We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a  CNN can be one of these 4 forms: 
+    * ["conv", channels, kernel size, stride, padding] 
+    * ["maxpool", kernel size, stride, padding]
+    * ["avgpool", kernel size, stride, padding]
+    * ["linear", units]
+* For a PyTorch network kernel size, stride, padding and units must be integers. For TensorFlow they must all be integers except for padding which must be one of {“valid”, “same”} 
+* e.g. with PyTorch
 layers_info=[ [“conv”, 24, 3, 3, 2], [“maxpool”, 3, 3, 0], [“linear”, 10]] 
 would create a 3 layer CNN with the first layer being a convolutional layer with 24 channels, kernel size 3, 
 stride 3 and padding of 2. The next layer would be a maxpool layer with kernel size 3, stride 3 and 0 padding. The final layer
@@ -85,19 +75,15 @@ would be a linear layer with 10 hidden units.
 
 ##### 3. RNN
 
-For a PyTorch RNN we expect *input_dim = # Features*. For TensorFlow you don't
-need to specify the field *input_dim*.
-
-We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a 
-RNN can be one of these 3 forms:
-* ["lstm", units]
-* ["gru", units]
-* ["linear", units]
-
-e.g. 
-layers_info=[[“gru”, 10], [“lstm”, 5], [“linear, 2]] 
+* **input_dim**: # Features in PyTorch, not needed for TensorFlow
+* **layers_info**: We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a  CNN can be one of these 4 forms: 
+    * ["lstm", units] 
+    * ["gru", units]
+    * ["linear", units]
+* e.g. layers_info=[[“gru”, 10], [“lstm”, 5], [“linear, 2]] 
 would create a 3 layer RNN with the first layer being a GRU layer with 10 hidden units, the next layer
-a LSTM layer with 5 hidden units and the final layer a linear layer with 2 hidden units.
+a LSTM layer with 5 hidden units and the final layer a linear layer with 2 hidden units. 
+
 
 ## Contributing
 

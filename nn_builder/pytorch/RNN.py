@@ -3,8 +3,6 @@ import torch.nn as nn
 import numpy as np
 from nn_builder.pytorch.Base_Network import Base_Network
 
-# TODO write tests for and add embedding layers
-
 class RNN(nn.Module, Base_Network):
     """Creates a PyTorch recurrent neural network
     Args:

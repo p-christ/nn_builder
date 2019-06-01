@@ -79,7 +79,7 @@ class NN(nn.Module, Base_Network):
 
     def forward(self, x):
         """Forward pass for the network"""
-        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x.cpu())
+        if not self.checked_forward_input_data_once: self.check_input_data_into_forward_once(x)
         if self.embedding_to_occur: x = self.incorporate_embeddings(x)
         x = self.process_hidden_layers(x)
         out = self.process_output_layers(x)

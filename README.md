@@ -5,7 +5,7 @@
 
 
 
-**nn_builder builds neural networks in 1 line** to save you time. You specify the type of network you want and it builds it.
+**nn_builder builds neural networks in 1 line**. You specify the type of network you want and it builds it.
 
 ### Install
 
@@ -39,7 +39,7 @@ of how to use this module on famous datasets Boston Housing, MNIST and IMDB.
 | Field | Description | Default |
 | :---: | :----------: | :---: |
 | *input_dim*| Dimension of the input into the network. See below for more detail. Not needed for Tensorflow.  | N/A |
-| *layers_info* | List to indicate the layers of the network you want. See below for more detail  | N/A |
+| *layers_info* | List to indicate the layers of the network you want. Exact requirements depend on network type, see below for more detail  | N/A |
 | *output_activation* | String to indicate the activation function you want the output to go through. Provide a list of strings if you want multiple output heads | No activation |                              
 | *hidden_activations* | String or list of string to indicate the activations you want used on the output of hidden layers (not including the output layer), default is ReLU and for example "tanh" would have tanh applied on all hidden layer activations | ReLU after every hidden layer |
 | *dropout* | Float to indicate what dropout probability you want applied after each hidden layer | 0 |
@@ -85,10 +85,16 @@ would be a linear layer with 10 hidden units.
 would create a 3 layer RNN with the first layer being a GRU layer with 10 hidden units, the next layer
 a LSTM layer with 5 hidden units and the final layer a linear layer with 2 hidden units. 
 
+#### Other notable features
+
+See this colab notebook for examples on how to use the features:
+* Multiple output heads
+* Embeddings
+* RNN outputting full sequence or final sequence
 
 ## Contributing
 
-Together we can make something that is useful for millions of people. Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 
+Together we can make something that is useful for thousands of people. Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 
 page for ideas on the best areas to contribute to and try to:
 1. Add tests to the tests folder that cover any code you write
 1. Write comments for every function

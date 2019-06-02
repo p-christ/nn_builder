@@ -31,7 +31,8 @@ Similarly for TensorFlow on the left is how you can create the CNN on the right 
 
 ### Usage
 
-See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5Rq11nyLHxMSVtTVZryhW) for lots of examples of how to use the module. 3 types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Each network takes the following arguments:
+See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5Rq11nyLHxMSVtTVZryhW) for lots of examples of how to use the module. 
+3 types of PyTorch and TensorFlow network are currently supported: NN, CNN and RNN. Each network takes the following arguments:
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
@@ -50,6 +51,8 @@ See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5R
 
 Each network type has slightly different requirements for **input_dim** and **layers_info** as explained below:
 
+--- 
+
 ##### 1. NN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
@@ -58,11 +61,10 @@ Each network type has slightly different requirements for **input_dim** and **la
 
 ```
 from nn_builder.pytorch.NN import NN   
-model = NN(input_dim=5, layers_info=[10, 10, 1], output_activation=None, hidden_activations="relu", dropout=0.0,
-           initialiser="xavier", batch_norm=False) 
+model = NN(input_dim=5, layers_info=[10, 10, 1], output_activation=None, hidden_activations="relu", 
+           dropout=0.0, initialiser="xavier", batch_norm=False)            
 ```
-
-
+--- 
 ##### 2. CNN
 
 * **input_dim**: (# Channels, Height, Width) in PyTorch, not needed for TensorFlow
@@ -82,7 +84,7 @@ model = CNN(input_dim=(3, 64, 64),
             hidden_activations="relu", output_activation="softmax", dropout=0.0,
             initialiser="xavier", batch_norm=True)
 ```
-
+--- 
 ##### 3. RNN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
@@ -98,7 +100,7 @@ model = RNN(input_dim=5, layers_info=[["gru", 50], ["lstm", 10], ["linear", 2]],
             hidden_activations="relu", output_activation="softmax", 
             batch_norm=False, dropout=0.0, initialiser="xavier")
 ```
-
+--- 
 ## Contributing
 
 Together we can make something that is useful for thousands of people. Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 

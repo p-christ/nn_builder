@@ -4,8 +4,6 @@ from tensorflow.keras.layers import Dense, Flatten, Conv2D, Concatenate, BatchNo
 from nn_builder.tensorflow.Base_Network import Base_Network
 import tensorflow as tf
 
-#TODO add transposed convolution... and make output size variable
-
 class CNN(Model, Base_Network):
     """Creates a PyTorch convolutional neural network
     Args:
@@ -92,11 +90,11 @@ class CNN(Model, Base_Network):
                 assert len(layer) == 4, error_msg_maxpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_maxpool_layer
                 if layer[1] != layer[2]: print("NOTE that your maxpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
-                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_conv_layer
+                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_maxpool_layer
             elif layer_type_name == "avgpool":
                 assert len(layer) == 4, error_msg_avgpool_layer
                 for ix in range(2): assert isinstance(layer[ix + 1], int) and layer[ix + 1] > 0, error_msg_avgpool_layer
-                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_conv_layer
+                assert isinstance(layer[3], str) and layer[3].lower() in ["valid", "same"], error_msg_avgpool_layer
                 if layer[1] != layer[2]:print("NOTE that your avgpool kernel size {} isn't the same as your stride {}".format(layer[1], layer[2]))
             elif layer_type_name == "linear":
                 assert len(layer) == 2, error_msg_linear_layer

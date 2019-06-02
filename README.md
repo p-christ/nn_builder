@@ -31,10 +31,7 @@ Similarly for TensorFlow on the left is how you can create the CNN on the right 
 
 ### Usage
 
-See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5Rq11nyLHxMSVtTVZryhW) for demonstrations 
-of how to use this module on famous datasets Boston Housing, MNIST and IMDB.  
-
-3 types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Each network takes the following arguments:
+See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5Rq11nyLHxMSVtTVZryhW) for lots of examples of how to use the module. 3 types of PyTorch and TensorFlow network are supported: NN, CNN and RNN. Each network takes the following arguments:
 
 | Field | Description | Default |
 | :---: | :----------: | :---: |
@@ -84,13 +81,6 @@ would be a linear layer with 10 hidden units.
 * e.g. layers_info=[[“gru”, 10], [“lstm”, 5], [“linear, 2]] 
 would create a 3 layer RNN with the first layer being a GRU layer with 10 hidden units, the next layer
 a LSTM layer with 5 hidden units and the final layer a linear layer with 2 hidden units. 
-
-#### Other notable features
-
-See this colab notebook for examples on how to use the features:
-* Multiple output heads
-* Embeddings
-* RNN outputting full sequence or final sequence
 
 ## Contributing
 

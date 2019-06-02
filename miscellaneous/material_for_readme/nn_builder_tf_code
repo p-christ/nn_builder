@@ -1,6 +1,6 @@
 #With nn_builder
 from nn_builder.tensorflow.CNN import CNN
-model=CNN(layers_info=[["conv", 32, 3, 1, "valid"],["maxpool", 3, 3, "valid"], 
+model=CNN(layers_info=[["conv", 32, 3, 1, "valid"],["maxpool", 3, 3, "valid"],
                        ["conv", 64, 3, 1, "valid"],["maxpool", 3, 2, "valid"],
                        ["conv", 128, 3, 1, "valid"],["maxpool", 3, 1, "valid"],
                        ["conv", 256, 3, 1, "valid"],["avgpool", 3, 1, "valid"],

@@ -27,14 +27,15 @@ class NN(Model, Base_Network):
         - random_seed: Integer to indicate the random seed you want to use
     """
     def __init__(self, layers_info, output_activation=None, hidden_activations="relu", dropout=0.0, initialiser="default",
-                 batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (), random_seed=0):
+                 batch_norm=False, columns_of_data_to_be_embedded=[], embedding_dimensions=[], y_range= (), random_seed=0,
+                 input_dim=None):
         Model.__init__(self)
         self.embedding_to_occur = len(columns_of_data_to_be_embedded) > 0
         self.columns_of_data_to_be_embedded = columns_of_data_to_be_embedded
         self.embedding_dimensions = embedding_dimensions
         self.embedding_layers = self.create_embedding_layers()
         Base_Network.__init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser,
-                              batch_norm, y_range, random_seed)
+                              batch_norm, y_range, random_seed, input_dim)
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

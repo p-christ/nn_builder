@@ -48,13 +48,20 @@ See this [colab notebook](https://colab.research.google.com/drive/1UdMT3aVSV0L5R
 | *random_seed* | Integer to indicate the random seed you want to use | 0 |
 | *return_final_seq_only* | Only needed for RNN. Boolean to indicate whether you only want to return the output for the final timestep (True) or if you want to return the output for all timesteps (False) | True |
 
-Each network type has slightly different requirements for *input_dim* and *layers_info* as explained below:
+Each network type has slightly different requirements for **input_dim** and **layers_info** as explained below:
 
 ##### 1. NN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
 * **layers_info**: List of integers to indicate number of hidden units you want per linear layer. 
-* e.g. [10, 10, 1] would create a 3 layer network where the layers are of size 10, 10 and 1.
+* For example:
+
+```
+from nn_builder.pytorch.NN import NN   
+model = NN(input_dim=5, layers_info=[10, 10, 1], output_activation=None, hidden_activations="relu", dropout=0.0,
+           initialiser="xavier", batch_norm=False) 
+```
+
 
 ##### 2. CNN
 
@@ -65,11 +72,16 @@ Each network type has slightly different requirements for *input_dim* and *layer
     * ["avgpool", kernel size, stride, padding]
     * ["linear", units]
 * For a PyTorch network kernel size, stride, padding and units must be integers. For TensorFlow they must all be integers except for padding which must be one of {“valid”, “same”} 
-* e.g. with PyTorch
-layers_info=[ [“conv”, 24, 3, 3, 2], [“maxpool”, 3, 3, 0], [“linear”, 10]] 
-would create a 3 layer CNN with the first layer being a convolutional layer with 24 channels, kernel size 3, 
-stride 3 and padding of 2. The next layer would be a maxpool layer with kernel size 3, stride 3 and 0 padding. The final layer
-would be a linear layer with 10 hidden units. 
+* For example:
+```
+from nn_builder.pytorch.CNN import CNN   
+model = CNN(input_dim=(3, 64, 64), 
+            layers_info=[["conv", 32, 3, 1, 0], ["maxpool", 2, 2, 0], 
+                         ["conv", 64, 3, 1, 2], ["avgpool", 2, 2, 0], 
+                         ["linear", 10]],
+            hidden_activations="relu", output_activation="softmax", dropout=0.0,
+            initialiser="xavier", batch_norm=True)
+```
 
 ##### 3. RNN
 
@@ -78,9 +90,14 @@ would be a linear layer with 10 hidden units.
     * ["lstm", units] 
     * ["gru", units]
     * ["linear", units]
-* e.g. layers_info=[[“gru”, 10], [“lstm”, 5], [“linear, 2]] 
-would create a 3 layer RNN with the first layer being a GRU layer with 10 hidden units, the next layer
-a LSTM layer with 5 hidden units and the final layer a linear layer with 2 hidden units. 
+* For example:
+
+```
+from nn_builder.pytorch.CNN import CNN   
+model = RNN(input_dim=5, layers_info=[["gru", 50], ["lstm", 10], ["linear", 2]],
+            hidden_activations="relu", output_activation="softmax", 
+            batch_norm=False, dropout=0.0, initialiser="xavier")
+```
 
 ## Contributing
 

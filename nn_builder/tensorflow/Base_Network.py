@@ -10,7 +10,8 @@ from abc import ABC, abstractmethod
 class Base_Network(Overall_Base_Network, ABC):
     """Base class for TensorFlow neural network classes"""
     def __init__(self, layers_info, output_activation, hidden_activations, dropout, initialiser, batch_norm, y_range,
-                 random_seed):
+                 random_seed, input_dim):
+        if input_dim is not None: print("You don't need to provide input_dim for a tensorflow network")
         super().__init__(None, layers_info, output_activation,
                  hidden_activations, dropout, initialiser, batch_norm, y_range, random_seed)
 

@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="nn_builder",
-    version="1.0.0",
+    version="1.0.1",
     author="Petros Christodoulou",
     author_email="p.christodoulou2@gmail.com",
     description="Build neural networks in 1 line",

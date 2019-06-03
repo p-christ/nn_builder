@@ -1,4 +1,4 @@
-![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) 
+![Image](https://travis-ci.org/p-christ/nn_builder.svg?branch=master) [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) [![Downloads](https://pepy.tech/badge/nn-builder)](https://pepy.tech/project/nn-builder) 
 
 
 ![nn_builder](miscellaneous/material_for_readme/nn_builder_new.png)

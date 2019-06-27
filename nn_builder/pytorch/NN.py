@@ -3,6 +3,40 @@ import numpy as np
 import torch.nn as nn
 from nn_builder.pytorch.Base_Network import Base_Network
 
+#
+# rewrite  README using same method as https://github.com/IDSIA/sacred
+#
+# Example
+# -------
+# +------------------------------------------------+--------------------------------------------+
+# | **Script to train an SVM on the iris dataset** | **The same script as a Sacred experiment** |
+# +------------------------------------------------+--------------------------------------------+
+# | .. code:: python                               | .. code:: python                           |
+# |                                                |                                            |
+# |  from numpy.random import permutation          |   from numpy.random import permutation     |
+# |  from sklearn import svm, datasets             |   from sklearn import svm, datasets        |
+# |                                                |   from sacred import Experiment            |
+# |                                                |   ex = Experiment('iris_rbf_svm')          |
+# |                                                |                                            |
+# |                                                |   @ex.config                               |
+# |                                                |   def cfg():                               |
+# |  C = 1.0                                       |     C = 1.0                                |
+# |  gamma = 0.7                                   |     gamma = 0.7                            |
+# |                                                |                                            |
+# |                                                |   @ex.automain                             |
+# |                                                |   def run(C, gamma):                       |
+# |  iris = datasets.load_iris()                   |     iris = datasets.load_iris()            |
+# |  perm = permutation(iris.target.size)          |     per = permutation(iris.target.size)    |
+# |  iris.data = iris.data[perm]                   |     iris.data = iris.data[per]             |
+# |  iris.target = iris.target[perm]               |     iris.target = iris.target[per]         |
+# |  clf = svm.SVC(C, 'rbf', gamma=gamma)          |     clf = svm.SVC(C, 'rbf', gamma=gamma)   |
+# |  clf.fit(iris.data[:90],                       |     clf.fit(iris.data[:90],                |
+# |          iris.target[:90])                     |             iris.target[:90])              |
+# |  print(clf.score(iris.data[90:],               |     return clf.score(iris.data[90:],       |
+# |                  iris.target[90:]))            |                      iris.target[90:])     |
+# +------------------------------------------------+--------------------------------------------+
+
+
 class NN(nn.Module, Base_Network):
     """Creates a PyTorch neural network
     Args:

@@ -31,12 +31,22 @@ class CNN(nn.Module, Base_Network):
     """
     def __init__(self, input_dim, layers_info, output_activation=None,
                  hidden_activations="relu", dropout=0.0, initialiser="default", batch_norm=False,
-                 y_range= (), random_seed=0):
+                 y_range= (), random_seed=0, converted_from_tf_model=False):
         nn.Module.__init__(self)
         self.valid_cnn_hidden_layer_types = {'conv', 'maxpool', 'avgpool', 'adaptivemaxpool', 'adaptiveavgpool', 'linear'}
         self.valid_layer_types_with_no_parameters = [nn.MaxPool2d, nn.AvgPool2d, nn.AdaptiveAvgPool2d, nn.AdaptiveMaxPool2d]
         Base_Network.__init__(self, input_dim, layers_info, output_activation, hidden_activations, dropout, initialiser,
                               batch_norm, y_range, random_seed)
+        self.converted_from_tf_model = converted_from_tf_model
+
+    def flatten_tensor(self, tensor):
+        """Flattens a tensor of shape (a, b, c, d, ...) into shape (a, b * c * d * .. )"""
+        if self.converted_from_tf_model:
+            tensor = tensor.permute(0, 2, 3, 1).contiguous()
+            tensor = tensor.view(tensor.size(0), -1)
+        else:
+            tensor = tensor.reshape(tensor.shape[0], -1)
+        return tensor
 
     def check_all_user_inputs_valid(self):
         """Checks that all the user inputs were valid"""

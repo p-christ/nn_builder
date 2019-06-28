@@ -80,7 +80,7 @@ class Base_Network(Overall_Base_Network, ABC):
         initialiser = self.str_to_initialiser_converter[self.initialiser.lower()]
         if initialiser != "use_default":
             for parameters in parameters_list:
-                if type(parameters) == nn.Linear:
+                if type(parameters) == nn.Linear or type(parameters) == nn.Conv2d:
                     initialiser(parameters.weight)
                 elif type(parameters) in [nn.LSTM, nn.RNN, nn.GRU]:
                     initialiser(parameters.weight_hh_l0)

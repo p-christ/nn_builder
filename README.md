@@ -5,7 +5,7 @@
 
 
 
-**nn_builder lets you build neural networks without boilerplate code**. You specify the type of network you want and it builds it.
+**nn_builder lets you build neural networks with less boilerplate code**. You specify the type of network you want and it builds it.
 
 ### Install
 

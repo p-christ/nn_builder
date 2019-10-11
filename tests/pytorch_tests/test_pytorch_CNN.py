@@ -462,10 +462,11 @@ def test_all_initialisers_work():
                                    dropout=0.0000001,
                                    initialiser="xavier", input_dim=(1, 5, 5))
     for key in nn_instance.str_to_initialiser_converter.keys():
-        model = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
-                                    dropout=0.0000001,
-                                   initialiser=key, input_dim=(1, 5, 5))
-        model(X)
+        if key != "eye":
+            model = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],
+                                        dropout=0.0000001,
+                                       initialiser=key, input_dim=(1, 5, 5))
+            model(X)
 
 def test_print_model_summary():
     nn_instance = CNN(layers_info=[["conv", 25, 5, 1, 0], ["adaptivemaxpool", 1, 1], ["linear", 1]],

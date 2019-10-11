@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<title>Sacred</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7952 2016-07-26 18:15:59Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+.subscript {
+  vertical-align: sub;
+  font-size: smaller }
+
+.superscript {
+  vertical-align: super;
+  font-size: smaller }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left, table.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right, table.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table.align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+.align-top    {
+  vertical-align: top }
+
+.align-middle {
+  vertical-align: middle }
+
+.align-bottom {
+  vertical-align: bottom }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="sacred">
+<h1 class="title">Sacred</h1>
+
+<blockquote>
+<div class="line-block">
+<div class="line"><em>Every experiment is sacred</em></div>
+<div class="line"><em>Every experiment is great</em></div>
+<div class="line"><em>If an experiment is wasted</em></div>
+<div class="line"><em>God gets quite irate</em></div>
+</div>
+</blockquote>
+<p><a class="reference external" href="https://pypi.python.org/pypi/sacred"><object data="https://img.shields.io/pypi/v/sacred.svg" type="image/svg+xml">Current PyPi Version</object></a> <a class="reference external" href="https://pypi.python.org/pypi/sacred"><object data="https://img.shields.io/pypi/pyversions/sacred.svg" type="image/svg+xml">Supported Python Versions</object></a> <a class="reference external" href="http://choosealicense.com/licenses/mit/"><img alt="MIT licensed" src="https://img.shields.io/badge/license-MIT-blue.png" /></a> <a class="reference external" href="https://sacred.readthedocs.io/en/stable/"><img alt="ReadTheDocs" src="https://readthedocs.org/projects/sacred/badge/?version=latest&amp;style=flat" /></a> <a class="reference external" href="http://dx.doi.org/10.5281/zenodo.16386"><object data="https://zenodo.org/badge/doi/10.5281/zenodo.16386.svg" type="image/svg+xml">DOI for this release</object></a></p>
+<p><a class="reference external" href="https://dev.azure.com/qwlouse/Sacred%20CI/_build/latest?definitionId=1&amp;branchName=master"><img alt="Azure CI status" src="https://dev.azure.com/qwlouse/Sacred%20CI/_apis/build/status/IDSIA.sacred?branchName=master" /></a> <a class="reference external" href="https://coveralls.io/r/IDSIA/sacred"><object data="https://coveralls.io/repos/IDSIA/sacred/badge.svg" type="image/svg+xml">Coverage Report</object></a> <a class="reference external" href="https://scrutinizer-ci.com/g/IDSIA/sacred/"><img alt="Code Scrutinizer Quality" src="https://scrutinizer-ci.com/g/IDSIA/sacred/badges/quality-score.png?b=master" /></a> <a class="reference external" href="https://github.com/ambv/black"><object data="https://img.shields.io/badge/code%20style-black-000000.svg" type="image/svg+xml">Code style: black</object></a></p>
+<p>Sacred is a tool to help you configure, organize, log and reproduce experiments.
+It is designed to do all the tedious overhead work that you need to do around
+your actual experiment in order to:</p>
+<ul class="simple">
+<li>keep track of all the parameters of your experiment</li>
+<li>easily run your experiment for different settings</li>
+<li>save configurations for individual runs in a database</li>
+<li>reproduce your results</li>
+</ul>
+<p>Sacred achieves this through the following main mechanisms:</p>
+<ul class="simple">
+<li><strong>ConfigScopes</strong> A very convenient way of the local variables in a function
+to define the parameters your experiment uses.</li>
+<li><strong>Config Injection</strong>: You can access all parameters of your configuration
+from every function. They are automatically injected by name.</li>
+<li><strong>Command-line interface</strong>: You get a powerful command-line interface for each
+experiment that you can use to change parameters and run different variants.</li>
+<li><strong>Observers</strong>: Sacred provides Observers that log all kinds of information
+about your experiment, its dependencies, the configuration you used,
+the machine it is run on, and of course the result. These can be saved
+to a MongoDB, for easy access later.</li>
+<li><strong>Automatic seeding</strong> helps controlling the randomness in your experiments,
+such that the results remain reproducible.</li>
+</ul>
+<div class="section" id="example">
+<h1>Example</h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><strong>Script to train an SVM on the iris dataset</strong></td>
+<td><strong>The same script as a Sacred experiment</strong></td>
+</tr>
+<tr><td><pre class="code python first last literal-block">
+<span class="keyword namespace">from</span> <span class="name namespace">numpy.random</span> <span class="keyword namespace">import</span> <span class="name">permutation</span>
+<span class="keyword namespace">from</span> <span class="name namespace">sklearn</span> <span class="keyword namespace">import</span> <span class="name">svm</span><span class="punctuation">,</span> <span class="name">datasets</span>
+
+
+
+
+
+<span class="name">C</span> <span class="operator">=</span> <span class="literal number float">1.0</span>
+<span class="name">gamma</span> <span class="operator">=</span> <span class="literal number float">0.7</span>
+
+
+
+<span class="name">iris</span> <span class="operator">=</span> <span class="name">datasets</span><span class="operator">.</span><span class="name">load_iris</span><span class="punctuation">()</span>
+<span class="name">perm</span> <span class="operator">=</span> <span class="name">permutation</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="operator">.</span><span class="name">size</span><span class="punctuation">)</span>
+<span class="name">iris</span><span class="operator">.</span><span class="name">data</span> <span class="operator">=</span> <span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[</span><span class="name">perm</span><span class="punctuation">]</span>
+<span class="name">iris</span><span class="operator">.</span><span class="name">target</span> <span class="operator">=</span> <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[</span><span class="name">perm</span><span class="punctuation">]</span>
+<span class="name">clf</span> <span class="operator">=</span> <span class="name">svm</span><span class="operator">.</span><span class="name">SVC</span><span class="punctuation">(</span><span class="name">C</span><span class="punctuation">,</span> <span class="literal string single">'rbf'</span><span class="punctuation">,</span> <span class="name">gamma</span><span class="operator">=</span><span class="name">gamma</span><span class="punctuation">)</span>
+<span class="name">clf</span><span class="operator">.</span><span class="name">fit</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[:</span><span class="literal number integer">90</span><span class="punctuation">],</span>
+        <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[:</span><span class="literal number integer">90</span><span class="punctuation">])</span>
+<span class="keyword">print</span><span class="punctuation">(</span><span class="name">clf</span><span class="operator">.</span><span class="name">score</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[</span><span class="literal number integer">90</span><span class="punctuation">:],</span>
+                <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[</span><span class="literal number integer">90</span><span class="punctuation">:]))</span>
+</pre>
+</td>
+<td><pre class="code python first last literal-block">
+<span class="keyword namespace">from</span> <span class="name namespace">numpy.random</span> <span class="keyword namespace">import</span> <span class="name">permutation</span>
+<span class="keyword namespace">from</span> <span class="name namespace">sklearn</span> <span class="keyword namespace">import</span> <span class="name">svm</span><span class="punctuation">,</span> <span class="name">datasets</span>
+<span class="keyword namespace">from</span> <span class="name namespace">sacred</span> <span class="keyword namespace">import</span> <span class="name">Experiment</span>
+<span class="name">ex</span> <span class="operator">=</span> <span class="name">Experiment</span><span class="punctuation">(</span><span class="literal string single">'iris_rbf_svm'</span><span class="punctuation">)</span>
+
+<span class="name decorator">&#64;ex.config</span>
+<span class="keyword">def</span> <span class="name function">cfg</span><span class="punctuation">():</span>
+  <span class="name">C</span> <span class="operator">=</span> <span class="literal number float">1.0</span>
+  <span class="name">gamma</span> <span class="operator">=</span> <span class="literal number float">0.7</span>
+
+<span class="name decorator">&#64;ex.automain</span>
+<span class="keyword">def</span> <span class="name function">run</span><span class="punctuation">(</span><span class="name">C</span><span class="punctuation">,</span> <span class="name">gamma</span><span class="punctuation">):</span>
+  <span class="name">iris</span> <span class="operator">=</span> <span class="name">datasets</span><span class="operator">.</span><span class="name">load_iris</span><span class="punctuation">()</span>
+  <span class="name">per</span> <span class="operator">=</span> <span class="name">permutation</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="operator">.</span><span class="name">size</span><span class="punctuation">)</span>
+  <span class="name">iris</span><span class="operator">.</span><span class="name">data</span> <span class="operator">=</span> <span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[</span><span class="name">per</span><span class="punctuation">]</span>
+  <span class="name">iris</span><span class="operator">.</span><span class="name">target</span> <span class="operator">=</span> <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[</span><span class="name">per</span><span class="punctuation">]</span>
+  <span class="name">clf</span> <span class="operator">=</span> <span class="name">svm</span><span class="operator">.</span><span class="name">SVC</span><span class="punctuation">(</span><span class="name">C</span><span class="punctuation">,</span> <span class="literal string single">'rbf'</span><span class="punctuation">,</span> <span class="name">gamma</span><span class="operator">=</span><span class="name">gamma</span><span class="punctuation">)</span>
+  <span class="name">clf</span><span class="operator">.</span><span class="name">fit</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[:</span><span class="literal number integer">90</span><span class="punctuation">],</span>
+          <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[:</span><span class="literal number integer">90</span><span class="punctuation">])</span>
+  <span class="keyword">return</span> <span class="name">clf</span><span class="operator">.</span><span class="name">score</span><span class="punctuation">(</span><span class="name">iris</span><span class="operator">.</span><span class="name">data</span><span class="punctuation">[</span><span class="literal number integer">90</span><span class="punctuation">:],</span>
+                   <span class="name">iris</span><span class="operator">.</span><span class="name">target</span><span class="punctuation">[</span><span class="literal number integer">90</span><span class="punctuation">:])</span>
+</pre>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation</h1>
+<p>The documentation is hosted at <a class="reference external" href="http://sacred.readthedocs.org/">ReadTheDocs</a>.</p>
+</div>
+<div class="section" id="installing">
+<h1>Installing</h1>
+<p>You can directly install it from the Python Package Index with pip:</p>
+<blockquote>
+pip install sacred</blockquote>
+<p>Or if you want to do it manually you can checkout the current version from git
+and install it yourself:</p>
+<blockquote>
+<div class="line-block">
+<div class="line">git clone <a class="reference external" href="https://github.com/IDSIA/sacred.git">https://github.com/IDSIA/sacred.git</a></div>
+<div class="line">cd sacred</div>
+<div class="line">python setup.py install</div>
+</div>
+</blockquote>
+<p>You might want to also install the <tt class="docutils literal">numpy</tt> and the <tt class="docutils literal">pymongo</tt> packages. They are
+optional dependencies but they offer some cool features:</p>
+<blockquote>
+pip install numpy, pymongo</blockquote>
+</div>
+<div class="section" id="tests">
+<h1>Tests</h1>
+<p>The tests for sacred use the <a class="reference external" href="http://pytest.org/latest/">pytest</a> package.
+You can execute them by running <tt class="docutils literal">pytest</tt> in the sacred directory like this:</p>
+<blockquote>
+pytest</blockquote>
+<p>There is also a config file for <a class="reference external" href="https://tox.readthedocs.io/en/latest/">tox</a> so you
+can automatically run the tests for various python versions like this:</p>
+<blockquote>
+tox</blockquote>
+</div>
+<div class="section" id="contributing">
+<h1>Contributing</h1>
+<p>If you find a bug, have a feature request or want to discuss something general you are welcome to open an
+<a class="reference external" href="https://github.com/IDSIA/sacred/issues">issue</a>. If you have a specific question related
+to the usage of sacred, please ask a question on StackOverflow under the
+<a class="reference external" href="https://stackoverflow.com/questions/tagged/python-sacred">python-sacred tag</a>. We value documentation
+a lot. If you find something that should be included in the documentation please
+document it or let us know whats missing. If you are using Sacred in one of your projects and want to share
+your code with others, put your repo in the <cite>Projects using Sacred &lt;docs/projects_using_sacred.rst</cite>&gt;_ list.
+Pull requests are highly welcome!</p>
+</div>
+<div class="section" id="frontends">
+<h1>Frontends</h1>
+<p>At this point there are three frontends to the database entries created by sacred (that I'm aware of).
+They are developed externally as separate projects.</p>
+<div class="section" id="id1">
+<h2><a class="reference external" href="https://github.com/vivekratnavel/omniboard">Omniboard</a></h2>
+<img alt="docs/images/omniboard-table.png" src="docs/images/omniboard-table.png" />
+<img alt="docs/images/omniboard-metric-graphs.png" src="docs/images/omniboard-metric-graphs.png" />
+<p>Omniboard is a web dashboard that helps in visualizing the experiments and metrics / logs collected by sacred.
+Omniboard is written with React, Node.js, Express and Bootstrap.</p>
+</div>
+<div class="section" id="id2">
+<h2><a class="reference external" href="https://github.com/JarnoRFB/incense">Incense</a></h2>
+<img alt="docs/images/incense-artifact.png" src="docs/images/incense-artifact.png" />
+<img alt="docs/images/incense-metric.png" src="docs/images/incense-metric.png" />
+<p>Incense is a Python library to retrieve runs stored in a MongoDB and interactively display metrics and artifacts
+in Jupyter notebooks.</p>
+</div>
+<div class="section" id="id3">
+<h2><a class="reference external" href="https://github.com/chovanecm/sacredboard">Sacredboard</a></h2>
+<img alt="docs/images/sacredboard.png" src="docs/images/sacredboard.png" />
+<p>Sacredboard is a web-based dashboard interface to the sacred runs stored in a
+MongoDB.</p>
+</div>
+<div class="section" id="id4">
+<h2><a class="reference external" href="https://neptune.ml/">Neptune</a></h2>
+<img alt="docs/images/neptune-compare.png" src="docs/images/neptune-compare.png" />
+<img alt="docs/images/neptune-collaboration.png" src="docs/images/neptune-collaboration.png" />
+<p>Neptune is a web service that lets you visualize, organize and compare your experiment runs.
+Once things are logged to Neptune you can share it with others, add comments and even access objects via
+experiment API:</p>
+<img alt="docs/images/neptune-query-api.png" src="docs/images/neptune-query-api.png" />
+<p>In order to log your runs to Neptune, all you need to do is add an observer:</p>
+<pre class="code python literal-block">
+<span class="keyword namespace">from</span> <span class="name namespace">neptunecontrib.monitoring.sacred</span> <span class="keyword namespace">import</span> <span class="name">NeptuneObserver</span>
+<span class="name">ex</span><span class="operator">.</span><span class="name">observers</span><span class="operator">.</span><span class="name">append</span><span class="punctuation">(</span><span class="name">NeptuneObserver</span><span class="punctuation">(</span><span class="name">api_token</span><span class="operator">=</span><span class="literal string single">'YOUR_API_TOKEN'</span><span class="punctuation">,</span>
+                                    <span class="name">project_name</span><span class="operator">=</span><span class="literal string single">'USER_NAME/PROJECT_NAME'</span><span class="punctuation">))</span>
+</pre>
+<p>For more info, check the <a class="reference external" href="https://neptune-contrib.readthedocs.io/examples/observer_sacred.html">neptune-contrib library</a>.</p>
+</div>
+<div class="section" id="id5">
+<h2><a class="reference external" href="https://github.com/michaelwand/SacredBrowser">SacredBrowser</a></h2>
+<img alt="docs/images/sacred_browser.png" src="docs/images/sacred_browser.png" />
+<p>SacredBrowser is a PyQt4 application to browse the MongoDB entries created by
+sacred experiments.
+Features include custom queries, sorting of the results,
+access to the stored source-code, and many more.
+No installation is required and it can connect to a local
+database or over the network.</p>
+</div>
+<div class="section" id="id6">
+<h2><a class="reference external" href="https://github.com/Qwlouse/prophet">Prophet</a></h2>
+<p>Prophet is an early prototype of a webinterface to the MongoDB entries created by
+sacred experiments, that is discontinued.
+It requires you to run <a class="reference external" href="http://restheart.org">RestHeart</a> to access the database.</p>
+</div>
+</div>
+<div class="section" id="related-projects">
+<h1>Related Projects</h1>
+<div class="section" id="id7">
+<h2><a class="reference external" href="https://pythonhosted.org/Sumatra/">Sumatra</a></h2>
+<blockquote>
+<div class="line-block">
+<div class="line">Sumatra is a tool for managing and tracking projects based on numerical</div>
+<div class="line">simulation and/or analysis, with the aim of supporting reproducible research.</div>
+<div class="line">It can be thought of as an automated electronic lab notebook for</div>
+<div class="line">computational projects.</div>
+</div>
+</blockquote>
+<p>Sumatra takes a different approach by providing commandline tools to initialize
+a project and then run arbitrary code (not just python).
+It tracks information about all runs in a SQL database and even provides a nice browser tool.
+It integrates less tightly with the code to be run, which makes it easily
+applicable to non-python experiments.
+But that also means it requires more setup for each experiment and
+configuration needs to be done using files.
+Use this project if you need to run non-python experiments, or are ok with the additional setup/configuration overhead.</p>
+</div>
+<div class="section" id="id8">
+<h2><a class="reference external" href="https://github.com/Kaixhin/FGLab">Future Gadget Laboratory</a></h2>
+<blockquote>
+<div class="line-block">
+<div class="line">FGLab is a machine learning dashboard, designed to make prototyping</div>
+<div class="line">experiments easier. Experiment details and results are sent to a database,</div>
+<div class="line">which allows analytics to be performed after their completion. The server</div>
+<div class="line">is FGLab, and the clients are FGMachines.</div>
+</div>
+</blockquote>
+<p>Similar to Sumatra, FGLab is an external tool that can keep track of runs from
+any program. Projects are configured via a JSON schema and the program needs to
+accept these configurations via command-line options.
+FGLab also takes the role of a basic scheduler by distributing runs over several
+machines.</p>
+</div>
+<div class="section" id="id9">
+<h2><a class="reference external" href="https://github.com/pgbovine/CDE/">CDE</a></h2>
+<p>By tracing system calls during program execution CDE creates a snapshot of
+<strong>all</strong> used files and libraries to guarantee the ability to reproduce any unix
+program execution. It <em>only</em> solves reproducibility, but it does so thoroughly.</p>
+</div>
+</div>
+<div class="section" id="license">
+<h1>License</h1>
+<p>This project is released under the terms of the <a class="reference external" href="http://opensource.org/licenses/MIT">MIT license</a>.</p>
+</div>
+<div class="section" id="citing-sacred">
+<h1>Citing Sacred</h1>
+<p><a class="reference external" href="http://conference.scipy.org/proceedings/scipy2017/klaus_greff.html">K. Greff, A. Klein, M. Chovanec, F. Hutter, and J. Schmidhuber, ‘The Sacred Infrastructure for Computational Research’,
+in Proceedings of the 15th Python in Science Conference (SciPy 2017), Austin, Texas, 2017, pp. 49–56</a>.</p>
+</div>
+</div>
+</body>
+</html>

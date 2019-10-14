@@ -53,7 +53,7 @@ Each network type has slightly different requirements for **input_dim** and **la
 
 --- 
 
-#### 1. NN
+### 1. NN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
 * **layers_info**: List of integers to indicate number of hidden units you want per linear layer. 
@@ -65,7 +65,7 @@ model = NN(input_dim=5, layers_info=[10, 10, 1], output_activation=None, hidden_
            dropout=0.0, initialiser="xavier", batch_norm=False)            
 ```
 --- 
-#### 2. CNN
+### 2. CNN
 
 * **input_dim**: (# Channels, Height, Width) in PyTorch, not needed for TensorFlow
 * **layers_info**: We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a  CNN can be one of these 4 forms: 
@@ -85,7 +85,7 @@ model = CNN(input_dim=(3, 64, 64),
             initialiser="xavier", batch_norm=True)
 ```
 --- 
-#### 3. RNN
+### 3. RNN
 
 * **input_dim**: # Features in PyTorch, not needed for TensorFlow
 * **layers_info**: We expect the field *layers_info* to be a list of lists indicating the size and type of layers that you want. Each layer in a  CNN can be one of these 4 forms: 

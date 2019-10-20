@@ -103,7 +103,7 @@ model = RNN(input_dim=5, layers_info=[["gru", 50], ["lstm", 10], ["linear", 2]],
 --- 
 ## Contributing
 
-Together we can make something that is useful for thousands of people. Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 
+Anyone is very welcome to contribute via a pull request. Please see the [issues](https://github.com/p-christ/nn_builder/issues) 
 page for ideas on the best areas to contribute to and try to:
 1. Add tests to the tests folder that cover any code you write
 1. Write comments for every function

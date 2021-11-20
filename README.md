@@ -109,7 +109,7 @@ page for ideas on the best areas to contribute to and try to:
 1. Write comments for every function
 1. Create a colab notebook demonstrating how any extra functionality you created works
 
-To help you remember things you learn about machine learning in general checkout [Save All](https://www.saveall.ai/)
+To help you remember things you learn about machine learning in general checkout [Save All](https://www.saveall.ai/landing/github_links)
  
 
  

@@ -1,6 +1,6 @@
 tensorflow==2.0.0a0
 torch==1.0.1.post2
 torchvision==0.2.2.post3
-numpy==1.16.2
+numpy==1.22.0
 setuptools==40.8.0
 pytest==4.4.0

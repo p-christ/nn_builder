@@ -1,4 +1,4 @@
-tensorflow==2.0.0a0
+tensorflow==2.11.1
 torch==1.0.1.post2
 torchvision==0.2.2.post3
 numpy==1.16.2
